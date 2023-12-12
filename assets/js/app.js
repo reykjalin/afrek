@@ -21,33 +21,16 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
+import Squire from "squire-rte";
 
 const hooks = {
   Editor: {
     mounted() {
-      wp.attachEditor(this.el, {
-        iso: {
-          blocks: {
-            allowBlocks: [
-              "core/paragraph",
-              "core/heading",
-              "core/list",
-              "core/quote",
-              "core/code",
-              "core/details",
-              "core/preformatted",
-              "core/pullquote",
-              "core/table",
-              "core/verse",
-              "core/columns",
-              "core/group",
-              "core/row",
-              "core/stack",
-              "core/separator",
-              "core/spacer",
-            ],
-          },
-        },
+      const editorElem = this.el.querySelector(`#${this.el.id}-editor`);
+      const editor = new Squire(editorElem, { blockTag: "P" });
+
+      this.el.addEventListener("toggle_code", () => {
+        editor.toggleCode();
       });
     },
   },

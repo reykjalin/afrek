@@ -19,9 +19,7 @@ defmodule TasksWeb.TasksLive do
         value=""
       />
 
-      <div class="w-full my-4">
-        <textarea class="editor" name="task-details" id="task-details" phx-hook="Editor"></textarea>
-      </div>
+      <.rte id="task-details" class="w-full my-4 border border-black" />
     </form>
 
     <div class="flex gap-4 my-5">

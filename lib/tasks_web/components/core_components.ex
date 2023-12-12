@@ -20,6 +20,66 @@ defmodule TasksWeb.CoreComponents do
   import TasksWeb.Gettext
 
   @doc """
+  Renders a rich text editor using Squire.
+
+  ## Examples
+
+        <.rte class="w-full" />
+  """
+  attr :id, :string
+  attr :class, :string, default: nil
+
+  def rte(assigns) do
+    ~H"""
+    <div class={@class} id={@id} phx-hook="Editor">
+      <div class="flex flex-row gap-2 border-b p-1">
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <strong>B</strong>
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <em>I</em>
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <u>U</u>
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <strike>S</strike>
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <.icon name="hero-link" />
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          Ordered list
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <.icon name="hero-list-bullet" />
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          Indent
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          Outdent
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <.icon name="hero-arrow-uturn-left" />
+        </button>
+        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <.icon name="hero-arrow-uturn-right" />
+        </button>
+        <button
+          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+          type="button"
+          phx-click={JS.dispatch("toggle_code", to: "##{@id}-editor")}
+        >
+          <.icon name="hero-code-bracket" />
+        </button>
+      </div>
+      <div class="editor p-2" id={"#{@id}-editor"}></div>
+    </div>
+    """
+  end
+
+  @doc """
   Renders a card.
 
   ## Examples

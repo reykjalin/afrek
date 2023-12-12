@@ -10,12 +10,8 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
-    <!-- Isolated Bock Editor scripts -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js">
-    </script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js">
-    </script>
-    <script src={~p"/assets/isolated-block-editor.js"}>
+    <!-- DOMPurify for use with the Squire Rich Text Editor -->
+    <script type="text/javascript" src={~p"/assets/purify.min.js"}>
     </script>
   </head>
   <body class="bg-white antialiased">
