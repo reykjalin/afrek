@@ -24,81 +24,81 @@ defmodule TasksWeb.TasksLive do
 
       <div class="w-full px-10">
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">12am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">12am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">1am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">1am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">2am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">2am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">3am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">3am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">4am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">4am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">5am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">5am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">6am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">6am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">7am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">7am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">8am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">8am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">9am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">9am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">10am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">10am <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">11am <hr class="w-full border-black mx-auto" /></p>
-        </div>
-
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">12pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">1pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">2pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">3am <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">4pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">5pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">6pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">7pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">8pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">9pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">10pm <hr class="w-full border-black mx-auto" /></p>
-        </div>
-        <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">11pm <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">11am <hr class="w-full border-black mx-auto" /></p>
         </div>
 
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px]">12am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">12pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">1pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">2pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">3am <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">4pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">5pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">6pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">7pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">8pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">9pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">10pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">11pm <hr class="w-full border-black mx-auto" /></p>
+        </div>
+
+        <div class="flex flex-column items-start h-[60px] gap-4">
+          <p class="text-sm mt-[-10px] w-[40px]">12am <hr class="w-full border-black mx-auto" /></p>
         </div>
       </div>
     </div>
