@@ -7,7 +7,24 @@ defmodule TasksWeb.TasksLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <div class="flex gap-4">
+    <.button class="mx-10">Add Task</.button>
+
+    <form class="m-10">
+      <.input
+        type="text"
+        name="task_title"
+        id="task_title"
+        class="mx-10"
+        placeholder="Foo the bar…"
+        value=""
+      />
+
+      <div class="w-full my-4">
+        <textarea class="editor" name="task-details" id="task-details" phx-hook="Editor"></textarea>
+      </div>
+    </form>
+
+    <div class="flex gap-4 my-5">
       <div class="w-full px-10 border-r border-black">
         <.card :for={task <- @tasks}>
           <div class="flex items-center gap-2">
