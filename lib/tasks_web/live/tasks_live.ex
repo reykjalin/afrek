@@ -7,12 +7,11 @@ defmodule TasksWeb.TasksLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <form class="m-10">
+    <.form for={@form} class="m-10" phx-change="validate" phx-submit="save">
       <div class="flex flex-row gap-4">
         <.input
+          field={@form[:title]}
           type="text"
-          name="task-title"
-          id="task-title"
           wrapper_class="grow"
           placeholder="Foo the bar…"
           value=""
@@ -20,18 +19,16 @@ defmodule TasksWeb.TasksLive do
         />
 
         <.input
+          field={@form[:due_date]}
           type="date"
-          name="task-due-date"
-          id="task-due-date"
           wrapper_class=""
           placeholder="Due date…"
           value=""
         />
 
         <.input
+          field={@form[:duration]}
           type="text"
-          name="task-duration"
-          id="task-duration"
           wrapper_class=""
           placeholder="1h 25m"
           value=""
@@ -45,7 +42,7 @@ defmodule TasksWeb.TasksLive do
       <div class="text-right mt-2">
         <.button type="submit">Add Task</.button>
       </div>
-    </form>
+    </.form>
 
     <div class="flex my-5">
       <div class="w-full px-10 flex flex-col gap-4 border-r">
@@ -167,7 +164,17 @@ defmodule TasksWeb.TasksLive do
       }
     ]
 
-    {:ok, assign(socket, tasks: tasks)}
+    {:ok, assign(socket, tasks: tasks, form: to_form(%{}))}
+  end
+
+  def handle_event("validate", task, socket) do
+    form = to_form(task)
+
+    {:noreply, assign(socket, form: form)}
+  end
+
+  def handle_event("save", task, socket) do
+    {:noreply, assign(socket, tasks: [task | socket.assigns.tasks], form: to_form(%{}))}
   end
 
   def handle_event("complete_task", %{"task" => task_id}, socket) do
