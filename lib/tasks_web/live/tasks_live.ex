@@ -138,24 +138,28 @@ defmodule TasksWeb.TasksLive do
   def mount(_params, _session, socket) do
     tasks = [
       %{
+        "id" => "1",
         "title" => "Foo the bar",
         "details" => "Foo the bar",
         "due_date" => "Jan 31, 2024",
         "duration" => "1h 30m"
       },
       %{
+        "id" => "2",
         "title" => "Baz the qux",
         "details" => "Baz the qux",
         "due_date" => nil,
         "duration" => "1h"
       },
       %{
+        "id" => "3",
         "title" => "Quux the quuz",
         "details" => "Quux the quuz",
         "due_date" => nil,
         "duration" => "30m"
       },
       %{
+        "id" => "4",
         "title" => "Corge the grault",
         "details" => "Corge the grault",
         "due_date" => nil,
@@ -164,5 +168,19 @@ defmodule TasksWeb.TasksLive do
     ]
 
     {:ok, assign(socket, tasks: tasks)}
+  end
+
+  def handle_event("complete_task", %{"task" => task_id}, socket) do
+    {:noreply, assign(socket, tasks: Enum.filter(socket.assigns.tasks, &(&1["id"] != task_id)))}
+  end
+
+  def handle_event("edit_task", %{"task" => task_id}, socket) do
+    task = Enum.find(socket.assigns.tasks, &(&1["id"] == task_id))
+
+    {:noreply, socket}
+  end
+
+  def handle_event("archive_task", %{"task" => task_id}, socket) do
+    {:noreply, assign(socket, tasks: Enum.filter(socket.assigns.tasks, &(&1["id"] != task_id)))}
   end
 end

@@ -39,9 +39,15 @@ defmodule TasksWeb.CoreComponents do
             <%= @task["due_date"] %>
           </p>
           <p :if={@task["duration"] != nil} class="text-sm"><%= @task["duration"] %></p>
-          <.icon name="hero-check" />
-          <.icon name="hero-pencil-square" />
-          <.icon name="hero-archive-box" />
+          <.no_outline_button phx-click="complete_task" phx-value-task={@task["id"]}>
+            <.icon name="hero-check" />
+          </.no_outline_button>
+          <.no_outline_button phx-click="edit_task" phx-value-task={@task["id"]}>
+            <.icon name="hero-pencil-square" />
+          </.no_outline_button>
+          <.no_outline_button phx-click="archive_task" phx-value-task={@task["id"]}>
+            <.icon name="hero-archive-box" />
+          </.no_outline_button>
         </summary>
 
         <div class="p-1">
@@ -356,6 +362,36 @@ defmodule TasksWeb.CoreComponents do
       class={[
         "phx-submit-loading:opacity-75 bg-indigo-700 hover:bg-indigo-500 border-2 border-indigo-500 py-2 px-3",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </button>
+    """
+  end
+
+  @doc """
+  Renders a button.
+
+  ## Examples
+
+      <.button>Send!</.button>
+      <.button phx-click="go" class="ml-2">Send!</.button>
+  """
+  attr :type, :string, default: nil
+  attr :class, :string, default: nil
+  attr :rest, :global, include: ~w(disabled form name value)
+
+  slot :inner_block, required: true
+
+  def no_outline_button(assigns) do
+    ~H"""
+    <button
+      type={@type}
+      class={[
+        "px-1 py-0.5 phx-submit-loading:opacity-75 text-sm font-semibold leading-6",
+        "border border-transparent hover:border hover:border-slate-300 active:bg-slate-100",
         @class
       ]}
       {@rest}
