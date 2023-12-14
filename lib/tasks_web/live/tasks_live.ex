@@ -179,6 +179,7 @@ defmodule TasksWeb.TasksLive do
   end
 
   def handle_event("save", task, socket) do
+    task = Map.put(task, "details", task["details"] |> HtmlSanitizeEx.html5())
     {:noreply, assign(socket, tasks: [task | socket.assigns.tasks], form: to_form(%{}))}
   end
 
