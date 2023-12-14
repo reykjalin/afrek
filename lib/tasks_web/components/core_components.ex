@@ -83,27 +83,43 @@ defmodule TasksWeb.CoreComponents do
       phx-hook="Editor"
     >
       <div class="flex flex-row gap-2 border-b p-1">
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <strong>B</strong>
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <em>I</em>
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <u>U</u>
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <strike>S</strike>
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <.icon name="hero-link" />
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          Ordered list
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          <.icon name="hero-list-bullet" />
-        </button>
+        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <strong>B</strong>
+          </button>
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <em>I</em>
+          </button>
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <u>U</u>
+          </button>
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <strike>S</strike>
+          </button>
+        </div>
+
+        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <.icon name="hero-link" />
+          </button>
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_code", to: "##{@id}-editor")}
+          >
+            <.icon name="hero-code-bracket" />
+          </button>
+        </div>
+
+        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            1.
+          </button>
+          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+            <.icon name="hero-list-bullet" />
+          </button>
+        </div>
+
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
           Indent
         </button>
@@ -115,13 +131,6 @@ defmodule TasksWeb.CoreComponents do
         </button>
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
           <.icon name="hero-arrow-uturn-right" />
-        </button>
-        <button
-          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
-          type="button"
-          phx-click={JS.dispatch("toggle_code", to: "##{@id}-editor")}
-        >
-          <.icon name="hero-code-bracket" />
         </button>
       </div>
       <div class="editor p-2 focus:outline-none" id={"#{@id}-editor"}></div>
