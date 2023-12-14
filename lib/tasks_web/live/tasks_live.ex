@@ -7,19 +7,44 @@ defmodule TasksWeb.TasksLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <.button class="mx-10">Add Task</.button>
-
     <form class="m-10">
-      <.input
-        type="text"
-        name="task_title"
-        id="task_title"
-        class="mx-10"
-        placeholder="Foo the bar…"
-        value=""
-      />
+      <div class="flex flex-row gap-4">
+        <.input
+          type="text"
+          name="task-title"
+          id="task-title"
+          wrapper_class="grow"
+          placeholder="Foo the bar…"
+          value=""
+          required
+        />
 
-      <.rte id="task-details" class="w-full my-4 border border-black" />
+        <.input
+          type="date"
+          name="task-due-date"
+          id="task-due-date"
+          wrapper_class=""
+          placeholder="Due date…"
+          value=""
+        />
+
+        <.input
+          type="text"
+          name="task-duration"
+          id="task-duration"
+          wrapper_class=""
+          placeholder="1h 25m"
+          value=""
+          pattern="^([0-9]+h)? ?([0-9]+m)?$"
+          title="Examples of valid durations: 1h, 45m, 1h 43m, 12h30m"
+        />
+      </div>
+
+      <.rte id="task-details" />
+
+      <div class="text-right mt-2">
+        <.button type="submit">Add Task</.button>
+      </div>
     </form>
 
     <div class="flex gap-4 my-5">

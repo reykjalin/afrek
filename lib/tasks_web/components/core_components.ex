@@ -31,7 +31,15 @@ defmodule TasksWeb.CoreComponents do
 
   def rte(assigns) do
     ~H"""
-    <div class={@class} id={@id} phx-hook="Editor">
+    <div
+      class={[
+        "mt-2 block w-full text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
+        "min-h-[6rem] border border-zinc-300 focus-within:border-zinc-400",
+        @class
+      ]}
+      id={@id}
+      phx-hook="Editor"
+    >
       <div class="flex flex-row gap-2 border-b p-1">
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
           <strong>B</strong>
@@ -74,7 +82,7 @@ defmodule TasksWeb.CoreComponents do
           <.icon name="hero-code-bracket" />
         </button>
       </div>
-      <div class="editor p-2" id={"#{@id}-editor"}></div>
+      <div class="editor p-2 focus:outline-none" id={"#{@id}-editor"}></div>
     </div>
     """
   end
@@ -354,6 +362,8 @@ defmodule TasksWeb.CoreComponents do
   attr :label, :string, default: nil
   attr :value, :any
 
+  attr :wrapper_class, :string, default: nil
+
   attr :type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file hidden month number password
@@ -390,7 +400,7 @@ defmodule TasksWeb.CoreComponents do
       end)
 
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div class={@wrapper_class} phx-feedback-for={@name}>
       <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
         <input type="hidden" name={@name} value="false" />
         <input
@@ -411,7 +421,7 @@ defmodule TasksWeb.CoreComponents do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div class={@wrapper_class} phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
       <select
         id={@id}
@@ -430,7 +440,7 @@ defmodule TasksWeb.CoreComponents do
 
   def input(%{type: "textarea"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div class={@wrapper_class} phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
       <textarea
         id={@id}
@@ -451,7 +461,7 @@ defmodule TasksWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div phx-feedback-for={@name}>
+    <div class={@wrapper_class} phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
       <input
         type={@type}
