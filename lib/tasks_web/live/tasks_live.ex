@@ -7,7 +7,14 @@ defmodule TasksWeb.TasksLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <.form for={@form} class="m-10" phx-change="validate" phx-submit="save">
+    <.form
+      id="new-task"
+      for={@form}
+      class="m-10"
+      phx-change="validate"
+      phx-submit="save"
+      phx-hook="SubmitTask"
+    >
       <div class="flex flex-row gap-4">
         <.input
           field={@form[:title]}
@@ -168,9 +175,7 @@ defmodule TasksWeb.TasksLive do
   end
 
   def handle_event("validate", task, socket) do
-    form = to_form(task)
-
-    {:noreply, assign(socket, form: form)}
+    {:noreply, socket}
   end
 
   def handle_event("save", task, socket) do

@@ -30,7 +30,7 @@ const hooks = {
       this.editor = new Squire(editorElem, { blockTag: "P" });
 
       this.el.addEventListener("toggle_code", () => {
-        editor.toggleCode();
+        this.editor.toggleCode();
       });
     },
 
@@ -47,7 +47,18 @@ const hooks = {
       this.editor.setHTML(this.editorContent);
 
       this.el.addEventListener("toggle_code", () => {
-        editor.toggleCode();
+        this.editor.toggleCode();
+      });
+    },
+  },
+  SubmitTask: {
+    mounted() {
+      this.el.addEventListener("formdata", (event) => {
+        const formData = event.formData;
+        const editorElem = this.el.querySelector(`div[contenteditable="true"]`);
+
+        // Append the Squire editor contents to the form data submitted to the server.
+        formData.append("details", editorElem.innerHTML);
       });
     },
   },

@@ -51,7 +51,10 @@ defmodule TasksWeb.CoreComponents do
         </summary>
 
         <div class="p-1">
-          <%= @task["details"] %>
+          <!-- FIXME: using unescaped HTML here seems like a bad idea and will potentially open the door for some XSS attacs at a minimum, -->
+          <!--        but I don't see a better way to do this at the moment, so will need to fix this later. Probaby by just cleaning this up -->
+          <!--        via an allowlist of elements and attributes? -->
+          <%= Phoenix.HTML.raw(@task["details"]) %>
         </div>
       </details>
     </.card>

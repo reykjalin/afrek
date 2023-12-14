@@ -8,36 +8,31 @@
     .editor {
         @apply leading-normal;
     }
-    .editor pre {
-        @apply p-2 my-2 bg-slate-100 text-slate-900 overflow-x-auto;
-    }
-
-    .editor code {
-        @apply p-1  border border-slate-900 bg-slate-100;
-    }
-
-    .editor ol {
-        @apply list-decimal list-outside ms-8;
-    }
-
-    .editor ul {
-        @apply list-disc list-outside ms-8;
-    }
-
     .editor > * {
-        @apply p-1;
-    }
-
-    .editor a {
-        @apply text-blue-600 underline hover:text-blue-400 hover:no-underline;
-    }
-
-    .editor > * {
-        @apply border-b border-t border-transparent;
+        @apply p-1 border-b border-t border-transparent;
     }
 
     .editor > *:hover{
         @apply border-b border-slate-300;
     }
 
+    pre {
+        @apply p-2 my-2 bg-slate-100 text-slate-900 overflow-x-auto;
+    }
+
+    code {
+        @apply p-1  border border-slate-900 bg-slate-100;
+    }
+
+    a {
+        @apply text-blue-600 underline hover:text-blue-400 hover:no-underline;
+    }
+
+    ul {
+        @apply list-disc list-outside ms-8;
+    }
+
+    ol {
+        @apply list-decimal list-outside ms-8;
+    }
 }
