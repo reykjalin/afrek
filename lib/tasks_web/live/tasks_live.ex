@@ -47,8 +47,8 @@ defmodule TasksWeb.TasksLive do
       </div>
     </form>
 
-    <div class="flex gap-4 my-5">
-      <div class="w-full px-10">
+    <div class="flex my-5">
+      <div class="w-full px-10 flex flex-col gap-4 border-r">
         <.task :for={task <- @tasks} task={task} />
       </div>
 

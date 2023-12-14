@@ -135,7 +135,7 @@ defmodule TasksWeb.CoreComponents do
   def card(assigns) do
     ~H"""
     <div class={[
-      "bg-white overflow-hidden border border-black shadow-[0_0_4px_1px_rgb(0_0_0_/_0.3)] my-4 p-1",
+      "bg-white overflow-hidden border border-black shadow-[0_0_4px_1px_rgb(0_0_0_/_0.3)] p-1",
       @class
     ]}>
       <%= render_slot(@inner_block) %>
