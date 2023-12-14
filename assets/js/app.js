@@ -27,7 +27,24 @@ const hooks = {
   Editor: {
     mounted() {
       const editorElem = this.el.querySelector(`#${this.el.id}-editor`);
-      const editor = new Squire(editorElem, { blockTag: "P" });
+      this.editor = new Squire(editorElem, { blockTag: "P" });
+
+      this.el.addEventListener("toggle_code", () => {
+        editor.toggleCode();
+      });
+    },
+
+    beforeUpdate() {
+      // Save the content since the Phoenix LiveView form updates will reset the form data.
+      this.editorContent = this.editor.getHTML();
+
+      this.editor.destroy();
+    },
+
+    updated() {
+      const editorElem = this.el.querySelector(`#${this.el.id}-editor`);
+      this.editor = new Squire(editorElem, { blockTag: "P" });
+      this.editor.setHTML(this.editorContent);
 
       this.el.addEventListener("toggle_code", () => {
         editor.toggleCode();
