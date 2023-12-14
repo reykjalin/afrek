@@ -20,6 +20,39 @@ defmodule TasksWeb.CoreComponents do
   import TasksWeb.Gettext
 
   @doc """
+  Renders a task given some data.
+  """
+  attr :task, :map
+  attr :class, :string, default: nil
+
+  def task(assigns) do
+    ~H"""
+    <.card class={@class}>
+      <details class="group">
+        <summary class="flex items-center gap-2 p-1 group-open:border-b group-open:border-slate-400">
+          <.icon
+            class="transition ease-in-out duration-100 group-open:rotate-90"
+            name="hero-chevron-right"
+          />
+          <p class="grow"><%= @task["title"] %></p>
+          <p :if={@task["due_date"] != nil} class="text-sm text-red-600">
+            <%= @task["due_date"] %>
+          </p>
+          <p :if={@task["duration"] != nil} class="text-sm"><%= @task["duration"] %></p>
+          <.icon name="hero-check" />
+          <.icon name="hero-pencil-square" />
+          <.icon name="hero-archive-box" />
+        </summary>
+
+        <div class="p-1">
+          <%= @task["details"] %>
+        </div>
+      </details>
+    </.card>
+    """
+  end
+
+  @doc """
   Renders a rich text editor using Squire.
 
   ## Examples
