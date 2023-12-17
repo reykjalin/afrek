@@ -2,6 +2,7 @@ defmodule VerkWeb.VerkLive do
   use VerkWeb, :live_view
 
   alias Verk.{Events, Tasks}
+  alias Verk.Tasks.Task
 
   def render(assigns) do
     ~H"""
@@ -9,7 +10,7 @@ defmodule VerkWeb.VerkLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <.form
+    <.simple_form
       id="new-task"
       for={@form}
       class="m-10"
@@ -23,24 +24,16 @@ defmodule VerkWeb.VerkLive do
           type="text"
           wrapper_class="grow"
           placeholder="Foo the bar…"
-          value=""
           required
         />
 
-        <.input
-          field={@form[:due_date]}
-          type="date"
-          wrapper_class=""
-          placeholder="Due date…"
-          value=""
-        />
+        <.input field={@form[:due_date]} type="date" wrapper_class="" placeholder="Due date…" />
 
         <.input
           field={@form[:duration]}
           type="text"
           wrapper_class=""
           placeholder="1h 25m"
-          value=""
           pattern="^([0-9]+h)? ?([0-9]+m)?$"
           title="Examples of valid durations: 1h, 45m, 1h 43m, 12h30m"
         />
@@ -51,7 +44,7 @@ defmodule VerkWeb.VerkLive do
       <div class="text-right mt-2">
         <.button type="submit">Add Task</.button>
       </div>
-    </.form>
+    </.simple_form>
 
     <div class="flex my-5">
       <div id="tasks" class="w-full px-10 flex flex-col gap-4 border-r" phx-update="stream">
@@ -148,36 +141,59 @@ defmodule VerkWeb.VerkLive do
 
     tasks = Tasks.list_tasks(socket.assigns.scope)
 
-    IO.inspect(tasks, label: "tasks")
-
     {
       :ok,
       socket
-      |> assign(form: to_form(%{}))
+      |> assign(form: to_change_form(%Task{}, %{}))
       |> stream(:tasks, tasks)
     }
   end
 
   def update(%{event: %Events.TaskAdded{task: task}}, socket) do
-    {:ok, stream_insert(socket, :tasks, task)}
+    {
+      :ok,
+      socket
+      |> stream_insert(:tasks, task)
+    }
   end
 
-  def handle_event("validate", task, socket) do
-    # task = %Task{id: task["id"]}
+  def handle_event(
+        "validate",
+        %{"task" => task_params, "details" => task_details} = params,
+        socket
+      ) do
+    task = %Task{}
 
-    # {:noreply, stream_insert(socket, :tasks, to_change_form(task, task, :validate))}
-    {:noreply, socket}
+    task_params = Map.put(task_params, "details", task_details)
+
+    IO.inspect(params, label: "params")
+    IO.inspect(task_params, label: "task")
+    IO.inspect(to_change_form(task, task_params, :validate), label: "task changeform")
+
+    {:noreply,
+     assign(
+       socket,
+       :form,
+       to_change_form(task, task_params, :validate)
+     )}
   end
 
-  def handle_event("save", params, socket) do
-    case Tasks.create_task(socket.assigns.scope, params) do
+  def handle_event("validate", %{"task" => task_params}, socket),
+    do: handle_event("validate", %{"task" => task_params, "details" => ""}, socket)
+
+  def handle_event("save", %{"task" => task_params, "details" => task_details}, socket) do
+    task_params = Map.put(task_params, "details", task_details)
+
+    case Tasks.create_task(socket.assigns.scope, task_params) do
       {:ok, new_todo} ->
+        # FIXME: Make sure to send a message to the front-end to clear the editor.
         {:noreply,
          socket
-         |> stream_insert(:tasks, new_todo)}
+         |> stream_insert(:tasks, new_todo)
+         |> assign(:form, to_change_form(%Task{}, %{}))}
 
       {:error, changeset} ->
-        {:noreply, stream_insert(socket, :tasks, to_change_form(changeset, params, :insert))}
+        {:noreply, assign(socket, :form, to_change_form(changeset, task_params, :insert))}
     end
   end
 
@@ -196,11 +212,9 @@ defmodule VerkWeb.VerkLive do
   end
 
   defp to_change_form(task_or_changeset, params, action \\ nil) do
-    changeset =
-      task_or_changeset
-      |> Tasks.change_task(params)
-      |> Map.put(:action, action)
-
-    to_form(changeset, as: "task", id: "form-#{changeset.data.id}")
+    task_or_changeset
+    |> Tasks.change_task(params)
+    |> Map.put(:action, action)
+    |> to_form()
   end
 end
