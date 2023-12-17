@@ -13,6 +13,8 @@ defmodule VerkWeb.Router do
     plug :fetch_current_user
   end
 
+  ## Application routes.
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -21,6 +23,11 @@ defmodule VerkWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live_session :default,
+      on_mount: [{VerkWeb.UserAuth, :ensure_authenticated}, VerkWeb.Scope] do
+      live "/tasks", VerkLive, :index
+    end
   end
 
   # Other scopes may use custom stacks.
@@ -68,8 +75,6 @@ defmodule VerkWeb.Router do
       on_mount: [{VerkWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-
-      live "/tasks", VerkLive, :index
     end
   end
 

@@ -34,18 +34,18 @@ defmodule VerkWeb.CoreComponents do
             class="transition ease-in-out duration-100 group-open:rotate-90"
             name="hero-chevron-right"
           />
-          <p class="grow"><%= @task["title"] %></p>
-          <p :if={@task["due_date"] != nil} class="text-sm text-red-600">
-            <%= @task["due_date"] %>
+          <p class="grow"><%= @task.title %></p>
+          <p :if={@task.due_date != nil} class="text-sm text-red-600">
+            <%= @task.due_date %>
           </p>
-          <p :if={@task["duration"] != nil} class="text-sm"><%= @task["duration"] %></p>
-          <.no_outline_button phx-click="complete_task" phx-value-task={@task["id"]}>
+          <p :if={@task.duration != nil} class="text-sm"><%= @task.duration %></p>
+          <.no_outline_button phx-click="complete_task" phx-value-task={@task.id}>
             <.icon name="hero-check" />
           </.no_outline_button>
-          <.no_outline_button phx-click="edit_task" phx-value-task={@task["id"]}>
+          <.no_outline_button phx-click="edit_task" phx-value-task={@task.id}>
             <.icon name="hero-pencil-square" />
           </.no_outline_button>
-          <.no_outline_button phx-click="archive_task" phx-value-task={@task["id"]}>
+          <.no_outline_button phx-click="archive_task" phx-value-task={@task.id}>
             <.icon name="hero-archive-box" />
           </.no_outline_button>
         </summary>
@@ -54,7 +54,7 @@ defmodule VerkWeb.CoreComponents do
           <!-- FIXME: using unescaped HTML here seems like a bad idea and will potentially open the door for some XSS attacs at a minimum, -->
           <!--        but I don't see a better way to do this at the moment, so will need to fix this later. Probaby by just cleaning this up -->
           <!--        via an allowlist of elements and attributes? -->
-          <%= Phoenix.HTML.raw(@task["details"]) %>
+          <%= Phoenix.HTML.raw(@task.details) %>
         </div>
       </details>
     </.card>

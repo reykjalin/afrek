@@ -1,6 +1,8 @@
 defmodule VerkWeb.VerkLive do
   use VerkWeb, :live_view
 
+  alias Verk.{Events, Tasks}
+
   def render(assigns) do
     ~H"""
     <h1 class="text-2xl font-bold mt-4 mb-10 text-center">
@@ -52,8 +54,8 @@ defmodule VerkWeb.VerkLive do
     </.form>
 
     <div class="flex my-5">
-      <div class="w-full px-10 flex flex-col gap-4 border-r">
-        <.task :for={task <- @tasks} task={task} />
+      <div id="tasks" class="w-full px-10 flex flex-col gap-4 border-r" phx-update="stream">
+        <.task :for={{_stream_id, task} <- @streams.tasks} task={task} />
       </div>
 
       <div class="w-full px-10">
@@ -140,47 +142,43 @@ defmodule VerkWeb.VerkLive do
   end
 
   def mount(_params, _session, socket) do
-    tasks = [
-      %{
-        "id" => "1",
-        "title" => "Foo the bar",
-        "details" => "Foo the bar",
-        "due_date" => "Jan 31, 2024",
-        "duration" => "1h 30m"
-      },
-      %{
-        "id" => "2",
-        "title" => "Baz the qux",
-        "details" => "Baz the qux",
-        "due_date" => nil,
-        "duration" => "1h"
-      },
-      %{
-        "id" => "3",
-        "title" => "Quux the quuz",
-        "details" => "Quux the quuz",
-        "due_date" => nil,
-        "duration" => "30m"
-      },
-      %{
-        "id" => "4",
-        "title" => "Corge the grault",
-        "details" => "Corge the grault",
-        "due_date" => nil,
-        "duration" => nil
-      }
-    ]
+    if connected?(socket) do
+      Tasks.subscribe(socket.assigns.scope)
+    end
 
-    {:ok, assign(socket, tasks: tasks, form: to_form(%{}))}
+    tasks = Tasks.list_tasks(socket.assigns.scope)
+
+    IO.inspect(tasks, label: "tasks")
+
+    {
+      :ok,
+      socket
+      |> assign(form: to_form(%{}))
+      |> stream(:tasks, tasks)
+    }
   end
 
-  def handle_event("validate", _task, socket) do
+  def update(%{event: %Events.TaskAdded{task: task}}, socket) do
+    {:ok, stream_insert(socket, :tasks, task)}
+  end
+
+  def handle_event("validate", task, socket) do
+    # task = %Task{id: task["id"]}
+
+    # {:noreply, stream_insert(socket, :tasks, to_change_form(task, task, :validate))}
     {:noreply, socket}
   end
 
-  def handle_event("save", task, socket) do
-    task = Map.put(task, "details", task["details"] |> HtmlSanitizeEx.basic_html())
-    {:noreply, assign(socket, tasks: [task | socket.assigns.tasks], form: to_form(%{}))}
+  def handle_event("save", params, socket) do
+    case Tasks.create_task(socket.assigns.scope, params) do
+      {:ok, new_todo} ->
+        {:noreply,
+         socket
+         |> stream_insert(:tasks, new_todo)}
+
+      {:error, changeset} ->
+        {:noreply, stream_insert(socket, :tasks, to_change_form(changeset, params, :insert))}
+    end
   end
 
   def handle_event("complete_task", %{"task" => task_id}, socket) do
@@ -195,5 +193,14 @@ defmodule VerkWeb.VerkLive do
 
   def handle_event("archive_task", %{"task" => task_id}, socket) do
     {:noreply, assign(socket, tasks: Enum.filter(socket.assigns.tasks, &(&1["id"] != task_id)))}
+  end
+
+  defp to_change_form(task_or_changeset, params, action \\ nil) do
+    changeset =
+      task_or_changeset
+      |> Tasks.change_task(params)
+      |> Map.put(:action, action)
+
+    to_form(changeset, as: "task", id: "form-#{changeset.data.id}")
   end
 end
