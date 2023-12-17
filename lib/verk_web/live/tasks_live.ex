@@ -1,4 +1,4 @@
-defmodule VerkWeb.VerkLive do
+defmodule VerkWeb.TasksLive do
   use VerkWeb, :live_view
 
   alias Verk.{Events, Tasks}
@@ -48,7 +48,9 @@ defmodule VerkWeb.VerkLive do
 
     <div class="flex my-5">
       <div id="tasks" class="w-full px-10 flex flex-col gap-4 border-r" phx-update="stream">
-        <.task :for={{_stream_id, task} <- @streams.tasks} task={task} />
+        <div :for={{id, task} <- @streams.tasks} id={id}>
+          <.task task={task} />
+        </div>
       </div>
 
       <div class="w-full px-10">
@@ -149,28 +151,22 @@ defmodule VerkWeb.VerkLive do
     }
   end
 
-  def update(%{event: %Events.TaskAdded{task: task}}, socket) do
-    {
-      :ok,
-      socket
-      |> stream_insert(:tasks, task)
-    }
+  def handle_info({Verk.Tasks, %Events.TaskAdded{task: task}}, socket) do
+    {:noreply, stream_insert(socket, :tasks, task)}
   end
 
-  def handle_event(
-        "validate",
-        %{"task" => task_params, "details" => task_details} = params,
-        socket
-      ) do
-    task = %Task{}
+  def handle_info({Verk.Tasks, %Events.TaskDeleted{task: task}}, socket) do
+    {:noreply, stream_delete(socket, :tasks, task)}
+  end
 
+  def handle_event("validate", %{"task" => task_params, "details" => task_details}, socket) do
     task_params = Map.put(task_params, "details", task_details)
 
     {:noreply,
      assign(
        socket,
        :form,
-       to_change_form(task, task_params, :validate)
+       to_change_form(%Task{}, task_params, :validate)
      )}
   end
 
@@ -194,7 +190,13 @@ defmodule VerkWeb.VerkLive do
   end
 
   def handle_event("complete_task", %{"task" => task_id}, socket) do
-    {:noreply, assign(socket, tasks: Enum.filter(socket.assigns.tasks, &(&1["id"] != task_id)))}
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+
+    # FIXME: Move task to the completed tasks table.
+
+    {:ok, _} = Tasks.delete_task(socket.assigns.scope, task)
+
+    {:noreply, socket}
   end
 
   def handle_event("edit_task", %{"task" => _task_id}, socket) do
@@ -204,7 +206,13 @@ defmodule VerkWeb.VerkLive do
   end
 
   def handle_event("archive_task", %{"task" => task_id}, socket) do
-    {:noreply, assign(socket, tasks: Enum.filter(socket.assigns.tasks, &(&1["id"] != task_id)))}
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+
+    # FIXME: Move task to the archived tasks table.
+
+    {:ok, _} = Tasks.delete_task(socket.assigns.scope, task)
+
+    {:noreply, socket}
   end
 
   defp to_change_form(task_or_changeset, params, action \\ nil) do

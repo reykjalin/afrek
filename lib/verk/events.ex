@@ -6,4 +6,8 @@ defmodule Verk.Events do
   defmodule TaskAdded do
     defstruct task: nil
   end
+
+  defmodule TaskDeleted do
+    defstruct task: nil
+  end
 end

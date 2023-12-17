@@ -72,7 +72,6 @@ defmodule Verk.Tasks do
     }
 
     Ecto.Multi.new()
-    # |> lock()
     |> Ecto.Multi.run(:position, fn repo, _changes ->
       position = repo.one(from t in Task, select: count(t.id))
 
@@ -123,8 +122,20 @@ defmodule Verk.Tasks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_task(%Task{} = task) do
-    Repo.delete(task)
+  def delete_task(%Scope{} = scope, %Task{} = task) do
+    Ecto.Multi.new()
+    |> multi_decrement_positions(:dec_rest_in_list, task)
+    |> Ecto.Multi.delete(:task, task)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{task: task}} ->
+        broadcast(scope, %Events.TaskDeleted{task: task})
+
+        {:ok, task}
+
+      {:error, _failed_op, failed_val, _changes_so_far} ->
+        {:error, failed_val}
+    end
   end
 
   @doc """
@@ -145,6 +156,20 @@ defmodule Verk.Tasks do
   end
 
   defp topic(%Scope{} = scope), do: "todos:#{scope.current_user.id}"
+
+  defp multi_update_all(multi, name, func, opts \\ []) do
+    Ecto.Multi.update_all(multi, name, func, opts)
+  end
+
+  defp multi_decrement_positions(%Ecto.Multi{} = multi, name, %type{} = struct) do
+    multi_update_all(multi, name, fn _ ->
+      from(t in type,
+        where:
+          t.position > subquery(from og in type, where: og.id == ^struct.id, select: og.position),
+        update: [inc: [position: -1]]
+      )
+    end)
+  end
 
   def test(to, %Scope{} = scope) do
     parent = self()

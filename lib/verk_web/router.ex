@@ -26,7 +26,7 @@ defmodule VerkWeb.Router do
 
     live_session :default,
       on_mount: [{VerkWeb.UserAuth, :ensure_authenticated}, VerkWeb.Scope] do
-      live "/tasks", VerkLive, :index
+      live "/tasks", TasksLive, :index
     end
   end
 
