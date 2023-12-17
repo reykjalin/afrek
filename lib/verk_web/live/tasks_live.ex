@@ -166,10 +166,6 @@ defmodule VerkWeb.VerkLive do
 
     task_params = Map.put(task_params, "details", task_details)
 
-    IO.inspect(params, label: "params")
-    IO.inspect(task_params, label: "task")
-    IO.inspect(to_change_form(task, task_params, :validate), label: "task changeform")
-
     {:noreply,
      assign(
        socket,
