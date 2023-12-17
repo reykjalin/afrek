@@ -1,4 +1,4 @@
-defmodule Tasks.DataCase do
+defmodule Verk.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule Tasks.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use Tasks.DataCase, async: true`, although
+  by setting `use Verk.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,17 +18,17 @@ defmodule Tasks.DataCase do
 
   using do
     quote do
-      alias Tasks.Repo
+      alias Verk.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Tasks.DataCase
+      import Verk.DataCase
     end
   end
 
   setup tags do
-    Tasks.DataCase.setup_sandbox(tags)
+    Verk.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -36,7 +36,7 @@ defmodule Tasks.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Tasks.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Verk.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 

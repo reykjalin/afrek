@@ -1,9 +1,9 @@
-defmodule Tasks.MixProject do
+defmodule Verk.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :tasks,
+      app: :verk,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +18,7 @@ defmodule Tasks.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Tasks.Application, []},
+      mod: {Verk.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -53,7 +53,7 @@ defmodule Tasks.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       # Not from phx.new.
-      {:html_sanitize_ex, "~> 1.4"},
+      {:html_sanitize_ex, "~> 1.4"}
     ]
   end
 

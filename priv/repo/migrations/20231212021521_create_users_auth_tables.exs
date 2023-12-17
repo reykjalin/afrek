@@ -1,4 +1,4 @@
-defmodule Tasks.Repo.Migrations.CreateUsersAuthTables do
+defmodule Verk.Repo.Migrations.CreateUsersAuthTables do
   use Ecto.Migration
 
   def change do

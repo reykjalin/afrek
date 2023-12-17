@@ -7,19 +7,19 @@
 # General application configuration
 import Config
 
-config :tasks,
-  ecto_repos: [Tasks.Repo],
+config :verk,
+  ecto_repos: [Verk.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :tasks, TasksWeb.Endpoint,
+config :verk, VerkWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
   render_errors: [
-    formats: [html: TasksWeb.ErrorHTML, json: TasksWeb.ErrorJSON],
+    formats: [html: VerkWeb.ErrorHTML, json: VerkWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Tasks.PubSub,
+  pubsub_server: Verk.PubSub,
   live_view: [signing_salt: "eA/J4YdZ"]
 
 # Configures the mailer
@@ -29,7 +29,7 @@ config :tasks, TasksWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :tasks, Tasks.Mailer, adapter: Swoosh.Adapters.Local
+config :verk, Verk.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
