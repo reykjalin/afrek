@@ -152,7 +152,7 @@ defmodule VerkWeb.TasksLive do
   end
 
   def handle_info({Verk.Tasks, %Events.TaskAdded{task: task}}, socket) do
-    {:noreply, stream_insert(socket, :tasks, task)}
+    {:noreply, stream_insert(socket, :tasks, task, at: 0)}
   end
 
   def handle_info({Verk.Tasks, %Events.TaskDeleted{task: task}}, socket) do

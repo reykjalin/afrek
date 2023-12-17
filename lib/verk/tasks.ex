@@ -31,7 +31,7 @@ defmodule Verk.Tasks do
   """
   def list_tasks(%Scope{} = scope) do
     Repo.all(
-      from(t in Task, where: t.user_id == ^scope.current_user_id, order_by: [asc: :position])
+      from(t in Task, where: t.user_id == ^scope.current_user_id, order_by: [desc: :position])
     )
   end
 
