@@ -54,8 +54,12 @@ defmodule VerkWeb.TasksLive do
           class="group flex flex-row gap-2 items-center"
         >
           <div class="flex flex-col invisible group-hover:visible self-start">
-            <.no_outline_button><.icon name="hero-chevron-up" /></.no_outline_button>
-            <.no_outline_button><.icon name="hero-chevron-down" /></.no_outline_button>
+            <.no_outline_button class="group-first:invisible">
+              <.icon name="hero-chevron-up" />
+            </.no_outline_button>
+            <.no_outline_button class="group-last:invisible">
+              <.icon name="hero-chevron-down" />
+            </.no_outline_button>
           </div>
           <div class="grow">
             <.task task={task} />
@@ -167,6 +171,11 @@ defmodule VerkWeb.TasksLive do
 
   def handle_info({Verk.Tasks, %Events.TaskDeleted{task: task}}, socket) do
     {:noreply, stream_delete(socket, :tasks, task)}
+  end
+
+  def handle_info({Verk.Tasks, %Events.TaskRepositioned{task: task}}, socket) do
+    # List is in descending order, which is why we need to subtract the new position from the size to get the right position.
+    {:noreply, stream_insert(socket, :tasks, task, at: socket.assigns.tasks.size - task.position)}
   end
 
   def handle_event("validate", %{"task" => task_params, "details" => task_details}, socket) do
