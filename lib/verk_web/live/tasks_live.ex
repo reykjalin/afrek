@@ -48,8 +48,18 @@ defmodule VerkWeb.TasksLive do
 
     <div class="flex my-5">
       <div id="tasks" class="w-full px-10 flex flex-col gap-4 border-r" phx-update="stream">
-        <div :for={{id, task} <- @streams.tasks} id={id}>
-          <.task task={task} />
+        <div
+          :for={{id, task} <- @streams.tasks}
+          id={id}
+          class="group flex flex-row gap-2 items-center"
+        >
+          <div class="flex flex-col invisible group-hover:visible self-start">
+            <.no_outline_button><.icon name="hero-chevron-up" /></.no_outline_button>
+            <.no_outline_button><.icon name="hero-chevron-down" /></.no_outline_button>
+          </div>
+          <div class="grow">
+            <.task task={task} />
+          </div>
         </div>
       </div>
 
