@@ -23,6 +23,7 @@ defmodule VerkWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/privacy", PageController, :privacy
 
     live_session :default,
       on_mount: [{VerkWeb.UserAuth, :ensure_authenticated}, VerkWeb.Scope] do
