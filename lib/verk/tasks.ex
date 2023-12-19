@@ -110,6 +110,55 @@ defmodule Verk.Tasks do
     |> Repo.update()
   end
 
+  def update_task_position(%Scope{} = scope, task, new_position) do
+    Ecto.Multi.new()
+    |> multi_reposition(:new, task, new_position)
+    |> Repo.transaction()
+    |> case do
+      {:ok, _} ->
+        new_task = %Task{task | position: new_position}
+        broadcast(scope, %Events.TaskRepositioned{task: new_task})
+
+        :ok
+
+      {:error, _failed_op, failed_val, _changes_so_far} ->
+        {:error, failed_val}
+    end
+  end
+
+  defp multi_reposition(%Ecto.Multi{} = multi, name, task, new_position)
+       when is_integer(new_position) do
+    old_position = task.position
+
+    multi
+    |> Ecto.Multi.run({:index, name}, fn repo, _changes ->
+      case repo.one(from(t in Task, select: count(t.id))) do
+        count when new_position < count -> {:ok, new_position}
+        count -> {:ok, count - 1}
+      end
+    end)
+    |> multi_update_all({:dec_positions, name}, fn %{{:index, ^name} => computed_index} ->
+      from(t in Task,
+        where: t.id != ^task.id,
+        where: t.position > ^old_position and t.position <= ^computed_index,
+        update: [inc: [position: -1]]
+      )
+    end)
+    |> multi_update_all({:inc_positions, name}, fn %{{:index, ^name} => computed_index} ->
+      from(t in Task,
+        where: t.id != ^task.id,
+        where: t.position < ^old_position and t.position >= ^computed_index,
+        update: [inc: [position: 1]]
+      )
+    end)
+    |> multi_update_all({:position, name}, fn %{{:index, ^name} => computed_index} ->
+      from(t in Task,
+        where: t.id == ^task.id,
+        update: [set: [position: ^computed_index]]
+      )
+    end)
+  end
+
   @doc """
   Deletes a task.
 

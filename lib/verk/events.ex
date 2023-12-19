@@ -10,4 +10,8 @@ defmodule Verk.Events do
   defmodule TaskDeleted do
     defstruct task: nil
   end
+
+  defmodule TaskRepositioned do
+    defstruct task: nil
+  end
 end

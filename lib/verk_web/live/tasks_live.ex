@@ -54,10 +54,18 @@ defmodule VerkWeb.TasksLive do
           class="group flex flex-row gap-2 items-center"
         >
           <div class="flex flex-col invisible group-hover:visible self-start">
-            <.no_outline_button class="group-first:invisible">
+            <.no_outline_button
+              class="group-first:invisible"
+              phx-click="increment_task_position"
+              phx-value-task={task.id}
+            >
               <.icon name="hero-chevron-up" />
             </.no_outline_button>
-            <.no_outline_button class="group-last:invisible">
+            <.no_outline_button
+              class="group-last:invisible"
+              phx-click="decrement_task_position"
+              phx-value-task={task.id}
+            >
               <.icon name="hero-chevron-down" />
             </.no_outline_button>
           </div>
@@ -175,7 +183,15 @@ defmodule VerkWeb.TasksLive do
 
   def handle_info({Verk.Tasks, %Events.TaskRepositioned{task: task}}, socket) do
     # List is in descending order, which is why we need to subtract the new position from the size to get the right position.
-    {:noreply, stream_insert(socket, :tasks, task, at: socket.assigns.tasks.size - task.position)}
+    {
+      :noreply,
+      stream_insert(
+        socket,
+        :tasks,
+        task,
+        at: Enum.count(Tasks.list_tasks(socket.assigns.scope)) - 1 - task.position
+      )
+    }
   end
 
   def handle_event("validate", %{"task" => task_params, "details" => task_details}, socket) do
@@ -214,6 +230,27 @@ defmodule VerkWeb.TasksLive do
     # FIXME: Move task to the completed tasks table.
 
     {:ok, _} = Tasks.delete_task(socket.assigns.scope, task)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("reposition_task", %{"task" => task_id, "new-pos" => new_pos}, socket) do
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+    Tasks.update_task_position(socket.assigns.scope, task, new_pos |> String.to_integer())
+
+    {:noreply, socket}
+  end
+
+  def handle_event("increment_task_position", %{"task" => task_id}, socket) do
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+    Tasks.update_task_position(socket.assigns.scope, task, task.position + 1)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("decrement_task_position", %{"task" => task_id}, socket) do
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+    Tasks.update_task_position(socket.assigns.scope, task, task.position - 1)
 
     {:noreply, socket}
   end
