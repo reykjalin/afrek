@@ -8,7 +8,14 @@ defmodule Verk.TasksTest do
 
     import Verk.TasksFixtures
 
-    @invalid_attrs %{position: nil, user: nil, title: nil, details: nil, due_date: nil, duration: nil}
+    @invalid_attrs %{
+      position: nil,
+      user: nil,
+      title: nil,
+      details: nil,
+      due_date: nil,
+      duration: nil
+    }
 
     test "list_tasks/0 returns all tasks" do
       task = task_fixture()
@@ -21,7 +28,14 @@ defmodule Verk.TasksTest do
     end
 
     test "create_task/1 with valid data creates a task" do
-      valid_attrs = %{position: 42, user: "some user", title: "some title", details: "some details", due_date: ~D[2023-12-16], duration: "some duration"}
+      valid_attrs = %{
+        position: 42,
+        user: "some user",
+        title: "some title",
+        details: "some details",
+        due_date: ~D[2023-12-16],
+        duration: "some duration"
+      }
 
       assert {:ok, %Task{} = task} = Tasks.create_task(valid_attrs)
       assert task.position == 42
@@ -38,7 +52,15 @@ defmodule Verk.TasksTest do
 
     test "update_task/2 with valid data updates the task" do
       task = task_fixture()
-      update_attrs = %{position: 43, user: "some updated user", title: "some updated title", details: "some updated details", due_date: ~D[2023-12-17], duration: "some updated duration"}
+
+      update_attrs = %{
+        position: 43,
+        user: "some updated user",
+        title: "some updated title",
+        details: "some updated details",
+        due_date: ~D[2023-12-17],
+        duration: "some updated duration"
+      }
 
       assert {:ok, %Task{} = task} = Tasks.update_task(task, update_attrs)
       assert task.position == 43
