@@ -31,23 +31,26 @@ defmodule VerkWeb.CoreComponents do
       <details :if={@task.details != nil and @task.details != "<p><br></p>"} class="group">
         <summary class="flex items-center gap-2 p-1 group-open:border-b group-open:border-slate-400">
           <.icon
-            class="transition ease-in-out duration-100 group-open:rotate-90"
+            class="transition ease-in-out duration-100 group-open:rotate-90 min-w-[20px]"
             name="hero-chevron-right"
           />
           <p class="grow"><%= @task.title %></p>
           <p :if={@task.due_date != nil} class="text-sm text-red-600">
             <%= @task.due_date %>
           </p>
-          <p :if={@task.duration != nil} class="text-sm"><%= @task.duration %></p>
-          <.no_outline_button phx-click="complete_task" phx-value-task={@task.id}>
-            <.icon name="hero-check" />
-          </.no_outline_button>
-          <.no_outline_button phx-click="edit_task" phx-value-task={@task.id}>
-            <.icon name="hero-pencil-square" />
-          </.no_outline_button>
-          <.no_outline_button phx-click="archive_task" phx-value-task={@task.id}>
-            <.icon name="hero-archive-box" />
-          </.no_outline_button>
+
+          <div class="flex flex-row items-center gap-2 flex-wrap md:flex-nowrap">
+            <p :if={@task.duration != nil} class="text-sm"><%= @task.duration %></p>
+            <.no_outline_button phx-click="complete_task" phx-value-task={@task.id}>
+              <.icon name="hero-check" />
+            </.no_outline_button>
+            <.no_outline_button phx-click="edit_task" phx-value-task={@task.id}>
+              <.icon name="hero-pencil-square" />
+            </.no_outline_button>
+            <.no_outline_button phx-click="archive_task" phx-value-task={@task.id}>
+              <.icon name="hero-archive-box" />
+            </.no_outline_button>
+          </div>
         </summary>
 
         <div class="p-1">
@@ -63,16 +66,19 @@ defmodule VerkWeb.CoreComponents do
         <p :if={@task.due_date != nil} class="text-sm text-red-600">
           <%= @task.due_date %>
         </p>
-        <p :if={@task.duration != nil} class="text-sm"><%= @task.duration %></p>
-        <.no_outline_button phx-click="complete_task" phx-value-task={@task.id}>
-          <.icon name="hero-check" />
-        </.no_outline_button>
-        <.no_outline_button phx-click="edit_task" phx-value-task={@task.id}>
-          <.icon name="hero-pencil-square" />
-        </.no_outline_button>
-        <.no_outline_button phx-click="archive_task" phx-value-task={@task.id}>
-          <.icon name="hero-archive-box" />
-        </.no_outline_button>
+
+        <div class="flex flex-row items-center gap-2 flex-wrap md:flex-nowrap">
+          <p :if={@task.duration != nil} class="text-sm"><%= @task.duration %></p>
+          <.no_outline_button phx-click="complete_task" phx-value-task={@task.id}>
+            <.icon name="hero-check" />
+          </.no_outline_button>
+          <.no_outline_button phx-click="edit_task" phx-value-task={@task.id}>
+            <.icon name="hero-pencil-square" />
+          </.no_outline_button>
+          <.no_outline_button phx-click="archive_task" phx-value-task={@task.id}>
+            <.icon name="hero-archive-box" />
+          </.no_outline_button>
+        </div>
       </div>
     </.card>
     """

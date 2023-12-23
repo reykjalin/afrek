@@ -16,6 +16,10 @@
         @apply border-b border-slate-300;
     }
 
+    details > summary::-webkit-details-marker {
+        display: none;
+    }
+
     pre {
         @apply p-2 my-2 bg-slate-100 text-slate-900 overflow-x-auto;
     }
