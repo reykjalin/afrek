@@ -18,7 +18,7 @@
     <script type="text/javascript" src={~p"/scripts/squire.js"} />
   </head>
   <body class="bg-white antialiased">
-    <header class="p-4 flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+    <header class="p-4 flex items-start md:items-center justify-between border-b border-zinc-100 py-3 text-sm">
       <div class="flex items-center gap-4">
         <a href="/tasks">
           <img src={~p"/images/logo.svg"} width="36" />
@@ -29,7 +29,7 @@
       </div>
 
       <nav>
-        <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+        <ul class="relative z-10 flex flex-col md:flex-row items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
           <%= if @current_user do %>
             <li>
               <.link

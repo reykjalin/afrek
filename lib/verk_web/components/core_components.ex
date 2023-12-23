@@ -99,7 +99,7 @@ defmodule VerkWeb.CoreComponents do
       id={@id}
       phx-hook="Editor"
     >
-      <div class="flex flex-row gap-2 border-b p-1">
+      <div class="flex flex-row gap-2 border-b p-1 overflow-x-scroll md:overflow-auto">
         <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
           <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
             <strong>B</strong>
@@ -138,10 +138,10 @@ defmodule VerkWeb.CoreComponents do
         </div>
 
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          Indent
+          |<.icon name="hero-chevron-double-left" />
         </button>
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          Outdent
+          |<.icon name="hero-chevron-double-right" />
         </button>
         <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
           <.icon name="hero-arrow-uturn-left" />

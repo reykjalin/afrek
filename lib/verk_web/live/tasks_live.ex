@@ -18,7 +18,7 @@ defmodule VerkWeb.TasksLive do
       phx-submit="save"
       phx-hook="SubmitTask"
     >
-      <div class="flex flex-row gap-4">
+      <div class="flex flex-col md:flex-row gap-4">
         <.input
           field={@form[:title]}
           type="text"
@@ -46,8 +46,8 @@ defmodule VerkWeb.TasksLive do
       </div>
     </.simple_form>
 
-    <div class="flex my-5">
-      <div id="tasks" class="w-full px-10 flex flex-col gap-4 border-r" phx-update="stream">
+    <div class="flex flex-col md:flex-row my-5">
+      <div id="tasks" class="w-full px-10 mb-10 flex flex-col gap-4 md:border-r" phx-update="stream">
         <div
           :for={{id, task} <- @streams.tasks}
           id={id}
@@ -74,6 +74,8 @@ defmodule VerkWeb.TasksLive do
           </div>
         </div>
       </div>
+
+      <hr class="md:hidden w-full border-black mb-10" />
 
       <div class="w-full px-10">
         <div class="flex flex-column items-start h-[60px] gap-4">
