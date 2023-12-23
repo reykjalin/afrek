@@ -114,4 +114,20 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  # Ensure there is a from email address for delivering emails.
+  System.get_env("EMAIL_FROM_ADDRESS") ||
+    raise """
+    environment variable EMAIL_FROM_ADDRESS is missing.
+    """
+
+  email_api_key =
+    System.get_env("EMAIL_API_KEY") ||
+      raise """
+      environment variable EMAIL_API_KEY is missing.
+      """
+
+  config :verk, Verk.Mailer,
+    adapter: Swoosh.Adapters.Sendgrid,
+    api_key: email_api_key
 end

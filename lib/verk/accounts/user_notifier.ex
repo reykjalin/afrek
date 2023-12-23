@@ -8,7 +8,7 @@ defmodule Verk.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Tasks", "contact@example.com"})
+      |> from({"Verk", System.get_env("EMAIL_FROM_ADDRESS")})
       |> subject(subject)
       |> text_body(body)
 
