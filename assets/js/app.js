@@ -21,9 +21,9 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-import Squire from "squire-rte";
 
 const hooks = {
+  // Squire is included via <script> tag in the root.html.heex template.
   Editor: {
     mounted() {
       const editorElem = this.el.querySelector(`#${this.el.id}-editor`);
