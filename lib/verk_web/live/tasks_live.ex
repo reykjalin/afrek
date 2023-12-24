@@ -13,7 +13,7 @@ defmodule VerkWeb.TasksLive do
     <.simple_form
       id="new-task"
       for={@form}
-      class="m-10"
+      class="my-10 md:m-10"
       phx-change="validate"
       phx-submit="save"
       phx-hook="SubmitTask"
@@ -47,13 +47,17 @@ defmodule VerkWeb.TasksLive do
     </.simple_form>
 
     <div class="flex flex-col md:flex-row my-5">
-      <div id="tasks" class="w-full px-10 mb-10 flex flex-col gap-4 md:border-r" phx-update="stream">
+      <div
+        id="tasks"
+        class="w-full md:px-10 mb-10 flex flex-col gap-4 md:border-r"
+        phx-update="stream"
+      >
         <div
           :for={{id, task} <- @streams.tasks}
           id={id}
           class="group flex flex-row gap-2 items-center"
         >
-          <div class="flex flex-col invisible group-hover:visible self-start">
+          <div class="flex flex-col md:invisible group-hover:visible self-start">
             <.no_outline_button
               class="group-first:invisible"
               phx-click="increment_task_position"
