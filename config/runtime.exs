@@ -63,7 +63,10 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    secret_key_base: secret_key_base
+    secret_key_base: secret_key_base,
+    # So the app can accept both the fly.io domain and the custom domain.
+    # https://community.fly.io/t/phoenix-liveview-constantly-refreshes-with-custom-domain/3384/10
+    check_origin: :conn
 
   # ## SSL Support
   #
