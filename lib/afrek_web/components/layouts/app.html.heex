@@ -1,4 +1,4 @@
-<header class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between border-b border-zinc-100 py-3 text-sm">
+<header class="p-4 flex flex-col md:flex-row items-center justify-between border-b border-zinc-100 py-3 text-sm">
   <div class="flex items-center gap-4">
     <.link href={~p"/tasks"}>
       <img src={~p"/images/logo.svg"} width="36" class="min-w-[36px]" />
@@ -14,7 +14,7 @@
   </div>
 
   <nav>
-    <ul class="relative z-10 flex flex-col md:flex-row items-center md:gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+    <ul class="relative z-10 flex flex-col md:flex-row items-center md:gap-4 px-4 sm:px-6 lg:px-8 m-0">
       <%= if @current_user do %>
         <li>
           <.link
@@ -79,7 +79,7 @@
   </nav>
 
   <%= if @current_user != nil do %>
-    <p class="text-[0.8125rem] leading-6 text-zinc-900">
+    <p class="text-[0.8125rem] text-center leading-6 text-zinc-900">
       <%= @current_user.email %>
     </p>
   <% end %>
