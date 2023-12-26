@@ -219,7 +219,6 @@ defmodule AfrekWeb.TasksLive do
 
     case Tasks.create_task(socket.assigns.scope, task_params) do
       {:ok, new_todo} ->
-        # FIXME: Make sure to send a message to the front-end to clear the editor.
         {
           :noreply,
           socket

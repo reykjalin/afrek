@@ -28,7 +28,7 @@ defmodule AfrekWeb.CoreComponents do
   def task(assigns) do
     ~H"""
     <.card class={@class}>
-      <details :if={@task.details != nil and @task.details != "<p><br></p>"} class="group">
+      <details :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() != ""} class="group">
         <summary class="flex items-center gap-2 p-1 group-open:border-b group-open:border-slate-400">
           <.icon
             class="transition ease-in-out duration-100 group-open:rotate-90 min-w-[20px]"
@@ -59,7 +59,7 @@ defmodule AfrekWeb.CoreComponents do
       </details>
 
       <div
-        :if={@task.details == nil or @task.details == "<p><br></p>"}
+        :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() == ""}
         class="flex items-center gap-2 p-1"
       >
         <p class="grow"><%= @task.title %></p>
