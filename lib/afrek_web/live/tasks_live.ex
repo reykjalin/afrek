@@ -220,10 +220,13 @@ defmodule AfrekWeb.TasksLive do
     case Tasks.create_task(socket.assigns.scope, task_params) do
       {:ok, new_todo} ->
         # FIXME: Make sure to send a message to the front-end to clear the editor.
-        {:noreply,
-         socket
-         |> stream_insert(:tasks, new_todo)
-         |> assign(:form, to_change_form(%Task{}, %{}))}
+        {
+          :noreply,
+          socket
+          |> stream_insert(:tasks, new_todo)
+          |> assign(:form, to_change_form(%Task{}, %{}))
+          |> push_event("task_added", %{task: new_todo.id})
+        }
 
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_change_form(changeset, task_params, :insert))}

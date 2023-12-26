@@ -29,8 +29,13 @@ const hooks = {
       const editorElem = this.el.querySelector(`#${this.el.id}-editor`);
       this.editor = new Squire(editorElem, { blockTag: "P" });
 
-      this.el.addEventListener("toggle_code", () => {
-        this.editor.toggleCode();
+      this.registerEvents();
+
+      // Window event listeners with server-pushed events.
+      window.addEventListener("phx:task_added", (e) => {
+        if (this.editor) {
+          this.editor.setHTML("<p><br></p>");
+        }
       });
     },
 
@@ -46,6 +51,10 @@ const hooks = {
       this.editor = new Squire(editorElem, { blockTag: "P" });
       this.editor.setHTML(this.editorContent);
 
+      this.registerEvents();
+    },
+
+    registerEvents() {
       this.el.addEventListener("toggle_code", () => {
         this.editor.toggleCode();
       });
