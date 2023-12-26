@@ -7,12 +7,7 @@ defmodule AfrekWeb.TasksLive do
   def render(assigns) do
     ~H"""
     <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-      <%= DateTime.now!(@timezone, TimeZoneInfo.TimeZoneDatabase)
-      |> Calendar.strftime("%a %b %d") %> &mdash; <%= DateTime.now!(
-        @timezone,
-        TimeZoneInfo.TimeZoneDatabase
-      )
-      |> Calendar.strftime("%I:%M%P") %>
+      <%= Calendar.strftime(@date, "%a %b %d") %> &mdash; <%= Calendar.strftime(@date, "%I:%M%P") %>
     </h2>
 
     <.modal id="new-task-modal">
@@ -195,11 +190,20 @@ defmodule AfrekWeb.TasksLive do
     tasks = Tasks.list_tasks(socket.assigns.scope)
     timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
 
+    :timer.send_interval(60_000, self(), :minute_tick)
+
+    date =
+      case DateTime.now(timezone, TimeZoneInfo.TimeZoneDatabase) do
+        {:ok, date} -> date
+        _ -> DateTime.utc_now()
+      end
+
     {
       :ok,
       socket
       |> assign(form: to_change_form(%Task{}, %{}))
       |> assign(timezone: timezone)
+      |> assign(date: date)
       |> stream(:tasks, tasks)
     }
   end
@@ -223,6 +227,19 @@ defmodule AfrekWeb.TasksLive do
         at: Enum.count(Tasks.list_tasks(socket.assigns.scope)) - 1 - task.position
       )
     }
+  end
+
+  def handle_info(:minute_tick, socket) do
+    date =
+      case DateTime.now(
+             socket.assigns.timezone,
+             TimeZoneInfo.TimeZoneDatabase
+           ) do
+        {:ok, date} -> date
+        _ -> DateTime.utc_now()
+      end
+
+    {:noreply, update(socket, :date, fn _ -> date end)}
   end
 
   def handle_event("validate", %{"task" => task_params, "details" => task_details}, socket) do
