@@ -99,7 +99,12 @@ defmodule AfrekWeb.TasksLive do
 
       <hr class="md:hidden w-full border-black mb-10" />
 
-      <div class="w-full px-10">
+      <div class="w-full px-10 relative">
+        <hr
+          class="w-full border-black mx-auto absolute"
+          style={"top: #{@date.hour * 60 + @date.minute}px"}
+        />
+
         <div class="flex flex-column items-start h-[60px] gap-4">
           <p class="text-sm mt-[-10px] w-[40px]">12am <hr class="w-full border-black mx-auto" /></p>
         </div>
