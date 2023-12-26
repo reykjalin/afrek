@@ -18,13 +18,18 @@
     <script type="text/javascript" src={~p"/scripts/squire.js"} />
   </head>
   <body class="bg-white antialiased">
-    <header class="p-4 flex items-start md:items-center justify-between border-b border-zinc-100 py-3 text-sm">
+    <header class="p-4 flex flex-col md:flex-row items-start md:items-center justify-between border-b border-zinc-100 py-3 text-sm">
       <div class="flex items-center gap-4">
-        <a href="/tasks">
+        <.link href={~p"/tasks"}>
           <img src={~p"/images/logo.svg"} width="36" class="min-w-[36px]" />
-        </a>
-        <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
-          v<%= Application.spec(:phoenix, :vsn) %>
+        </.link>
+        <p class="text-2xl px-1 font-medium leading-6">
+          <.link class="text-brand hover:text-indigo-400 no-underline" href={~p"/tasks"}>
+            Afrek
+          </.link>
+        </p>
+        <p class="bg-brand/5 text-brand px-1 font-medium leading-6">
+          v<%= Application.spec(:afrek, :vsn) %>
         </p>
       </div>
 
@@ -44,7 +49,7 @@
                 href={~p"/tasks"}
                 class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
               >
-                Completed Tasks
+                Completed
               </.link>
             </li>
             <li>
@@ -52,7 +57,7 @@
                 href={~p"/tasks"}
                 class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
               >
-                Archived Tasks
+                Archived
               </.link>
             </li>
             <li>
