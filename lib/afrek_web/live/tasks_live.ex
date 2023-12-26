@@ -10,71 +10,89 @@ defmodule AfrekWeb.TasksLive do
       <%= DateTime.utc_now() |> Calendar.strftime("%A %b %d") %>
     </h1>
 
-    <.simple_form
-      id="new-task"
-      for={@form}
-      class="my-10 md:m-10"
-      phx-change="validate"
-      phx-submit="save"
-      phx-hook="SubmitTask"
-    >
-      <div class="flex flex-col md:flex-row gap-4">
-        <.input
-          field={@form[:title]}
-          type="text"
-          wrapper_class="grow"
-          placeholder="Foo the bar…"
-          required
-        />
+    <.modal id="new-task-modal">
+      <.simple_form
+        id="new-task"
+        for={@form}
+        class="my-10 md:m-10"
+        phx-change="validate"
+        phx-submit="save"
+        phx-hook="SubmitTask"
+      >
+        <div class="flex flex-col md:flex-row gap-4">
+          <.input
+            field={@form[:title]}
+            type="text"
+            wrapper_class="grow"
+            placeholder="Foo the bar…"
+            required
+          />
 
-        <.input field={@form[:due_date]} type="date" wrapper_class="" placeholder="Due date…" />
+          <.input field={@form[:due_date]} type="date" wrapper_class="" placeholder="Due date…" />
 
-        <.input
-          field={@form[:duration]}
-          type="text"
-          wrapper_class=""
-          placeholder="1h 25m"
-          pattern="^([0-9]+h)? ?([0-9]+m)?$"
-          title="Examples of valid durations: 1h, 45m, 1h 43m, 12h30m"
-        />
-      </div>
+          <.input
+            field={@form[:duration]}
+            type="text"
+            wrapper_class=""
+            placeholder="1h 25m"
+            pattern="^([0-9]+h)? ?([0-9]+m)?$"
+            title="Examples of valid durations: 1h, 45m, 1h 43m, 12h30m"
+          />
+        </div>
 
-      <.rte id="task-details" />
+        <.rte id="task-details" />
 
-      <div class="text-right mt-2">
-        <.button type="submit">Add Task</.button>
-      </div>
-    </.simple_form>
+        <div class="mt-2">
+          <.button class="w-full" type="submit" phx-click={hide_modal("new-task-modal")}>
+            Add Task
+          </.button>
+        </div>
+      </.simple_form>
+    </.modal>
 
     <div class="flex flex-col md:flex-row my-5">
-      <div
-        id="tasks"
-        class="w-full md:px-10 mb-10 flex flex-col gap-4 md:border-r"
-        phx-update="stream"
-      >
-        <div
-          :for={{id, task} <- @streams.tasks}
-          id={id}
-          class="group flex flex-row gap-2 items-center"
-        >
-          <div class="flex flex-col md:invisible group-hover:visible self-start">
-            <.no_outline_button
-              class="group-first:invisible"
-              phx-click="increment_task_position"
-              phx-value-task={task.id}
-            >
+      <div class="w-full md:px-10 mb-10 gap-4 md:border-r">
+        <div class="flex flex-row gap-2 items-center mb-2">
+          <div class="flex flex-col invisible self-start">
+            <.no_outline_button class="">
               <.icon name="hero-chevron-up" />
             </.no_outline_button>
-            <.no_outline_button
-              class="group-last:invisible"
-              phx-click="decrement_task_position"
-              phx-value-task={task.id}
-            >
+            <.no_outline_button class="">
               <.icon name="hero-chevron-down" />
             </.no_outline_button>
           </div>
           <div class="grow">
-            <.task task={task} />
+            <.button class="w-full" phx-click={show_modal("new-task-modal")}>
+              New task
+            </.button>
+          </div>
+        </div>
+
+        <div id="tasks" class="w-full flex flex-col gap-4" phx-update="stream">
+          <div
+            :for={{id, task} <- @streams.tasks}
+            id={id}
+            class="group flex flex-row gap-2 items-center"
+          >
+            <div class="flex flex-col md:opacity-0 group-hover:opacity-100 self-start">
+              <.no_outline_button
+                class="group-first:invisible"
+                phx-click="increment_task_position"
+                phx-value-task={task.id}
+              >
+                <.icon name="hero-chevron-up" />
+              </.no_outline_button>
+              <.no_outline_button
+                class="group-last:invisible"
+                phx-click="decrement_task_position"
+                phx-value-task={task.id}
+              >
+                <.icon name="hero-chevron-down" />
+              </.no_outline_button>
+            </div>
+            <div class="grow">
+              <.task task={task} />
+            </div>
           </div>
         </div>
       </div>
