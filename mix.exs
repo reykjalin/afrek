@@ -53,7 +53,8 @@ defmodule Afrek.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       # Not from phx.new.
-      {:html_sanitize_ex, "~> 1.4"}
+      {:html_sanitize_ex, "~> 1.4"},
+      {:time_zone_info, "~> 0.7.1"}
     ]
   end
 

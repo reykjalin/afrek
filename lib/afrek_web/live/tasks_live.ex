@@ -7,7 +7,11 @@ defmodule AfrekWeb.TasksLive do
   def render(assigns) do
     ~H"""
     <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-      <%= DateTime.utc_now() |> Calendar.strftime("%a %b %d") %> &mdash; <%= DateTime.utc_now()
+      <%= DateTime.now!(@timezone, TimeZoneInfo.TimeZoneDatabase)
+      |> Calendar.strftime("%a %b %d") %> &mdash; <%= DateTime.now!(
+        @timezone,
+        TimeZoneInfo.TimeZoneDatabase
+      )
       |> Calendar.strftime("%I:%M%P") %>
     </h2>
 
@@ -189,11 +193,13 @@ defmodule AfrekWeb.TasksLive do
     end
 
     tasks = Tasks.list_tasks(socket.assigns.scope)
+    timezone = get_connect_params(socket)["timezone"] || "Etc/UTC"
 
     {
       :ok,
       socket
       |> assign(form: to_change_form(%Task{}, %{}))
+      |> assign(timezone: timezone)
       |> stream(:tasks, tasks)
     }
   end
