@@ -105,8 +105,10 @@ defmodule AfrekWeb.CoreComponents do
       id={@id}
       phx-hook="Editor"
     >
-      <div class="flex flex-row gap-2 border-b p-1 overflow-x-scroll md:overflow-auto">
-        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+      <div class="editor p-2 focus:outline-none" id={"#{@id}-editor"}></div>
+
+      <div class="flex flex-row gap-2 border-t p-2 overflow-x-scroll md:overflow-auto">
+        <div class="flex flex-row gap-2 border-r border-slate-300 ">
           <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
             <strong>B</strong>
           </button>
@@ -121,7 +123,7 @@ defmodule AfrekWeb.CoreComponents do
           </button>
         </div>
 
-        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+        <div class="flex flex-row gap-2 border-r border-slate-300 ">
           <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
             <.icon name="hero-link" />
           </button>
@@ -134,7 +136,7 @@ defmodule AfrekWeb.CoreComponents do
           </button>
         </div>
 
-        <div class="flex flex-row gap-2 pe-2 border-r border-slate-300 ">
+        <div class="flex flex-row gap-2 border-r border-slate-300 ">
           <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
             1.
           </button>
@@ -156,7 +158,6 @@ defmodule AfrekWeb.CoreComponents do
           <.icon name="hero-arrow-uturn-right" />
         </button>
       </div>
-      <div class="editor p-2 focus:outline-none" id={"#{@id}-editor"}></div>
     </div>
     """
   end
