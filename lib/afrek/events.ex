@@ -14,4 +14,12 @@ defmodule Afrek.Events do
   defmodule TaskRepositioned do
     defstruct task: nil
   end
+
+  defmodule CompletedTaskAdded do
+    defstruct task: nil
+  end
+
+  defmodule ArchivedTaskAdded do
+    defstruct task: nil
+  end
 end

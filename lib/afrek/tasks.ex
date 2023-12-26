@@ -7,7 +7,7 @@ defmodule Afrek.Tasks do
   alias Afrek.Repo
 
   alias Afrek.Tasks.Task
-  alias Afrek.{Events, Scope}
+  alias Afrek.{ArchivedTasks, CompletedTasks, Events, Scope}
 
   @doc """
   Subscribers the given scope to the todo pubsub.
@@ -90,6 +90,32 @@ defmodule Afrek.Tasks do
       {:error, :task, changeset, _changes_so_far} ->
         {:error, changeset}
     end
+  end
+
+  def complete_task(%Scope{} = scope, task) do
+    {:ok, _} =
+      CompletedTasks.create_completed_task(
+        scope,
+        %{
+          title: task.title,
+          details: task.details
+        }
+      )
+
+    delete_task(scope, task)
+  end
+
+  def archive_task(%Scope{} = scope, task) do
+    {:ok, _} =
+      ArchivedTasks.create_archived_task(
+        scope,
+        %{
+          title: task.title,
+          details: task.details
+        }
+      )
+
+    delete_task(scope, task)
   end
 
   @doc """
@@ -204,7 +230,7 @@ defmodule Afrek.Tasks do
     Phoenix.PubSub.broadcast(Afrek.PubSub, topic(scope), {__MODULE__, event})
   end
 
-  defp topic(%Scope{} = scope), do: "todos:#{scope.current_user.id}"
+  defp topic(%Scope{} = scope), do: "tasks:#{scope.current_user.id}"
 
   defp multi_update_all(multi, name, func, opts \\ []) do
     Ecto.Multi.update_all(multi, name, func, opts)

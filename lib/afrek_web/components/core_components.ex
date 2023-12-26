@@ -20,6 +20,39 @@ defmodule AfrekWeb.CoreComponents do
   import AfrekWeb.Gettext
 
   @doc """
+  Renders a completed task given some data.
+  """
+  attr :task, :map
+  attr :class, :string, default: nil
+
+  def completed_task(assigns) do
+    ~H"""
+    <.card class={@class}>
+      <details :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() != ""} class="group">
+        <summary class="flex items-center gap-2 p-1 group-open:border-b group-open:border-slate-400">
+          <.icon
+            class="transition ease-in-out duration-100 group-open:rotate-90 min-w-[20px]"
+            name="hero-chevron-right"
+          />
+          <p class="grow"><%= @task.title %></p>
+        </summary>
+
+        <div class="p-1">
+          <%= @task.details |> HtmlSanitizeEx.basic_html() |> Phoenix.HTML.raw() %>
+        </div>
+      </details>
+
+      <div
+        :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() == ""}
+        class="flex items-center gap-2 p-1"
+      >
+        <p class="grow"><%= @task.title %></p>
+      </div>
+    </.card>
+    """
+  end
+
+  @doc """
   Renders a task given some data.
   """
   attr :task, :map

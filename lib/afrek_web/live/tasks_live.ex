@@ -284,7 +284,7 @@ defmodule AfrekWeb.TasksLive do
 
     # FIXME: Move task to the completed tasks table.
 
-    {:ok, _} = Tasks.delete_task(socket.assigns.scope, task)
+    {:ok, _} = Tasks.complete_task(socket.assigns.scope, task)
 
     {:noreply, socket}
   end
@@ -321,7 +321,7 @@ defmodule AfrekWeb.TasksLive do
 
     # FIXME: Move task to the archived tasks table.
 
-    {:ok, _} = Tasks.delete_task(socket.assigns.scope, task)
+    {:ok, _} = Tasks.archive_task(socket.assigns.scope, task)
 
     {:noreply, socket}
   end

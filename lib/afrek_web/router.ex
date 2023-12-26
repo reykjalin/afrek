@@ -28,6 +28,8 @@ defmodule AfrekWeb.Router do
     live_session :default,
       on_mount: [{AfrekWeb.UserAuth, :ensure_authenticated}, AfrekWeb.Scope] do
       live "/tasks", TasksLive, :index
+      live "/completed", CompletedTasksLive, :index
+      live "/archived", ArchivedTasksLive, :index
     end
   end
 
