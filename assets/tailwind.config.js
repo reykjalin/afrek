@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = {
-  content: ["./js/**/*.js", "../lib/verk_web.ex", "../lib/verk_web/**/*.*ex"],
+  content: ["./js/**/*.js", "../lib/afrek_web.ex", "../lib/afrek_web/**/*.*ex"],
   theme: {
     extend: {
       colors: {

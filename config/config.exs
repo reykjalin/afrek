@@ -7,19 +7,19 @@
 # General application configuration
 import Config
 
-config :verk,
-  ecto_repos: [Verk.Repo],
+config :afrek,
+  ecto_repos: [Afrek.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :verk, VerkWeb.Endpoint,
+config :afrek, AfrekWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Phoenix.Endpoint.Cowboy2Adapter,
   render_errors: [
-    formats: [html: VerkWeb.ErrorHTML, json: VerkWeb.ErrorJSON],
+    formats: [html: AfrekWeb.ErrorHTML, json: AfrekWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Verk.PubSub,
+  pubsub_server: Afrek.PubSub,
   live_view: [signing_salt: "eA/J4YdZ"]
 
 # Configures the mailer
@@ -29,7 +29,7 @@ config :verk, VerkWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :verk, Verk.Mailer, adapter: Swoosh.Adapters.Local
+config :afrek, Afrek.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,

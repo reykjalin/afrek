@@ -1,1 +1,1 @@
-call "%~dp0\verk" eval Verk.Release.migrate
+call "%~dp0\afrek" eval Afrek.Release.migrate

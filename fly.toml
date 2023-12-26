@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for verk on 2023-12-19T10:58:10-05:00
+# fly.toml app configuration file generated for afrek on 2023-12-25T18:42:43-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "verk"
+app = "afrek"
 primary_region = "yyz"
 kill_signal = "SIGTERM"
 
@@ -13,7 +13,7 @@ kill_signal = "SIGTERM"
   release_command = "/app/bin/migrate"
 
 [env]
-  PHX_HOST = "verk.fly.dev"
+  PHX_HOST = "afrek.fly.dev"
   PORT = "8080"
 
 [http_service]

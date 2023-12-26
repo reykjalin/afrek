@@ -1,7 +1,7 @@
-defmodule Verk.AccountsFixtures do
+defmodule Afrek.AccountsFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Verk.Accounts` context.
+  entities via the `Afrek.Accounts` context.
   """
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
@@ -18,7 +18,7 @@ defmodule Verk.AccountsFixtures do
     {:ok, user} =
       attrs
       |> valid_user_attributes()
-      |> Verk.Accounts.register_user()
+      |> Afrek.Accounts.register_user()
 
     user
   end

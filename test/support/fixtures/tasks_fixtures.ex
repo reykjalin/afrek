@@ -1,7 +1,7 @@
-defmodule Verk.TasksFixtures do
+defmodule Afrek.TasksFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Verk.Tasks` context.
+  entities via the `Afrek.Tasks` context.
   """
 
   @doc """
@@ -18,7 +18,7 @@ defmodule Verk.TasksFixtures do
         title: "some title",
         user: "some user"
       })
-      |> Verk.Tasks.create_task()
+      |> Afrek.Tasks.create_task()
 
     task
   end
