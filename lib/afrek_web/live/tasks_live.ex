@@ -101,7 +101,7 @@ defmodule AfrekWeb.TasksLive do
 
       <div class="w-full px-10 relative">
         <hr
-          class="w-full border-black mx-auto absolute"
+          class="max-w-[90%] w-full border-black absolute"
           style={"top: #{@date.hour * 60 + @date.minute}px"}
         />
 
@@ -282,8 +282,6 @@ defmodule AfrekWeb.TasksLive do
   def handle_event("complete_task", %{"task" => task_id}, socket) do
     task = Tasks.get_task!(socket.assigns.scope, task_id)
 
-    # FIXME: Move task to the completed tasks table.
-
     {:ok, _} = Tasks.complete_task(socket.assigns.scope, task)
 
     {:noreply, socket}
@@ -318,8 +316,6 @@ defmodule AfrekWeb.TasksLive do
 
   def handle_event("archive_task", %{"task" => task_id}, socket) do
     task = Tasks.get_task!(socket.assigns.scope, task_id)
-
-    # FIXME: Move task to the archived tasks table.
 
     {:ok, _} = Tasks.archive_task(socket.assigns.scope, task)
 
