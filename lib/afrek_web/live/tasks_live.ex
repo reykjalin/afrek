@@ -152,7 +152,7 @@ defmodule AfrekWeb.TasksLive do
           <p class="text-sm mt-[-10px] w-[40px]">2pm <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
-          <p class="text-sm mt-[-10px] w-[40px]">3am <hr class="w-full border-black mx-auto" /></p>
+          <p class="text-sm mt-[-10px] w-[40px]">3pm <hr class="w-full border-black mx-auto" /></p>
         </div>
         <div class="flex flex-column items-start h-[60px] gap-4">
           <p class="text-sm mt-[-10px] w-[40px]">4pm <hr class="w-full border-black mx-auto" /></p>
