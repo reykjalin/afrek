@@ -48,24 +48,26 @@
   </p>
 </div>
 
-<section class="bg-indigo-600 px-10 md:px-20 py-40 flex flex-row justify-around flex-wrap lg:flex-nowrap gap-10">
-  <div class="text-center md:text-left">
+<section class="bg-indigo-600 px-10 md:px-20 py-40 flex flex-col lg:flex-row justify-around gap-10 text-white">
+  <div class="text-center lg:text-left">
     <h2 class="text-5xl font-bold text-white m-5 md:m-10">Be productive with Afrek</h2>
 
     <p class="text-2xl text-white m-5 md:m-10">
       Schedule. Stay organized. Succeed.
     </p>
 
-    <div class="w-full flex">
+    <div class="w-full flex flex-col m-5 gap-2 text-center">
       <.link
         href={~p"/users/register"}
-        class="flex-grow m-5 py-4 px-20 md:px-40 text-center text-white font-semibold text-xl bg-indigo-700 hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 no-underline whitespace-nowrap"
+        class="flex-grow py-4 px-20 md:px-40 text-center text-white font-semibold text-xl bg-indigo-700 hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 no-underline whitespace-nowrap"
       >
         Sign up
       </.link>
+      <p><i>It's free for now!</i></p>
+      <p><i>Eventually this will be a 30-day free trial and then $3/month or $30/year.</i></p>
     </div>
   </div>
-  <div class="flex flex-row flex-wrap md:flex-nowrap items-center justify-center gap-2">
+  <div class="flex flex-col lg:flex-row items-center justify-center gap-2">
     <img width="500" class="min-w-[300px]" src={~p"/images/desktop.webp"} />
     <img width="170" class="min-w-[100px]" class="mx-auto" src={~p"/images/mobile.webp"} />
   </div>
@@ -73,7 +75,7 @@
 
 <section class="px-10 md:px-20 py-40 w-full">
   <!-- What can you do section. -->
-  <div class="flex flex-row justify-around items-center gap-10 flex-wrap lg:flex-nowrap">
+  <div class="flex flex-col lg:flex-row justify-around items-center gap-10">
     <div class="flex flex-col items-center gap-5">
       <.icon name="hero-calendar-days" class="w-32 h-32" />
       <p class="text-2xl text-center">Plan your day</p>
@@ -129,7 +131,7 @@
   </div>
 </section>
 
-<footer class="p-20 bg-slate-700 flex flex-col md:flex-row items-start md:items-center justify-around text-sm text-white">
+<footer class="p-20 bg-slate-700 flex flex-col md:flex-row items-center justify-around text-sm text-white">
   <div class="text-center">
     <p class="text-center">
       <.link href={~p"/privacy"} class="text-white">Privacy</.link>
