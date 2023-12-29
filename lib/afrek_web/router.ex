@@ -26,7 +26,11 @@ defmodule AfrekWeb.Router do
     get "/privacy", PageController, :privacy
 
     live_session :default,
-      on_mount: [{AfrekWeb.UserAuth, :ensure_authenticated}, AfrekWeb.Scope] do
+      on_mount: [
+        {AfrekWeb.UserAuth, :ensure_authenticated},
+        {AfrekWeb.SaveRequestPath, :save_request_path},
+        AfrekWeb.Scope
+      ] do
       live "/tasks", TasksLive, :index
       live "/completed", CompletedTasksLive, :index
       live "/archived", ArchivedTasksLive, :index
@@ -75,7 +79,10 @@ defmodule AfrekWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{AfrekWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [
+        {AfrekWeb.UserAuth, :ensure_authenticated},
+        {AfrekWeb.SaveRequestPath, :save_request_path}
+      ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
