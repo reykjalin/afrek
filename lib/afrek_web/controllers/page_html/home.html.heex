@@ -72,7 +72,7 @@
 </section>
 
 <section class="px-10 md:px-20 py-40 w-full">
-  <!-- What can you do section? -->
+  <!-- What can you do section. -->
   <div class="flex flex-row justify-around items-center gap-10 flex-wrap lg:flex-nowrap">
     <div class="flex flex-col items-center gap-5">
       <.icon name="hero-calendar-days" class="w-32 h-32" />
@@ -100,12 +100,44 @@
   </div>
 </section>
 
-<section class="">
-  <!-- Features section -->
+<section class="w-full">
+  <!-- Features section. -->
+  <div class="flex flex-col lg:flex-row">
+    <div class="px-10 lg:px-20 py-40 bg-brand text-white flex flex-col gap-5 lg:w-1/2">
+      <p class="text-2xl">Tasks are more than just short descriptions</p>
+      <p>
+        Afrek has full rich-text editing capabilities allowing you to include all the details necessary to complete your task.
+      </p>
+    </div>
+    <div class="px-10 py-5 lg:px-40 lg:w-1/2 flex flex-col justify-center items-center">
+      <img width="300" height="300" class="bg-slate-400" alt="Placeholder, no image yet." />
+    </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row-reverse">
+    <div class="px-10 lg:px-20 py-40 bg-brand text-white flex flex-col gap-5 lg:w-1/2">
+      <p class="text-2xl">Scheduling that gets out of your way</p>
+      <p>(Still a work in progress)</p>
+      <p>
+        Scheduling your tasks is just a matter of dragging and dropping tasks on a calendar-like interface.
+        Afrek will automatically shift tasks around to prevent any tasks from overlapping.
+      </p>
+    </div>
+    <div class="px-10 py-5 lg:px-40 lg:w-1/2 flex flex-col justify-center items-center">
+      <img width="300" height="300" class="bg-slate-400" alt="Placeholder, no image yet." />
+    </div>
+  </div>
 </section>
 
-<footer class="p-20 bg-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between text-sm">
-  <p class="text-center">
-    <.link href={~p"/privacy"} class="text-white">Privacy</.link>
-  </p>
+<footer class="p-20 bg-slate-700 flex flex-col md:flex-row items-start md:items-center justify-around text-sm text-white">
+  <div class="text-center">
+    <p class="text-center">
+      <.link href={~p"/privacy"} class="text-white">Privacy</.link>
+    </p>
+    <p>Contact</p>
+    <p class="mt-10">
+      Developed with &lt;3 by
+      <.link class="text-white" href="https://thorlaksson.com">Kristófer Reykjalín</.link>
+    </p>
+  </div>
 </footer>
