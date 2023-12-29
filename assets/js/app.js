@@ -58,6 +58,57 @@ const hooks = {
       this.el.addEventListener("toggle_code", () => {
         this.editor.toggleCode();
       });
+      this.el.addEventListener("toggle_bold", () => {
+        if (this.editor.hasFormat("b")) {
+          this.editor.removeBold();
+        } else {
+          this.editor.bold();
+        }
+      });
+      this.el.addEventListener("toggle_italic", () => {
+        if (this.editor.hasFormat("i")) {
+          this.editor.removeItalic();
+        } else {
+          this.editor.italic();
+        }
+      });
+      this.el.addEventListener("toggle_underline", () => {
+        if (this.editor.hasFormat("u")) {
+          this.editor.removeUnderline();
+        } else {
+          this.editor.underline();
+        }
+      });
+      this.el.addEventListener("toggle_ordered_list", () => {
+        if (this.editor.hasFormat("ol")) {
+          this.editor.removeList();
+        } else {
+          this.editor.makeOrderedList();
+        }
+      });
+      this.el.addEventListener("toggle_unordered_list", () => {
+        if (this.editor.hasFormat("ul")) {
+          this.editor.removeList();
+        } else {
+          this.editor.makeUnorderedList();
+        }
+      });
+      this.el.addEventListener("undo", () => {
+        this.editor.undo();
+      });
+      this.el.addEventListener("redo", () => {
+        this.editor.redo();
+      });
+      this.el.addEventListener("toggle_link", () => {
+        if (this.editor.hasFormat("a")) {
+          this.editor.removeLink();
+        } else {
+          const url = prompt("Enter the URL");
+          if (url) {
+            this.editor.makeLink(url);
+          }
+        }
+      });
     },
   },
   SubmitTask: {

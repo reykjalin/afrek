@@ -141,23 +141,36 @@ defmodule AfrekWeb.CoreComponents do
       <div class="editor p-2 focus:outline-none" id={"#{@id}-editor"}></div>
 
       <div class="flex flex-row gap-2 border-t p-2 overflow-x-scroll md:overflow-auto">
-        <div class="flex flex-row gap-2 border-r border-slate-300 ">
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+        <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_bold", to: "##{@id}-editor")}
+          >
             <strong>B</strong>
           </button>
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_italic", to: "##{@id}-editor")}
+          >
             <em>I</em>
           </button>
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_underline", to: "##{@id}-editor")}
+          >
             <u>U</u>
-          </button>
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-            <strike>S</strike>
           </button>
         </div>
 
-        <div class="flex flex-row gap-2 border-r border-slate-300 ">
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+        <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_link", to: "##{@id}-editor")}
+          >
             <.icon name="hero-link" />
           </button>
           <button
@@ -169,25 +182,35 @@ defmodule AfrekWeb.CoreComponents do
           </button>
         </div>
 
-        <div class="flex flex-row gap-2 border-r border-slate-300 ">
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+        <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_ordered_list", to: "##{@id}-editor")}
+          >
             1.
           </button>
-          <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+          <button
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            type="button"
+            phx-click={JS.dispatch("toggle_unordered_list", to: "##{@id}-editor")}
+          >
             <.icon name="hero-list-bullet" />
           </button>
         </div>
 
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          |<.icon name="hero-chevron-double-left" />
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
-          |<.icon name="hero-chevron-double-right" />
-        </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+        <button
+          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+          type="button"
+          phx-click={JS.dispatch("undo", to: "##{@id}-editor")}
+        >
           <.icon name="hero-arrow-uturn-left" />
         </button>
-        <button class="border border-gray-400 shadow-sm p-1 min-w-[35px]" type="button">
+        <button
+          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+          type="button"
+          phx-click={JS.dispatch("redo", to: "##{@id}-editor")}
+        >
           <.icon name="hero-arrow-uturn-right" />
         </button>
       </div>
