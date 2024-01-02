@@ -127,6 +127,8 @@ const hooks = {
     mounted() {
       this.sortable = new Sortable(this.el, {
         draggable: ".task-item",
+        delay: 150,
+        delayOnTouchOnly: true,
         animation: 150,
         easing: "cubic-bezier(0.87, 0, 0.13, 1)",
         dragClass: "drag-item",
