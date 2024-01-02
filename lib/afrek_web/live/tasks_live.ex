@@ -77,7 +77,7 @@ defmodule AfrekWeb.TasksLive do
               "drag-ghost:bg-slate-300 drag-ghost:rounded-sm"
             ]}
           >
-            <div class="flex flex-col md:opacity-0 group-hover:opacity-100 self-start">
+            <div class="flex flex-col md:opacity-0 drag-ghost:hidden drag-item:hidden group-hover:opacity-100 self-start">
               <.no_outline_button
                 class="group-first:invisible"
                 phx-click="increment_task_position"
@@ -93,7 +93,7 @@ defmodule AfrekWeb.TasksLive do
                 <.icon name="hero-chevron-down" />
               </.no_outline_button>
             </div>
-            <div class="grow">
+            <div class="grow drag-ghost:opacity-0">
               <.task task={task} />
             </div>
           </div>
