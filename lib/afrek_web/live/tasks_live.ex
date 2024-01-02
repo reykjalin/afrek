@@ -68,11 +68,11 @@ defmodule AfrekWeb.TasksLive do
           </div>
         </div>
 
-        <div id="tasks" class="w-full flex flex-col gap-4" phx-update="stream">
+        <div id="tasks" class="w-full flex flex-col gap-4" phx-update="stream" phx-hook="Sortable">
           <div
             :for={{id, task} <- @streams.tasks}
             id={id}
-            class="group flex flex-row gap-2 items-center"
+            class="task-item group flex flex-row gap-2 items-center"
           >
             <div class="flex flex-col md:opacity-0 group-hover:opacity-100 self-start">
               <.no_outline_button
@@ -288,8 +288,12 @@ defmodule AfrekWeb.TasksLive do
   end
 
   def handle_event("reposition_task", %{"task" => task_id, "new-pos" => new_pos}, socket) do
+    # New position is based on the new index of the task in the front-end, which is sorted in descending order from the DB
+    # so we have to subtract the new position from the length of the list to get the correct new position.
+    new_pos = Enum.count(Tasks.list_tasks(socket.assigns.scope)) - 1 - new_pos
+
     task = Tasks.get_task!(socket.assigns.scope, task_id)
-    Tasks.update_task_position(socket.assigns.scope, task, new_pos |> String.to_integer())
+    Tasks.update_task_position(socket.assigns.scope, task, new_pos)
 
     {:noreply, socket}
   end

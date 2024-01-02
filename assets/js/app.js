@@ -21,6 +21,7 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
+import Sortable from "../vendor/sortable";
 
 const hooks = {
   // Squire is included via <script> tag in the root.html.heex template.
@@ -119,6 +120,27 @@ const hooks = {
 
         // Append the Squire editor contents to the form data submitted to the server.
         formData.append("details", editorElem.innerHTML);
+      });
+    },
+  },
+  Sortable: {
+    mounted() {
+      this.sortable = new Sortable(this.el, {
+        draggable: ".task-item",
+        onEnd: (event) => {
+          const { newIndex, item } = event;
+          const id = parseInt(item.id.split("-")[1]) ?? "";
+
+          if (!id) {
+            console.error("No ID found for the task that was moved.", event);
+            return;
+          }
+
+          this.pushEvent("reposition_task", {
+            task: id,
+            "new-pos": newIndex,
+          });
+        },
       });
     },
   },
