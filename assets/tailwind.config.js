@@ -43,6 +43,14 @@ module.exports = {
       ])
     ),
 
+    // Variants for allowing drag class prefixes.
+    plugin(({ addVariant }) =>
+      addVariant("drag-item", [".drag-item&", ".drag-item &"])
+    ),
+    plugin(({ addVariant }) =>
+      addVariant("drag-ghost", [".drag-ghost&", ".drag-ghost &"])
+    ),
+
     // Embeds Heroicons (https://heroicons.com) into your app.css bundle
     // See your `CoreComponents.icon/1` for more information.
     //

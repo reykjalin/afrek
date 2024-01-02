@@ -129,6 +129,8 @@ const hooks = {
         draggable: ".task-item",
         animation: 150,
         easing: "cubic-bezier(0.87, 0, 0.13, 1)",
+        dragClass: "drag-item",
+        ghostClass: "drag-ghost",
         onEnd: (event) => {
           const { newIndex, item } = event;
           const id = parseInt(item.id.split("-")[1]) ?? "";

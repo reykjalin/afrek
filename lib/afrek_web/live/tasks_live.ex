@@ -72,7 +72,10 @@ defmodule AfrekWeb.TasksLive do
           <div
             :for={{id, task} <- @streams.tasks}
             id={id}
-            class="task-item group flex flex-row gap-2 items-center"
+            class={[
+              "task-item group flex flex-row gap-2 items-center",
+              "drag-ghost:bg-slate-300 drag-ghost:rounded-sm"
+            ]}
           >
             <div class="flex flex-col md:opacity-0 group-hover:opacity-100 self-start">
               <.no_outline_button
