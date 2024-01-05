@@ -28,7 +28,12 @@ defmodule AfrekWeb.TasksLive do
             required
           />
 
-          <.input field={@form[:due_date]} type="date" wrapper_class="" placeholder="Due date…" />
+          <.input
+            field={@form[:scheduled_date]}
+            type="datetime-local"
+            wrapper_class=""
+            placeholder="Due date…"
+          />
 
           <.input
             field={@form[:duration]}

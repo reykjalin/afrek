@@ -71,8 +71,8 @@ defmodule AfrekWeb.CoreComponents do
             name="hero-chevron-right"
           />
           <p class="grow"><%= @task.title %></p>
-          <p :if={@task.due_date != nil} class="text-sm text-red-600">
-            <%= @task.due_date %>
+          <p :if={@task.scheduled_date != nil} class="text-sm text-red-600">
+            <%= @task.scheduled_date %>
           </p>
 
           <div class="flex flex-row items-center gap-2 flex-wrap md:flex-nowrap">
@@ -99,8 +99,8 @@ defmodule AfrekWeb.CoreComponents do
         class="flex items-center gap-2 p-1"
       >
         <p class="grow"><%= @task.title %></p>
-        <p :if={@task.due_date != nil} class="text-sm text-red-600">
-          <%= @task.due_date %>
+        <p :if={@task.scheduled_date != nil} class="text-sm text-red-600">
+          <%= @task.scheduled_date %>
         </p>
 
         <div class="flex flex-row items-center gap-2 flex-wrap md:flex-nowrap">

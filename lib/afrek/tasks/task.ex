@@ -6,7 +6,7 @@ defmodule Afrek.Tasks.Task do
     field :position, :integer
     field :title, :string
     field :details, :string
-    field :due_date, :date
+    field :scheduled_date, :naive_datetime
     field :duration, :string
 
     belongs_to :user, Afrek.Accounts.User
@@ -17,7 +17,7 @@ defmodule Afrek.Tasks.Task do
   @doc false
   def changeset(task, attrs) do
     task
-    |> cast(attrs, [:title, :details, :due_date, :duration, :position])
+    |> cast(attrs, [:title, :details, :scheduled_date, :duration, :position])
     |> validate_required([:title])
   end
 end
