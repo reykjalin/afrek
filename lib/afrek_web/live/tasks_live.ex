@@ -226,14 +226,7 @@ defmodule AfrekWeb.TasksLive do
       |> assign(timezone: timezone)
       |> assign(date: date)
       |> stream(:tasks, tasks)
-      |> assign(
-        scheduled_tasks:
-          Enum.filter(tasks, fn t -> t.scheduled_date != nil end)
-          |> Enum.filter(fn t ->
-            t.scheduled_date.day == date.day and t.scheduled_date.month == date.month and
-              t.scheduled_date.year == date.year
-          end)
-      )
+      |> assign(scheduled_tasks: tasks_for_date(tasks, date))
     }
   end
 
@@ -288,13 +281,22 @@ defmodule AfrekWeb.TasksLive do
   def handle_event("save", %{"task" => task_params, "details" => task_details}, socket) do
     task_params = Map.put(task_params, "details", task_details)
 
+    # FIXME: We need to verify that there is no scheduling overlap before creating the new task.
+
     case Tasks.create_task(socket.assigns.scope, task_params) do
       {:ok, new_todo} ->
+        date =
+          case DateTime.now(socket.assigns.timezone, TimeZoneInfo.TimeZoneDatabase) do
+            {:ok, date} -> date
+            _ -> DateTime.utc_now()
+          end
+
         {
           :noreply,
           socket
           |> stream_insert(:tasks, new_todo)
           |> assign(:form, to_change_form(%Task{}, %{}))
+          |> assign(scheduled_tasks: tasks_for_date(Tasks.list_tasks(socket.assigns.scope), date))
           |> push_event("task_added", %{task: new_todo.id})
         }
 
@@ -355,5 +357,13 @@ defmodule AfrekWeb.TasksLive do
     |> Tasks.change_task(params)
     |> Map.put(:action, action)
     |> to_form()
+  end
+
+  defp tasks_for_date(tasks, date) do
+    Enum.filter(tasks, fn t -> t.scheduled_date != nil end)
+    |> Enum.filter(fn t ->
+      t.scheduled_date.day == date.day and t.scheduled_date.month == date.month and
+        t.scheduled_date.year == date.year
+    end)
   end
 end
