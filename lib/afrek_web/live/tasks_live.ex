@@ -113,6 +113,14 @@ defmodule AfrekWeb.TasksLive do
           style={"top: #{@date.hour * 60 + @date.minute}px"}
         />
 
+        <div
+          :for={task <- @scheduled_tasks}
+          class="absolute w-full ml-[55px]"
+          style={"top: #{task.scheduled_date.hour * 60 + task.scheduled_date.minute}px"}
+        >
+          <.scheduled_task task={task} class="w-full max-w-[70%]" />
+        </div>
+
         <div class="flex flex-column items-start h-[60px] gap-4">
           <p class="text-sm mt-[-10px] w-[40px]">12am <hr class="w-full border-black mx-auto" /></p>
         </div>
@@ -218,6 +226,14 @@ defmodule AfrekWeb.TasksLive do
       |> assign(timezone: timezone)
       |> assign(date: date)
       |> stream(:tasks, tasks)
+      |> assign(
+        scheduled_tasks:
+          Enum.filter(tasks, fn t -> t.scheduled_date != nil end)
+          |> Enum.filter(fn t ->
+            t.scheduled_date.day == date.day and t.scheduled_date.month == date.month and
+              t.scheduled_date.year == date.year
+          end)
+      )
     }
   end
 
