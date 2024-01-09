@@ -52,6 +52,17 @@ defmodule AfrekWeb.CoreComponents do
     """
   end
 
+  attr :task, :map
+  attr :class, :string, default: nil
+
+  def scheduled_task(assigns) do
+    ~H"""
+    <.card class={@class} style={"height: #{task_duration_in_minutes(@task)}px"}>
+      <p><%= @task.title %></p>
+    </.card>
+    """
+  end
+
   @doc """
   Renders a task given some data.
   """
@@ -231,14 +242,18 @@ defmodule AfrekWeb.CoreComponents do
       </.card>
   """
   attr :class, :string, default: nil
+  attr :style, :string, default: nil
   slot :inner_block, required: true
 
   def card(assigns) do
     ~H"""
-    <div class={[
-      "bg-white overflow-hidden border border-black shadow-[0_0_4px_1px_rgb(0_0_0_/_0.3)] p-1",
-      @class
-    ]}>
+    <div
+      class={[
+        "bg-white overflow-hidden border border-black shadow-[0_0_4px_1px_rgb(0_0_0_/_0.3)] p-1",
+        @class
+      ]}
+      style={@style}
+    >
       <%= render_slot(@inner_block) %>
     </div>
     """
@@ -927,5 +942,28 @@ defmodule AfrekWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  defp task_duration_in_minutes(%Afrek.Tasks.Task{duration: duration}) do
+    if duration == nil or duration == "" do
+      60
+    else
+      regex = Regex.compile!("(?<hours>\\d+ ?h)?[ ]?(?<minutes>\\d+ ?m)?")
+
+      case Regex.named_captures(regex, duration) do
+        %{"hours" => hours, "minutes" => ""} ->
+          String.to_integer(hours |> String.trim("h") |> String.trim()) * 60
+
+        %{"hours" => "", "minutes" => minutes} ->
+          String.to_integer(minutes |> String.trim("m") |> String.trim())
+
+        %{"hours" => hours, "minutes" => minutes} ->
+          String.to_integer(hours |> String.trim("h") |> String.trim()) * 60 +
+            String.to_integer(minutes |> String.trim("m") |> String.trim())
+
+        _ ->
+          60
+      end
+    end
   end
 end
