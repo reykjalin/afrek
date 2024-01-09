@@ -123,9 +123,10 @@ const hooks = {
       });
     },
   },
-  Sortable: {
+  SortableTasks: {
     mounted() {
       this.sortable = new Sortable(this.el, {
+        group: { name: "tasks", pull: "clone", put: false, revertClone: true },
         draggable: ".task-item",
         delay: 150,
         delayOnTouchOnly: true,
@@ -133,7 +134,17 @@ const hooks = {
         easing: "cubic-bezier(0.87, 0, 0.13, 1)",
         dragClass: "drag-item",
         ghostClass: "drag-ghost",
+        onChange: (event) => {
+          if (event.item && event.item.style.position !== "inherit") {
+            event.item.style.position = "inherit";
+          }
+        },
         onEnd: (event) => {
+          // Make sure this event isn't run when dropping a task into the calendar view.
+          if (event.to !== this.el) {
+            return;
+          }
+
           const { newIndex, item } = event;
           const id = parseInt(item.id.split("-")[1]) ?? "";
 
@@ -146,6 +157,55 @@ const hooks = {
             task: id,
             "new-pos": newIndex,
           });
+        },
+      });
+    },
+  },
+  SortableSchedule: {
+    mounted() {
+      this.sortable = new Sortable(this.el, {
+        group: { name: "scheduled_tasks", pull: false, put: ["tasks"] },
+        draggable: ".scheduled-item",
+        delay: 150,
+        delayOnTouchOnly: true,
+        animation: 150,
+        easing: "cubic-bezier(0.87, 0, 0.13, 1)",
+        dragClass: "drag-item",
+        ghostClass: "drag-ghost",
+        sort: false,
+        onAdd: (event) => {
+          console.log("scheduled add:", event);
+          console.log(
+            `x: ${event.originalEvent.clientX}, y: ${event.originalEvent.clientY}`
+          );
+
+          if (event.item) {
+            // Remove the item from the DOM since it will be added on the backend instead.
+            event.item.remove();
+          }
+
+          event.preventDefault();
+        },
+        onChange: (event) => {
+          if (!event.item) {
+            return;
+          }
+
+          if (event.item.style.position !== "absolute") {
+            event.item.style.position = "absolute";
+          }
+
+          // FIXME: Align top with the task, not with the mouse cursor.
+          // FIXME: Allow people to configure the interval of where tasks should snap to.
+          // FIXME: Add some indicator of what time the task is being dropped at.
+
+          // Make sure the position of the ghost is calculated relative to the top of the calendar view.
+          const top = this.el.getBoundingClientRect().top;
+          const ghostTop = event.originalEvent.clientY - top;
+          event.item.style.top = `${ghostTop}px`;
+
+          event.item.className =
+            "group flex flex-row gap-2 items-center drag-ghost:bg-slate-300 drag-ghost:rounded-sm sortable-chosen drag-ghost w-full ml-[55px] max-w-[70%]";
         },
       });
     },

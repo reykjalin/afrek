@@ -73,7 +73,12 @@ defmodule AfrekWeb.TasksLive do
           </div>
         </div>
 
-        <div id="tasks" class="w-full flex flex-col gap-4" phx-update="stream" phx-hook="Sortable">
+        <div
+          id="tasks"
+          class="w-full flex flex-col gap-4"
+          phx-update="stream"
+          phx-hook="SortableTasks"
+        >
           <div
             :for={{id, task} <- @streams.tasks}
             id={id}
@@ -107,7 +112,7 @@ defmodule AfrekWeb.TasksLive do
 
       <hr class="md:hidden w-full border-black mb-10" />
 
-      <div class="w-full px-10 relative">
+      <div id="scheduled-tasks" class="w-full px-10 relative" phx-hook="SortableSchedule">
         <hr
           class="max-w-[90%] w-full border-black absolute"
           style={"top: #{@date.hour * 60 + @date.minute}px"}
@@ -115,7 +120,7 @@ defmodule AfrekWeb.TasksLive do
 
         <div
           :for={task <- @scheduled_tasks}
-          class="absolute w-full ml-[55px]"
+          class="scheduled-item absolute w-full ml-[55px]"
           style={"top: #{task.scheduled_date.hour * 60 + task.scheduled_date.minute}px"}
         >
           <.scheduled_task task={task} class="w-full max-w-[70%]" />
