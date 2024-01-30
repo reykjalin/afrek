@@ -3,14 +3,16 @@
     <.link href={~p"/"}>
       <img src={~p"/images/logo.svg"} width="36" class="min-w-[36px]" />
     </.link>
-    <p class="text-2xl px-1 font-medium leading-6">
-      <.link class="text-brand hover:text-indigo-400 no-underline" href={~p"/"}>
-        Afrek
-      </.link>
-    </p>
-    <p class="bg-brand/5 text-brand px-1 font-medium leading-6">
-      v<%= Application.spec(:afrek, :vsn) %>
-    </p>
+    <div class="flex flex-row gap-1">
+      <p class="text-2xl px-1 font-medium leading-6">
+        <.link class="text-brand hover:text-indigo-400 no-underline" href={~p"/"}>
+          Afrek
+        </.link>
+      </p>
+      <p class="bg-brand/5 text-brand px-1 font-medium leading-6 small-caps">
+        Alpha
+      </p>
+    </div>
   </div>
 
   <nav>

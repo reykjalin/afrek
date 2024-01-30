@@ -16,6 +16,10 @@
         @apply border-b border-slate-300;
     }
 
+    .small-caps {
+        font-variant: small-caps;
+    }
+
     details.task .task__details > * {
         @apply px-5 py-1;
     }
