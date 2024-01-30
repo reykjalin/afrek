@@ -197,7 +197,7 @@ const hooks = {
 
           // FIXME: Align top with the task, not with the mouse cursor.
           // FIXME: Allow people to configure the interval of where tasks should snap to.
-          // FIXME: Add some indicator of what time the task is being dropped at.
+          // FIXME: Add data to event indicating when the task should be scheduled.
 
           // Make sure the position of the ghost is calculated relative to the top of the calendar view.
           const top = this.el.getBoundingClientRect().top;
@@ -212,6 +212,22 @@ const hooks = {
 
           event.item.className =
             "group flex flex-row gap-2 items-center drag-ghost:bg-slate-300 drag-ghost:rounded-sm sortable-chosen drag-ghost w-full ml-[55px] max-w-[70%]";
+
+          if (!event.item.querySelector("#drop-time")) {
+            const time = document.createElement("p");
+            time.id = "drop-time";
+
+            hours = Math.floor(ghostTop / 60);
+            minutes = ghostTop - hours * 60;
+            time.innerText = `${hours}:${minutes}`;
+
+            event.item.appendChild(time);
+          } else {
+            const time = event.item.querySelector("#drop-time");
+            hours = Math.floor(ghostTop / 60);
+            minutes = ghostTop - hours * 60;
+            time.innerText = `${hours}:${minutes}`;
+          }
         },
       });
     },
