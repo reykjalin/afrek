@@ -202,6 +202,12 @@ const hooks = {
           // Make sure the position of the ghost is calculated relative to the top of the calendar view.
           const top = this.el.getBoundingClientRect().top;
           const ghostTop = event.originalEvent.clientY - top;
+
+          // Make sure the task is snapped to the nearest 10 minute interval.
+          if (ghostTop % 10 != 0) {
+            return;
+          }
+
           event.item.style.top = `${ghostTop}px`;
 
           event.item.className =
