@@ -184,6 +184,10 @@ const hooks = {
             event.item.remove();
           }
 
+          console.log(
+            `hours: ${event.item.dataset.hours}, minutes: ${event.item.dataset.minutes}`
+          );
+
           event.preventDefault();
         },
         onChange: (event) => {
@@ -197,7 +201,6 @@ const hooks = {
 
           // FIXME: Align top with the task, not with the mouse cursor.
           // FIXME: Allow people to configure the interval of where tasks should snap to.
-          // FIXME: Add data to event indicating when the task should be scheduled.
 
           // Make sure the position of the ghost is calculated relative to the top of the calendar view.
           const top = this.el.getBoundingClientRect().top;
@@ -228,6 +231,10 @@ const hooks = {
             minutes = ghostTop - hours * 60;
             time.innerText = `${hours}:${minutes}`;
           }
+
+          // Add data to event indicating when the task should be scheduled.
+          event.item.dataset.hours = hours;
+          event.item.dataset.minutes = minutes;
         },
       });
     },
