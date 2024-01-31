@@ -86,6 +86,7 @@ defmodule AfrekWeb.TasksLive do
               "task-item group flex flex-row gap-2 items-center",
               "drag-ghost:bg-slate-300 drag-ghost:rounded-sm"
             ]}
+            data-duration={task_duration_in_minutes(task)}
           >
             <div class="flex flex-col md:opacity-0 drag-ghost:hidden drag-item:invisible group-hover:opacity-100 self-start">
               <.no_outline_button

@@ -944,7 +944,7 @@ defmodule AfrekWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-  defp task_duration_in_minutes(%Afrek.Tasks.Task{duration: duration}) do
+  def task_duration_in_minutes(%Afrek.Tasks.Task{duration: duration}) do
     if duration == nil or duration == "" do
       60
     else

@@ -212,6 +212,7 @@ const hooks = {
           }
 
           event.item.style.top = `${ghostTop}px`;
+          event.item.style.height = `${event.item.dataset.duration}px`;
 
           event.item.className =
             "group flex flex-row gap-2 items-center drag-ghost:bg-slate-300 drag-ghost:rounded-sm sortable-chosen drag-ghost w-full ml-[55px] max-w-[70%]";
