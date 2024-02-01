@@ -1,41 +1,4 @@
-<header class="p-4 flex flex-col md:flex-row items-center justify-between border-b border-zinc-100 py-3 text-sm">
-  <div class="flex items-center gap-4">
-    <.link href={~p"/"}>
-      <img src={~p"/images/logo.svg"} width="36" class="min-w-[36px]" />
-    </.link>
-    <div class="flex flex-row gap-1">
-      <p class="text-2xl px-1 font-medium leading-6">
-        <.link class="text-brand hover:text-indigo-400 no-underline" href={~p"/"}>
-          Afrek
-        </.link>
-      </p>
-      <p class="bg-brand/5 text-brand px-1 font-medium leading-6 small-caps">
-        Alpha
-      </p>
-    </div>
-  </div>
-
-  <nav>
-    <ul class="relative z-10 flex flex-col md:flex-row items-center md:gap-4 px-4 sm:px-6 lg:px-8 m-0">
-      <li>
-        <.link
-          href={~p"/users/register"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Register
-        </.link>
-      </li>
-      <li>
-        <.link
-          href={~p"/users/log_in"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Log in
-        </.link>
-      </li>
-    </ul>
-  </nav>
-</header>
+<._static_header />
 
 <.flash_group flash={@flash} />
 
@@ -137,19 +100,4 @@
   </div>
 </section>
 
-<footer class="p-20 bg-slate-700 flex flex-col md:flex-row items-center justify-around text-sm text-white">
-  <div class="text-center flex flex-col gap-2">
-    <p class="text-center">
-      <.link href={~p"/privacy"} class="text-white">Privacy</.link>
-    </p>
-    <p>
-      <.link class="text-white" href="mailto:kristofer@thorlaksson.com">
-        <.icon name="hero-envelope" /> Contact
-      </.link>
-    </p>
-    <p class="mt-10">
-      Developed with &lt;3 by
-      <.link class="text-white" href="https://thorlaksson.com">Kristófer Reykjalín</.link>
-    </p>
-  </div>
-</footer>
+<._static_footer />
