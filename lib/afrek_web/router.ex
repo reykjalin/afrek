@@ -24,6 +24,7 @@ defmodule AfrekWeb.Router do
 
     get "/", PageController, :home
     get "/privacy", PageController, :privacy
+    get "/blog", PageController, :blog
 
     live_session :default,
       on_mount: [

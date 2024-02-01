@@ -10,4 +10,8 @@ defmodule AfrekWeb.PageController do
   def privacy(conn, _params) do
     render(conn, :privacy, layout: false)
   end
+
+  def blog(conn, _params) do
+    render(conn, :blog, layout: false)
+  end
 end
