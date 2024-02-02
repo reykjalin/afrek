@@ -211,6 +211,11 @@ const hooks = {
             return;
           }
 
+          // Don't allow scheduling at or past midnight.
+          if (ghostTop >= 60 * 24) {
+            return;
+          }
+
           event.item.style.top = `${ghostTop}px`;
           event.item.style.height = `${event.item.dataset.duration}px`;
 
