@@ -217,25 +217,33 @@ const hooks = {
           event.item.className =
             "group flex flex-row gap-2 items-center drag-ghost:bg-slate-300 drag-ghost:rounded-sm sortable-chosen drag-ghost w-full ml-[55px] max-w-[70%]";
 
-          if (!event.item.querySelector("#drop-time")) {
-            const time = document.createElement("p");
-            time.id = "drop-time";
-
-            hours = Math.floor(ghostTop / 60);
-            minutes = ghostTop - hours * 60;
-            time.innerText = `${hours}:${minutes}`;
-
-            event.item.appendChild(time);
-          } else {
-            const time = event.item.querySelector("#drop-time");
-            hours = Math.floor(ghostTop / 60);
-            minutes = ghostTop - hours * 60;
-            time.innerText = `${hours}:${minutes}`;
-          }
+          let hours = Math.floor(ghostTop / 60);
+          let minutes = ghostTop - hours * 60;
+          let time = null;
 
           // Add data to event indicating when the task should be scheduled.
           event.item.dataset.hours = hours;
           event.item.dataset.minutes = minutes;
+
+          if (!event.item.querySelector("#drop-time")) {
+            time = document.createElement("p");
+            time.id = "drop-time";
+
+            event.item.appendChild(time);
+          } else {
+            time = event.item.querySelector("#drop-time");
+          }
+
+          if (hours < 12) {
+            hours = hours == 0 ? 12 : hours;
+            time.innerText = `${hours}:${minutes}am`;
+          } else if (hours >= 24) {
+            time.innerText = `12:${minutes}am`;
+          } else {
+            hours = hours % 12;
+            hours = hours == 0 ? 12 : hours;
+            time.innerText = `${hours}:${minutes}pm`;
+          }
         },
       });
     },
