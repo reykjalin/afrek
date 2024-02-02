@@ -3,12 +3,16 @@
 <.flash_group flash={@flash} />
 
 <div class="bg-red-500 p-10">
-  <p class="text-white text-2xl font-semibold text-center mb-10">
-    <b>Afrek is a work in progress</b>.
+  <p class="text-2xl font-semibold text-center mb-10">
+    <b>
+      <.link class="text-white hover:text-white" href={~p"/blog/introduction"}>
+        Afrek is a work in progress
+      </.link>
+    </b>
   </p>
   <p class="text-white text-2xl font-semibold text-center">
     Task management has mostly been implemented, but key features such as task scheduling are still missing.
-    You are still more than welcome to sign up! Once ready Afrek will cost $3 per month or $30 per year. Emails will be sent to everyone registered with at least 30-day
+    You are still more than welcome to sign up! Once ready Afrek will cost US$3 per month or US$30 per year. Emails will be sent to everyone registered with at least 30-day
     notice before the first payment is due.
   </p>
 </div>
@@ -29,7 +33,12 @@
         Sign up
       </.link>
       <p><i>It's free for now!</i></p>
-      <p><i>Eventually this will be a 30-day free trial and then $3/month or $30/year.</i></p>
+      <p>
+        <i>
+          <.link class="text-white" href={~p"/blog/introduction"}>Eventually</.link>
+          this will be a 30-day free trial and then US$3/month or US$30/year.
+        </i>
+      </p>
     </div>
   </div>
   <div class="flex flex-row items-center justify-center">
