@@ -188,6 +188,20 @@ const hooks = {
             `hours: ${event.item.dataset.hours}, minutes: ${event.item.dataset.minutes}`
           );
 
+          if (
+            !event.item.dataset.id ||
+            !event.item.dataset.hours ||
+            !event.item.dataset.minutes
+          ) {
+            return;
+          }
+
+          this.pushEvent("schedule_task", {
+            task: event.item.dataset.id,
+            hours: event.item.dataset.hours,
+            minutes: event.item.dataset.minutes,
+          });
+
           event.preventDefault();
         },
         onChange: (event) => {

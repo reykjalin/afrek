@@ -86,6 +86,7 @@ defmodule AfrekWeb.TasksLive do
               "task-item group flex flex-row gap-2 items-center",
               "drag-ghost:bg-slate-300 drag-ghost:rounded-sm"
             ]}
+            data-id={task.id}
             data-duration={task_duration_in_minutes(task)}
           >
             <div class="flex flex-col md:opacity-0 drag-ghost:hidden drag-item:invisible group-hover:opacity-100 self-start">
@@ -123,6 +124,8 @@ defmodule AfrekWeb.TasksLive do
           :for={task <- @scheduled_tasks}
           class="scheduled-item absolute w-full ml-[55px]"
           style={"top: #{task.scheduled_date.hour * 60 + task.scheduled_date.minute}px"}
+          data-id={task.id}
+          data-duration={task_duration_in_minutes(task)}
         >
           <.scheduled_task task={task} class="w-full max-w-[70%]" />
         </div>
@@ -244,6 +247,17 @@ defmodule AfrekWeb.TasksLive do
     {:noreply, stream_delete(socket, :tasks, task)}
   end
 
+  def handle_info({Afrek.Tasks, %Events.TaskScheduled{task: task}}, socket) do
+    tasks = Tasks.list_tasks(socket.assigns.scope)
+
+    socket =
+      assign(socket,
+        scheduled_tasks: tasks_for_date(tasks, socket.assigns.date)
+      )
+
+    {:noreply, stream_insert(socket, :tasks, task)}
+  end
+
   def handle_info({Afrek.Tasks, %Events.TaskRepositioned{task: task}}, socket) do
     # List is in descending order, which is why we need to subtract the new position from the size to get the right position.
     {
@@ -346,6 +360,27 @@ defmodule AfrekWeb.TasksLive do
 
   def handle_event("edit_task", %{"task" => _task_id}, socket) do
     # task = Enum.find(socket.assigns.tasks, &(&1["id"] == task_id))
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "schedule_task",
+        %{"task" => task_id, "hours" => hours, "minutes" => minutes},
+        socket
+      ) do
+    task = Tasks.get_task!(socket.assigns.scope, task_id)
+
+    date = socket.assigns.date
+    year = Integer.to_string(date.year)
+    month = Integer.to_string(date.month) |> String.pad_leading(2, "0")
+    day = Integer.to_string(date.day) |> String.pad_leading(2, "0")
+
+    # Date: "2024-02-02T04:10"
+    scheduled_date =
+      "#{year}-#{month}-#{day}T#{hours |> String.pad_leading(2, "0")}:#{minutes |> String.pad_leading(2, "0")}"
+
+    Tasks.schedule_task(socket.assigns.scope, task, scheduled_date)
 
     {:noreply, socket}
   end

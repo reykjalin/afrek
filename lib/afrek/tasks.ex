@@ -136,6 +136,22 @@ defmodule Afrek.Tasks do
     |> Repo.update()
   end
 
+  def schedule_task(%Scope{} = scope, task, date) do
+    case task
+         |> Task.changeset(%{"scheduled_date" => date})
+         |> Repo.update() do
+      {:ok, updated_task} ->
+        broadcast(scope, %Events.TaskScheduled{
+          task: %Task{task | scheduled_date: updated_task.scheduled_date}
+        })
+
+        :ok
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
   def update_task_position(%Scope{} = scope, task, new_position) do
     Ecto.Multi.new()
     |> multi_reposition(:new, task, new_position)
