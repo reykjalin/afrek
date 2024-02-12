@@ -22,9 +22,14 @@ defmodule Afrek.CompletedTasks do
     Repo.all(
       from(t in CompletedTask,
         where: t.user_id == ^scope.current_user_id,
-        order_by: [desc: :inserted_at]
+        order_by: [desc: :inserted_at],
+        group_by: [t.id, fragment("DATE(?)", t.inserted_at)],
+        select: {fragment("DATE(?)", t.inserted_at), data: t}
       )
     )
+    |> List.foldl(%{}, fn {date, task}, acc -> Map.update(acc, date, task, &(&1 ++ task)) end)
+    |> Map.to_list()
+    |> Enum.sort(fn d1, d2 -> Date.compare(elem(d1, 0), elem(d2, 0)) == :gt end)
   end
 
   @doc """

@@ -9,10 +9,13 @@ defmodule AfrekWeb.CompletedTasksLive do
       Completed Tasks
     </h2>
 
-    <div id="completed-tasks" class="w-full flex flex-col gap-4" phx-update="stream">
-      <div :for={{id, task} <- @streams.tasks} id={id} class="group flex flex-row gap-2 items-center">
-        <div class="grow">
-          <.completed_task task={task} />
+    <div id="completed-tasks" class="w-full" phx-update="stream">
+      <div :for={{date, tasks} <- @tasks}>
+        <h2 class="text-2xl mt-5 mb-3 font-bold"><%= Calendar.strftime(date, "%a %b %d, %Y") %></h2>
+        <div class="flex flex-col gap-2 items-center">
+          <div :for={{id, task} <- tasks} id={id} class="w-full">
+            <.completed_task class="w-full" task={task} />
+          </div>
         </div>
       </div>
     </div>
@@ -29,7 +32,7 @@ defmodule AfrekWeb.CompletedTasksLive do
     {
       :ok,
       socket
-      |> stream(:tasks, tasks)
+      |> assign(:tasks, tasks)
     }
   end
 end
