@@ -28,7 +28,10 @@ defmodule AfrekWeb.CoreComponents do
   def completed_task(assigns) do
     ~H"""
     <.card class={@class}>
-      <details :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() != ""} class="group">
+      <details
+        :if={HtmlSanitizeEx.strip_tags(@task.details) |> String.trim() != ""}
+        class="group task"
+      >
         <summary class="flex items-center gap-2 p-1 group-open:border-b group-open:border-slate-400">
           <.icon
             class="transition ease-in-out duration-100 group-open:rotate-90 min-w-[20px]"
@@ -37,7 +40,7 @@ defmodule AfrekWeb.CoreComponents do
           <p class="grow"><%= @task.title %></p>
         </summary>
 
-        <div class="p-1">
+        <div class="p-1 task__details">
           <%= @task.details |> HtmlSanitizeEx.basic_html() |> Phoenix.HTML.raw() %>
         </div>
       </details>
@@ -249,7 +252,7 @@ defmodule AfrekWeb.CoreComponents do
     ~H"""
     <div
       class={[
-        "bg-white overflow-hidden border border-black shadow-[0_0_4px_1px_rgb(0_0_0_/_0.3)] p-1",
+        "bg-white overflow-hidden border border-black shadow-sm rounded-sm p-1",
         @class
       ]}
       style={@style}
@@ -472,6 +475,7 @@ defmodule AfrekWeb.CoreComponents do
       class={[
         "phx-submit-loading:opacity-75 bg-indigo-700 hover:bg-indigo-500 border-2 border-indigo-500 py-2 px-3",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "rounded-sm shadow-sm",
         @class
       ]}
       {@rest}
