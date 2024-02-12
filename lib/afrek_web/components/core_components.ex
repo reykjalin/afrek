@@ -150,6 +150,7 @@ defmodule AfrekWeb.CoreComponents do
       class={[
         "mt-2 block w-full text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
         "min-h-[6rem] border border-zinc-300 focus-within:border-zinc-400",
+        "shadow-sm rounded-sm",
         @class
       ]}
       id={@id}
@@ -160,21 +161,21 @@ defmodule AfrekWeb.CoreComponents do
       <div class="flex flex-row gap-2 border-t p-2 overflow-x-scroll md:overflow-auto">
         <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_bold", to: "##{@id}-editor")}
           >
             <strong>B</strong>
           </button>
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_italic", to: "##{@id}-editor")}
           >
             <em>I</em>
           </button>
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_underline", to: "##{@id}-editor")}
           >
@@ -184,14 +185,14 @@ defmodule AfrekWeb.CoreComponents do
 
         <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_link", to: "##{@id}-editor")}
           >
             <.icon name="hero-link" />
           </button>
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_code", to: "##{@id}-editor")}
           >
@@ -201,14 +202,14 @@ defmodule AfrekWeb.CoreComponents do
 
         <div class="flex flex-row gap-2 pr-2 border-r border-slate-300 ">
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_ordered_list", to: "##{@id}-editor")}
           >
             1.
           </button>
           <button
-            class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+            class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
             type="button"
             phx-click={JS.dispatch("toggle_unordered_list", to: "##{@id}-editor")}
           >
@@ -217,14 +218,14 @@ defmodule AfrekWeb.CoreComponents do
         </div>
 
         <button
-          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+          class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
           type="button"
           phx-click={JS.dispatch("undo", to: "##{@id}-editor")}
         >
           <.icon name="hero-arrow-uturn-left" />
         </button>
         <button
-          class="border border-gray-400 shadow-sm p-1 min-w-[35px]"
+          class="border border-gray-400 shadow-sm p-1 min-w-[35px] rounded-sm shadow-sm"
           type="button"
           phx-click={JS.dispatch("redo", to: "##{@id}-editor")}
         >
@@ -309,7 +310,7 @@ defmodule AfrekWeb.CoreComponents do
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden bg-white p-2 shadow-lg ring-1 transition"
+              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden bg-white p-2 shadow-lg rounded-sm ring-1 transition"
             >
               <div class="absolute top-3 right-3">
                 <button
@@ -506,6 +507,7 @@ defmodule AfrekWeb.CoreComponents do
       class={[
         "px-1 py-0.5 phx-submit-loading:opacity-75 text-sm font-semibold leading-6",
         "border border-transparent hover:border hover:border-slate-300 active:bg-slate-100",
+        "hover:shadow-sm rounded-sm",
         @class
       ]}
       {@rest}
@@ -631,6 +633,7 @@ defmodule AfrekWeb.CoreComponents do
         class={[
           "mt-2 block w-full text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           "min-h-[6rem] phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+          "roundes-sm shadow-sm",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
@@ -654,6 +657,7 @@ defmodule AfrekWeb.CoreComponents do
         class={[
           "mt-2 block w-full text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+          "shadow-sm rounded-sm",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
