@@ -60,7 +60,10 @@ defmodule AfrekWeb.CoreComponents do
 
   def scheduled_task(assigns) do
     ~H"""
-    <.card class={@class} style={"height: #{task_duration_in_minutes(@task)}px"}>
+    <.card
+      class={"bg-indigo-800 text-white font-bold #{@class}"}
+      style={"height: #{task_duration_in_minutes(@task)}px"}
+    >
       <p><%= @task.title %></p>
     </.card>
     """
