@@ -6,9 +6,7 @@ defmodule AfrekWeb.CompletedTasksLive do
   def render(assigns) do
     ~H"""
     <section class="max-w-prose mx-auto">
-      <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-        Completed Tasks
-      </h2>
+      <.header class="text-center mt-4 mb-10">Completed Tasks</.header>
 
       <div id="completed-tasks" class="w-full" phx-update="stream">
         <div :for={{date, tasks} <- @tasks}>

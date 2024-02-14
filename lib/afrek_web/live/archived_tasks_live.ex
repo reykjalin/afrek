@@ -6,9 +6,7 @@ defmodule AfrekWeb.ArchivedTasksLive do
   def render(assigns) do
     ~H"""
     <section class="max-w-prose mx-auto">
-      <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-        Archived Tasks
-      </h2>
+      <.header class="text-center mt-4 mb-10">Archived Tasks</.header>
 
       <div id="archived-tasks" class="w-full flex flex-col gap-4" phx-update="stream">
         <div

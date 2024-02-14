@@ -6,9 +6,10 @@ defmodule AfrekWeb.TasksLive do
 
   def render(assigns) do
     ~H"""
-    <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-      <%= Calendar.strftime(@date, "%a %b %d") %> &mdash; <%= Calendar.strftime(@date, "%I:%M%P") %>
-    </h2>
+    <.header class="text-center">
+      <%= Calendar.strftime(@date, "%a %b %d") %>
+      <:subtitle><%= Calendar.strftime(@date, "%I:%M%P") %></:subtitle>
+    </.header>
 
     <.modal id="new-task-modal">
       <.simple_form
