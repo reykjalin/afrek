@@ -5,17 +5,23 @@ defmodule AfrekWeb.ArchivedTasksLive do
 
   def render(assigns) do
     ~H"""
-    <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
-      Archived Tasks
-    </h2>
+    <section class="max-w-prose mx-auto">
+      <h2 class="text-2xl font-bold mt-4 mb-10 text-center">
+        Archived Tasks
+      </h2>
 
-    <div id="archived-tasks" class="w-full flex flex-col gap-4" phx-update="stream">
-      <div :for={{id, task} <- @streams.tasks} id={id} class="group flex flex-row gap-2 items-center">
-        <div class="grow">
-          <.completed_task task={task} />
+      <div id="archived-tasks" class="w-full flex flex-col gap-4" phx-update="stream">
+        <div
+          :for={{id, task} <- @streams.tasks}
+          id={id}
+          class="group flex flex-row gap-2 items-center"
+        >
+          <div class="grow">
+            <.completed_task task={task} />
+          </div>
         </div>
       </div>
-    </div>
+    </section>
     """
   end
 
