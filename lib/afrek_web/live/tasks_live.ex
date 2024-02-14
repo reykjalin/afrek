@@ -114,7 +114,11 @@ defmodule AfrekWeb.TasksLive do
 
       <hr class="md:hidden w-full border-black mb-10" />
 
-      <div id="scheduled-tasks" class="w-full px-10 relative" phx-hook="SortableSchedule">
+      <div
+        id="scheduled-tasks"
+        class="w-full max-w-[500px] px-10 relative mx-auto"
+        phx-hook="SortableSchedule"
+      >
         <hr
           class="max-w-[90%] w-full border-black absolute"
           style={"top: #{@date.hour * 60 + @date.minute}px"}
