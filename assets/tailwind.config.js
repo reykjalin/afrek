@@ -12,6 +12,18 @@ module.exports = {
       colors: {
         brand: "#6366f1",
       },
+      fontFamily: {
+        sans: [
+          "Atkinson Hyperlegible",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji",
+        ],
+      },
     },
   },
   plugins: [

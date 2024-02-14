@@ -22,7 +22,7 @@
           <.link
             href={~p"/tasks"}
             class={[
-              "text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700",
+              "leading-6 text-zinc-900 hover:text-zinc-700",
               if @current_url_path == "/tasks" do
                 "border-brand border-b-4 no-underline hover:border-none"
               end
@@ -35,7 +35,7 @@
           <.link
             href={~p"/completed"}
             class={[
-              "text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700",
+              "leading-6 text-zinc-900 hover:text-zinc-700",
               if @current_url_path == "/completed" do
                 "border-brand border-b-4 no-underline hover:border-none"
               end
@@ -48,7 +48,7 @@
           <.link
             href={~p"/archived"}
             class={[
-              "text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700",
+              "leading-6 text-zinc-900 hover:text-zinc-700",
               if @current_url_path == "/archived" do
                 "border-brand border-b-4 no-underline hover:border-none"
               end
@@ -61,7 +61,7 @@
           <.link
             href={~p"/users/settings"}
             class={[
-              "text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700",
+              "leading-6 text-zinc-900 hover:text-zinc-700",
               if @current_url_path == "/users/settings" do
                 "border-brand border-b-4 no-underline hover:border-none"
               end
@@ -74,25 +74,19 @@
           <.link
             href={~p"/users/log_out"}
             method="delete"
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            class="leading-6 text-zinc-900 hover:text-zinc-700"
           >
             Log out
           </.link>
         </li>
       <% else %>
         <li>
-          <.link
-            href={~p"/users/register"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
+          <.link href={~p"/users/register"} class="leading-6 text-zinc-900 hover:text-zinc-700">
             Register
           </.link>
         </li>
         <li>
-          <.link
-            href={~p"/users/log_in"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
+          <.link href={~p"/users/log_in"} class="leading-6 text-zinc-900 hover:text-zinc-700">
             Log in
           </.link>
         </li>
@@ -101,7 +95,7 @@
   </nav>
 
   <%= if @current_user != nil do %>
-    <p class="text-[0.8125rem] text-center leading-6 text-zinc-900">
+    <p class="leading-6 text-zinc-900">
       <%= @current_user.email %>
     </p>
   <% end %>
