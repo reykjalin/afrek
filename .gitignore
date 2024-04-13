@@ -2,13 +2,13 @@
 .DS_Store
 
 # Laravel ignores.
-/backend/.phpunit.cache
-/backend/node_modules
-/backend/public/build
-/backend/public/hot
-/backend/public/storage
-/backend/storage/*.key
-/backend/vendor
+/api/.phpunit.cache
+/api/node_modules
+/api/public/build
+/api/public/hot
+/api/public/storage
+/api/storage/*.key
+/api/vendor
 .env
 .env.*
 !.env.example
