@@ -1,0 +1,22 @@
+meta {
+  name: Login
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/login
+  body: json
+  auth: none
+}
+
+headers {
+  X-XSRF-TOKEN: eyJpdiI6IlFNMWduTnArcnZWTkhpMHFCS2hpZmc9PSIsInZhbHVlIjoiZ0F0VGRCSUdLbjJYeHNvcTFDYXY5WVRmQzlRbUNtWUVCSDJkNnJ5MjBhYUlya2FxVHErUE5jQ2xOU0JtUmM2VHk3Ujc2ZnE2cnB3T1JKaFBvTDFCajNZQTBWMFFDcXNzMmxzUis4S21WQjRsMWpOYVUrTGkyY3dLTU9yU0E0dDQiLCJtYWMiOiJlMTEzNTQwMmYxYThjOTczNTJjNWFiYTRlOTZhNjVlYTA2YTVkZGYwMThiZGIyNmMyNTA1MDMxZTc3OGJiODE5IiwidGFnIjoiIn0=
+}
+
+body:json {
+  {
+    "email": "test@example.com",
+    "password": "password"
+  }
+}
