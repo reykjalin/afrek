@@ -7,6 +7,31 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Start developing Afrek
+
+Afrek has a separate frontend and backend that both live in this repo. To start developing you need to:
+
+### Run the backend
+
+```shell
+php artisan serve
+```
+
+### Prepare the frontend
+
+```shell
+cd resources/js
+npm i
+```
+
+### Run the frontend
+
+```shell
+npm run dev
+```
+
+And now the app should be available on http://localhost:5173/.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
