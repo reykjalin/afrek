@@ -26,12 +26,14 @@
 		}
 	}
 
-	let error: string;
+	let error = '';
 
-	let email: string;
-	let password: string;
-	let confirmPassword: string;
+	let email = '';
+	let password = '';
+	let confirmPassword = '';
 </script>
+
+<h2>Register</h2>
 
 <form on:submit|preventDefault={handleSubmit}>
 	{#if error}<p>{error}</p>{/if}

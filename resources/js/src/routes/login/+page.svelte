@@ -1,22 +1,20 @@
 <script lang="ts">
-	import axios from '$lib/axios';
 	import { isAxiosError } from 'axios';
 	import { goto } from '$app/navigation';
+	import { getCsrfCookie, login, getUser } from '$lib/api';
+	import { getContext } from 'svelte';
+
+	const { user } = getContext('auth');
 
 	async function handleSubmit() {
 		try {
 			error = '';
 
-			await axios.get('/sanctum/csrf-cookie');
-			await axios.post('/login', {
-				email,
-				password,
-			});
+			await getCsrfCookie();
+			await login({ email, password, remember }, (e) => (error = e));
 
-			const user = await axios.get('/api/user');
-			console.log(user);
-
-			goto('/');
+			const user = await getUser();
+			$user = user.data;
 		} catch (e) {
 			if (isAxiosError(e)) {
 				console.log(e);
@@ -25,15 +23,25 @@
 		}
 	}
 
-	let error: string;
+	$: {
+		if ($user) {
+			goto('/tasks');
+		}
+	}
 
-	let email: string;
-	let password: string;
+	let error = '';
+
+	let email = '';
+	let password = '';
+	let remember = false;
 </script>
+
+<h2>Login</h2>
 
 <form on:submit|preventDefault={handleSubmit}>
 	{#if error}<p>{error}</p>{/if}
 
+	<label for="email">Email</label>
 	<input
 		type="email"
 		name="email"
@@ -41,7 +49,13 @@
 		placeholder="afrek@example.com"
 		bind:value={email}
 	/>
+
+	<label for="password">Password</label>
 	<input type="password" name="password" id="password" bind:value={password} />
+
+	<label for="remember-me">Remember me?</label>
+	<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
+
 	<input type="submit" value="Login" />
 </form>
 
