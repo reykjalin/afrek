@@ -1,12 +1,20 @@
 <script lang="ts">
-	import axios from '$lib/axios';
-	import { goto } from '$app/navigation';
+	import { setContext } from 'svelte';
+	import { getCsrfCookie, logout } from '$lib/api';
+	import { user } from '$lib/stores/auth';
 
-	async function logout() {
-		await axios.get('/sanctum/csrf-cookie');
-		await axios.post('/logout', {});
-		goto('/login');
+	async function handleLogout() {
+		await getCsrfCookie();
+		await logout();
+		$user = undefined;
 	}
+
+	export let data;
+	$: $user = data.user;
+
+	setContext('auth', {
+		user,
+	});
 </script>
 
 <header>
@@ -18,9 +26,14 @@
 	<nav>
 		<ul>
 			<li><a href="/">Home</a></li>
-			<li><a href="/login">Login</a></li>
-			<li><a href="/register">Register</a></li>
-			<li><a href="/logout" on:click|preventDefault={logout}>Logout</a></li>
+			{#if $user}
+				<li><a href="/tasks">Tasks</a></li>
+				<li><a href="/logout" on:click|preventDefault={handleLogout}>Logout</a></li>
+				<li>{$user.email}</li>
+			{:else}
+				<li><a href="/login">Login</a></li>
+				<li><a href="/register">Register</a></li>
+			{/if}
 		</ul>
 	</nav>
 </header>
