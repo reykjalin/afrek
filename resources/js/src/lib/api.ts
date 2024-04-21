@@ -47,6 +47,22 @@ async function login(
 	}
 }
 
+async function register(
+	data: { email: string; password: string; password_confirmation: string },
+	setError: (error: string) => void,
+) {
+	try {
+		setError('');
+
+		return await axios.post('/register', data);
+	} catch (e) {
+		if (isAxiosError(e)) {
+			console.log(e);
+			setError(e.response?.data?.message ?? e.message);
+		}
+	}
+}
+
 async function logout() {
 	return axios.post('/logout');
 }
@@ -74,4 +90,4 @@ async function getUser() {
 	}
 }
 
-export { getCsrfCookie, login, logout, getUser };
+export { getCsrfCookie, login, register, logout, getUser };
