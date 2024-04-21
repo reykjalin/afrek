@@ -13,8 +13,7 @@
 			await getCsrfCookie();
 			await login({ email, password, remember }, (e) => (error = e));
 
-			const user = await getUser();
-			$user = user.data;
+			$user = await getUser();
 		} catch (e) {
 			if (isAxiosError(e)) {
 				console.log(e);
