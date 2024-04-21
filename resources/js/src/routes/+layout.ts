@@ -5,9 +5,9 @@ export const ssr = false;
 export async function load() {
 	try {
 		await getCsrfCookie();
-		const response = await getUser();
+		const user = await getUser();
 
-		return { user: response.data };
+		return { user };
 	} catch (e) {
 		// Not logged in.
 		return { user: undefined };
