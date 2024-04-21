@@ -4,10 +4,19 @@
 	import { goto } from '$app/navigation';
 
 	async function handleSubmit() {
+		error = '';
+
+		if (password.length < 8) {
+			error = 'The password must be at least 8 characters';
+			return;
+		} else if (password !== confirmPassword) {
+			error = 'The password field confirmation does not match.';
+			return;
+		}
+
 		try {
 			await axios.get('/sanctum/csrf-cookie');
 
-			error = '';
 			await axios.post('/register', {
 				email,
 				password,
@@ -36,7 +45,7 @@
 <h2>Register</h2>
 
 <form on:submit|preventDefault={handleSubmit}>
-	{#if error}<p>{error}</p>{/if}
+	{#if error}<p class="error">{error}</p>{/if}
 
 	<input
 		type="email"
@@ -60,5 +69,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+
+		& .error {
+			color: red;
+		}
 	}
 </style>
