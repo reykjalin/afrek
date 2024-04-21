@@ -34,7 +34,7 @@ async function login(
 	try {
 		setError('');
 
-		return await axios.post('/login', {
+		return await axios.post('/api/login', {
 			email,
 			password,
 			remember,
@@ -54,7 +54,7 @@ async function register(
 	try {
 		setError('');
 
-		return await axios.post('/register', data);
+		return await axios.post('/api/register', data);
 	} catch (e) {
 		if (isAxiosError(e)) {
 			console.log(e);
@@ -64,7 +64,7 @@ async function register(
 }
 
 async function logout() {
-	return axios.post('/logout');
+	return axios.post('/api/logout');
 }
 
 async function getUser() {

@@ -17,7 +17,10 @@
 		}
 
 		await getCsrfCookie();
-		register({ email, password, password_confirmation: confirmPassword }, (e) => (error = e));
+		await register(
+			{ email, password, password_confirmation: confirmPassword },
+			(e) => (error = e),
+		);
 
 		const user = await getUser();
 		$user = user;
