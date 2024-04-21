@@ -1,7 +1,9 @@
 <script lang="ts">
-	import axios from '$lib/axios';
-	import { isAxiosError } from 'axios';
 	import { goto } from '$app/navigation';
+	import { getContext } from 'svelte';
+	import { getCsrfCookie, getUser, register } from '$lib/api';
+
+	const { user } = getContext('auth');
 
 	async function handleSubmit() {
 		error = '';
@@ -14,24 +16,16 @@
 			return;
 		}
 
-		try {
-			await axios.get('/sanctum/csrf-cookie');
+		await getCsrfCookie();
+		register({ email, password, password_confirmation: confirmPassword }, (e) => (error = e));
 
-			await axios.post('/register', {
-				email,
-				password,
-				password_confirmation: confirmPassword,
-			});
+		const user = await getUser();
+		$user = user;
+	}
 
-			const user = await axios.get('/api/user');
-			console.log(user);
-
-			goto('/');
-		} catch (e) {
-			if (isAxiosError(e)) {
-				console.log(e);
-				error = e?.response?.data?.message ?? e.message;
-			}
+	$: {
+		if ($user) {
+			goto('/tasks');
 		}
 	}
 
