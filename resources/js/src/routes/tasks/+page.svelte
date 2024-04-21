@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { tasks } from '$lib/tasks';
+
+	import Task from '$lib/components/task.svelte';
 
 	const { user } = getContext('auth');
 
@@ -14,8 +17,14 @@
 <h2>Tasks</h2>
 
 <ul>
-	<li>Task 1</li>
-	<li>Task 2</li>
-	<li>Task 3</li>
-	<li>Task 4</li>
+	{#each tasks as task}
+		<li><Task {task} /></li>
+	{/each}
 </ul>
+
+<style>
+	ul {
+		list-style-type: none;
+		padding-inline-start: 0;
+	}
+</style>
