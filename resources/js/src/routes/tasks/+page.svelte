@@ -75,6 +75,13 @@
 	}
 
 	function handleKeyPress(ev: KeyboardEvent) {
+		// Make sure event propagates if the modal is already open
+		if (dialog.open) {
+			return;
+		}
+
+		ev.preventDefault();
+
 		const { key } = ev;
 
 		if (key === 'n') {
@@ -98,7 +105,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <dialog bind:this={dialog}>
-	<form on:submit|preventDefault={createNewTask}>
+	<form on:submit={createNewTask}>
 		<input type="text" placeholder="fib the frobbler" bind:value={taskDescription} />
 	</form>
 </dialog>
