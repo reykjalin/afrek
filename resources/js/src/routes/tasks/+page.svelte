@@ -17,6 +17,7 @@
 	let tasks = t;
 
 	let itemBeingDragged: number | null = null;
+	let draggingEnabled = false;
 
 	function onDragStart(id: number) {
 		return function (ev: DragEvent) {
@@ -38,6 +39,7 @@
 			console.log('new pos:', draggingIndex);
 
 			itemBeingDragged = null;
+			draggingEnabled = false;
 		};
 	}
 
@@ -56,6 +58,10 @@
 			tasks[draggingIndex] = tmp;
 		};
 	}
+
+	function enableDragging() {
+		draggingEnabled = true;
+	}
 </script>
 
 <h2>Tasks</h2>
@@ -65,12 +71,13 @@
 		<li
 			class={itemBeingDragged ? 'is-dragging' : ''}
 			animate:flip={{ duration: 300 }}
-			draggable="true"
+			draggable={draggingEnabled}
 			on:dragstart={onDragStart(task.id)}
 			on:dragend={onDragEnd(task.id)}
 			on:dragenter|preventDefault={swapOnEnter(task.id)}
 			on:dragover|preventDefault={() => {}}
 		>
+			<button on:mousedown={enableDragging}>anchor</button>
 			<Task isDragging={itemBeingDragged === task.id} {task} />
 		</li>
 	{/each}
@@ -80,6 +87,13 @@
 	ul {
 		list-style-type: none;
 		padding-inline-start: 0;
+
+		& li {
+			display: flex;
+			flex-direction: row;
+			gap: 0.5rem;
+			align-items: center;
+		}
 
 		& li.is-dragging * {
 			/* Make sure dragenter and dragleave only fire once. */
