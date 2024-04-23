@@ -13,8 +13,8 @@
 
 <div class={isDragging ? 'is-dragging' : ''}>
 	<div>
-		<p>{task.description}</p>
 		<button on:click={buttonHandler}>✅</button>
+		<p>{task.description}</p>
 	</div>
 
 	{#if import.meta.env.MODE === 'development'}
@@ -40,12 +40,25 @@
 			margin: 0.5rem 0;
 		}
 
+		& button {
+			background-color: white;
+			border: 1px solid lightgray;
+			border-radius: 0.25rem;
+			padding: 0.25rem 0.5rem;
+
+			&:hover,
+			&:focus {
+				background-color: lightgray;
+			}
+		}
+
 		& div {
 			border: none;
 			display: flex;
 			flex-direction: row;
 			gap: 0.5rem;
 			justify-content: space-between;
+			align-items: center;
 
 			& p {
 				padding: 0;

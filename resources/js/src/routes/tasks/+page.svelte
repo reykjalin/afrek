@@ -80,8 +80,6 @@
 			return;
 		}
 
-		ev.preventDefault();
-
 		const { key } = ev;
 
 		if (key === 'n') {
@@ -106,7 +104,13 @@
 
 <dialog bind:this={dialog}>
 	<form on:submit={createNewTask}>
-		<input type="text" placeholder="fib the frobbler" bind:value={taskDescription} />
+		<label for="description"><b>New task:</b></label>
+		<input
+			name="description"
+			type="text"
+			placeholder="fib the frobbler"
+			bind:value={taskDescription}
+		/>
 	</form>
 </dialog>
 
@@ -126,7 +130,8 @@
 				on:dragenter|preventDefault={swapOnEnter(task.id)}
 				on:dragover|preventDefault={() => {}}
 			>
-				<button on:mousedown={enableDragging}>⠛</button>
+				<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
+				<button tabindex="-1" on:mousedown={enableDragging}>⠛</button>
 				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 			</li>
 		{/each}
@@ -147,6 +152,18 @@
 			align-items: center;
 		}
 
+		& button {
+			background-color: white;
+			border: 1px solid lightgray;
+			border-radius: 0.25rem;
+			padding: 0.25rem 0.5rem;
+
+			&:hover,
+			&:focus {
+				background-color: lightgray;
+			}
+		}
+
 		& li.is-dragging * {
 			/* Make sure dragenter and dragleave only fire once. */
 			pointer-events: none;
@@ -160,6 +177,7 @@
 		& input {
 			/* FIXME: The input isn't centered when width is 100% for some reason. */
 			width: 100%;
+			margin-block: 0.25rem;
 		}
 	}
 </style>
