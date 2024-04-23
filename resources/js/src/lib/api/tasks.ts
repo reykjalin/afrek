@@ -1,11 +1,9 @@
-import { getContext } from 'svelte';
-
-type Task = {
+export interface Task {
 	id: number;
 	description: string;
 	details?: string;
 	order: number;
-};
+}
 
 let tasks: Task[] = [];
 

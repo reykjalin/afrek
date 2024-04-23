@@ -126,7 +126,7 @@
 				on:dragenter|preventDefault={swapOnEnter(task.id)}
 				on:dragover|preventDefault={() => {}}
 			>
-				<button on:mousedown={enableDragging}>anchor</button>
+				<button on:mousedown={enableDragging}>⠛</button>
 				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 			</li>
 		{/each}
