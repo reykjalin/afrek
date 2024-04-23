@@ -16,8 +16,13 @@
 
 	let tasks = t;
 
+	// List props.
 	let itemBeingDragged: number | null = null;
 	let draggingEnabled = false;
+
+	// Create new task props.
+	let dialog: HTMLDialogElement;
+	let taskDescription = '';
 
 	function onDragStart(id: number) {
 		return function (ev: DragEvent) {
@@ -62,7 +67,30 @@
 	function enableDragging() {
 		draggingEnabled = true;
 	}
+
+	function handleKeyPress(ev: KeyboardEvent) {
+		const { key } = ev;
+
+		if (key === 'n') {
+			console.log('create new task');
+			ev.preventDefault();
+			dialog.showModal();
+		}
+	}
+
+	function createNewTask() {
+		taskDescription = '';
+		dialog.close();
+	}
 </script>
+
+<svelte:window on:keydown={handleKeyPress} />
+
+<dialog bind:this={dialog}>
+	<form on:submit|preventDefault={createNewTask}>
+		<input type="text" placeholder="fib the frobbler" bind:value={taskDescription} />
+	</form>
+</dialog>
 
 <h2>Tasks</h2>
 
@@ -98,6 +126,16 @@
 		& li.is-dragging * {
 			/* Make sure dragenter and dragleave only fire once. */
 			pointer-events: none;
+		}
+	}
+
+	dialog {
+		max-width: 760px;
+		width: 90vw;
+
+		& input {
+			/* FIXME: The input isn't centered when width is 100% for some reason. */
+			width: 100%;
 		}
 	}
 </style>
