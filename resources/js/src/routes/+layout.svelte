@@ -27,7 +27,6 @@
 	</h1>
 	<nav>
 		<ul>
-			<li><a href="/">Home</a></li>
 			{#if $user}
 				<li><a href="/tasks">Tasks</a></li>
 				<li><a href="/logout" on:click|preventDefault={handleLogout}>Logout</a></li>
