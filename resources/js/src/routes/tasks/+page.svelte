@@ -5,6 +5,7 @@
 
 	import { getTasks, createTask, moveTask, deleteTask } from '$lib/api/tasks';
 	import Task from '$lib/components/task.svelte';
+	import Pill from '$lib/components/pill.svelte';
 
 	const { user } = getContext('auth');
 
@@ -115,6 +116,11 @@
 </dialog>
 
 <h2>Tasks</h2>
+
+<p style={'text-align: center'}>
+	<Pill onClick={() => {}}>Default</Pill>
+	<Pill onClick={() => {}}>Completed</Pill>
+</p>
 
 {#await fetchTasks()}
 	<p>Loading…</p>
