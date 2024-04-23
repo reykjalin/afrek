@@ -11,7 +11,7 @@
 	}
 </script>
 
-<div class={isDragging ? 'is-dragging' : ''}>
+<div class={`${isDragging ? 'is-dragging ' : ''}task`}>
 	<div>
 		<button on:click={buttonHandler}>✅</button>
 		<p>{task.description}</p>
@@ -29,11 +29,12 @@
 </div>
 
 <style>
-	div {
+	div.task {
 		border: 1px solid black;
 		border-radius: 0.25rem;
-		padding: 0.5rem;
+		padding: 1rem;
 		margin: 0.5rem;
+		width: 100%;
 
 		& p {
 			padding: 0;
@@ -52,7 +53,7 @@
 			}
 		}
 
-		& div {
+		& div:not(.meta) {
 			border: none;
 			display: flex;
 			flex-direction: row;
@@ -63,6 +64,7 @@
 			& p {
 				padding: 0;
 				margin: 0;
+				flex-grow: 1;
 			}
 		}
 	}

@@ -141,9 +141,15 @@
 {/await}
 
 <style>
+	h2 {
+		text-align: center;
+	}
+
 	ul {
 		list-style-type: none;
 		padding-inline-start: 0;
+		max-width: 760px;
+		margin: auto;
 
 		& li {
 			display: flex;
