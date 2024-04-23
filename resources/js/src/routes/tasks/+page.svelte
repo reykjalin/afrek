@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
+	import { flip } from 'svelte/animate';
 	import { goto } from '$app/navigation';
-	import { tasks } from '$lib/tasks';
 
+	import { tasks as t } from '$lib/tasks';
 	import Task from '$lib/components/task.svelte';
 
 	const { user } = getContext('auth');
@@ -12,13 +13,66 @@
 			goto('/login');
 		}
 	}
+
+	let tasks = t;
+
+	let itemBeingDragged: number | null = null;
+
+	function onDragStart(id: number) {
+		return function (ev: DragEvent) {
+			itemBeingDragged = id;
+
+			if (ev.dataTransfer) {
+				ev.dataTransfer.effectAllowed = 'move';
+				ev.dataTransfer.dropEffect = 'move';
+			}
+		};
+	}
+
+	function onDragEnd(id: number) {
+		return function (ev: DragEvent) {
+			const draggingIndex = tasks.findIndex((task) => task.id === id);
+
+			// FIXME: Update API with new task position.
+
+			console.log('new pos:', draggingIndex);
+
+			itemBeingDragged = null;
+		};
+	}
+
+	function swapOnEnter(id: number) {
+		return function (ev: DragEvent) {
+			// Don't swap if we just entered the item we're dragging, or if nothing is dragging.
+			if (itemBeingDragged === null || itemBeingDragged === id) {
+				return;
+			}
+
+			const enteredIndex = tasks.findIndex((t) => t.id === id);
+			const draggingIndex = tasks.findIndex((t) => t.id === itemBeingDragged);
+
+			const tmp = tasks[enteredIndex];
+			tasks[enteredIndex] = tasks[draggingIndex];
+			tasks[draggingIndex] = tmp;
+		};
+	}
 </script>
 
 <h2>Tasks</h2>
 
 <ul>
-	{#each tasks as task}
-		<li><Task {task} /></li>
+	{#each tasks as task (task.id)}
+		<li
+			class={itemBeingDragged ? 'is-dragging' : ''}
+			animate:flip={{ duration: 300 }}
+			draggable="true"
+			on:dragstart={onDragStart(task.id)}
+			on:dragend={onDragEnd(task.id)}
+			on:dragenter|preventDefault={swapOnEnter(task.id)}
+			on:dragover|preventDefault={() => {}}
+		>
+			<Task isDragging={itemBeingDragged === task.id} {task} />
+		</li>
 	{/each}
 </ul>
 
@@ -26,5 +80,10 @@
 	ul {
 		list-style-type: none;
 		padding-inline-start: 0;
+
+		& li.is-dragging * {
+			/* Make sure dragenter and dragleave only fire once. */
+			pointer-events: none;
+		}
 	}
 </style>

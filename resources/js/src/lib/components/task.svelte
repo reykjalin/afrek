@@ -1,23 +1,20 @@
 <script lang="ts">
 	export let task;
 
-	let showMeta = false;
+	export let isDragging = false;
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div on:mouseenter={() => (showMeta = true)} on:mouseleave={() => (showMeta = false)}>
+<div class={isDragging ? 'is-dragging' : ''}>
 	<p>{task.description}</p>
 
-	{#if showMeta}
-		<div class="meta">
-			<p><small><b>ID:</b> {task.id}</small></p>
-			<p><small><b>Order:</b> {task.order}</small></p>
-			<p><small><b>Created at:</b> {task.created_at}</small></p>
-			<details>
-				<summary><small>Details</small></summary><small>{task.details}</small>
-			</details>
-		</div>
-	{/if}
+	<div class="meta">
+		<p><small><b>ID:</b> {task.id}</small></p>
+		<p><small><b>Order:</b> {task.order}</small></p>
+		<p><small><b>Created at:</b> {task.created_at}</small></p>
+		<details>
+			<summary><small>Details</small></summary><small>{task.details}</small>
+		</details>
+	</div>
 </div>
 
 <style>
@@ -42,6 +39,14 @@
 				padding: 0;
 				margin: 0;
 			}
+		}
+	}
+
+	.is-dragging {
+		background-color: lightgray;
+
+		& > * {
+			opacity: 0;
 		}
 	}
 </style>
