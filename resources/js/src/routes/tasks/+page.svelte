@@ -17,7 +17,7 @@
 	let tasks: Awaited<ReturnType<typeof getTasks>>;
 
 	let fetchTasks = async () => {
-		tasks = await getTasks();
+		tasks = await getTasks($user);
 	};
 
 	// List props.
@@ -46,7 +46,7 @@
 
 			if (taskBeingMoved) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
-				tasks = await moveTask(taskBeingMoved, movedToIndex);
+				tasks = await moveTask($user, taskBeingMoved, movedToIndex);
 			}
 
 			itemBeingDragged = null;
@@ -86,12 +86,12 @@
 
 	async function createNewTask() {
 		dialog.close();
-		tasks = await createTask(taskDescription);
+		tasks = await createTask($user, taskDescription);
 		taskDescription = '';
 	}
 
 	async function onDelete(task: (typeof tasks)[0]) {
-		tasks = await deleteTask(task);
+		tasks = await deleteTask($user, task);
 	}
 </script>
 

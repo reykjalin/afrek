@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
 	import { getCsrfCookie, logout } from '$lib/api/auth';
+	import { clearTasks } from '$lib/api/tasks';
 	import { user } from '$lib/stores/auth';
 
 	async function handleLogout() {
 		await getCsrfCookie();
 		await logout();
+		await clearTasks();
 		$user = undefined;
 	}
 
