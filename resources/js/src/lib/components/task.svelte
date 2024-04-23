@@ -1,20 +1,36 @@
 <script lang="ts">
-	export let task;
+	export let task: {
+		id: number;
+		order: number;
+		created_at: string;
+		details?: string;
+		description: string;
+	};
 
 	export let isDragging = false;
+	export let onDelete: (t: typeof task) => void;
+
+	function buttonHandler(ev: MouseEvent) {
+		onDelete(task);
+	}
 </script>
 
 <div class={isDragging ? 'is-dragging' : ''}>
-	<p>{task.description}</p>
-
-	<div class="meta">
-		<p><small><b>ID:</b> {task.id}</small></p>
-		<p><small><b>Order:</b> {task.order}</small></p>
-		<p><small><b>Created at:</b> {task.created_at}</small></p>
-		<details>
-			<summary><small>Details</small></summary><small>{task.details}</small>
-		</details>
+	<div>
+		<p>{task.description}</p>
+		<button on:click={buttonHandler}>✅</button>
 	</div>
+
+	{#if import.meta.env.MODE === 'development'}
+		<div class="meta">
+			<p><small><b>ID:</b> {task.id}</small></p>
+			<p><small><b>Order:</b> {task.order}</small></p>
+			<p><small><b>Created at:</b> {task.created_at}</small></p>
+			<details>
+				<summary><small>Details</small></summary><small>{task.details}</small>
+			</details>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -33,7 +49,7 @@
 			display: flex;
 			flex-direction: row;
 			gap: 0.5rem;
-			justify-content: flex-start;
+			justify-content: space-between;
 
 			& p {
 				padding: 0;

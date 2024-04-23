@@ -3,7 +3,7 @@
 	import { flip } from 'svelte/animate';
 	import { goto } from '$app/navigation';
 
-	import { tasks as t } from '$lib/tasks';
+	import { getTasks, createTask, moveTask, deleteTask } from '$lib/api/tasks';
 	import Task from '$lib/components/task.svelte';
 
 	const { user } = getContext('auth');
@@ -14,7 +14,11 @@
 		}
 	}
 
-	let tasks = t;
+	let tasks: Awaited<ReturnType<typeof getTasks>>;
+
+	let fetchTasks = async () => {
+		tasks = await getTasks();
+	};
 
 	// List props.
 	let itemBeingDragged: number | null = null;
@@ -36,12 +40,14 @@
 	}
 
 	function onDragEnd(id: number) {
-		return function (ev: DragEvent) {
-			const draggingIndex = tasks.findIndex((task) => task.id === id);
+		return async function (ev: DragEvent) {
+			const movedToIndex = tasks.findIndex((task) => task.id === id);
+			const taskBeingMoved = tasks.find((t) => t.id === itemBeingDragged);
 
-			// FIXME: Update API with new task position.
-
-			console.log('new pos:', draggingIndex);
+			if (taskBeingMoved) {
+				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
+				tasks = await moveTask(taskBeingMoved, movedToIndex);
+			}
 
 			itemBeingDragged = null;
 			draggingEnabled = false;
@@ -78,9 +84,14 @@
 		}
 	}
 
-	function createNewTask() {
-		taskDescription = '';
+	async function createNewTask() {
 		dialog.close();
+		tasks = await createTask(taskDescription);
+		taskDescription = '';
+	}
+
+	async function onDelete(task: (typeof tasks)[0]) {
+		tasks = await deleteTask(task);
 	}
 </script>
 
@@ -94,22 +105,28 @@
 
 <h2>Tasks</h2>
 
-<ul>
-	{#each tasks as task (task.id)}
-		<li
-			class={itemBeingDragged ? 'is-dragging' : ''}
-			animate:flip={{ duration: 300 }}
-			draggable={draggingEnabled}
-			on:dragstart={onDragStart(task.id)}
-			on:dragend={onDragEnd(task.id)}
-			on:dragenter|preventDefault={swapOnEnter(task.id)}
-			on:dragover|preventDefault={() => {}}
-		>
-			<button on:mousedown={enableDragging}>anchor</button>
-			<Task isDragging={itemBeingDragged === task.id} {task} />
-		</li>
-	{/each}
-</ul>
+{#await fetchTasks()}
+	<p>Loading…</p>
+{:then _}
+	<ul>
+		{#each tasks as task (task.id)}
+			<li
+				class={itemBeingDragged ? 'is-dragging' : ''}
+				animate:flip={{ duration: 300 }}
+				draggable={draggingEnabled}
+				on:dragstart={onDragStart(task.id)}
+				on:dragend={onDragEnd(task.id)}
+				on:dragenter|preventDefault={swapOnEnter(task.id)}
+				on:dragover|preventDefault={() => {}}
+			>
+				<button on:mousedown={enableDragging}>anchor</button>
+				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
+			</li>
+		{/each}
+	</ul>
+{:catch error}
+	<p class="error">Failed to load tasks: {error}.</p>
+{/await}
 
 <style>
 	ul {
