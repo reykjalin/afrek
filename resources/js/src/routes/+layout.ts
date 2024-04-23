@@ -1,4 +1,4 @@
-import { getCsrfCookie, getUser } from '$lib/api';
+import { getCsrfCookie, getUser } from '$lib/api/auth';
 
 export const ssr = false;
 

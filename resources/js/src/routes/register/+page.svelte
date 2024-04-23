@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getContext } from 'svelte';
-	import { getCsrfCookie, getUser, register } from '$lib/api';
+	import { getCsrfCookie, getUser, register } from '$lib/api/auth';
 
 	const { user } = getContext('auth');
 

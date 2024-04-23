@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { isAxiosError } from 'axios';
 	import { goto } from '$app/navigation';
-	import { getCsrfCookie, login, getUser } from '$lib/api';
+	import { getCsrfCookie, login, getUser } from '$lib/api/auth';
 	import { getContext } from 'svelte';
 
 	const { user } = getContext('auth');

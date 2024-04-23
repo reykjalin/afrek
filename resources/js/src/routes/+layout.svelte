@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
-	import { getCsrfCookie, logout } from '$lib/api';
+	import { getCsrfCookie, logout } from '$lib/api/auth';
 	import { user } from '$lib/stores/auth';
 
 	async function handleLogout() {
