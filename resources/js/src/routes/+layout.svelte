@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { setContext } from 'svelte';
+
 	import { getCsrfCookie, logout } from '$lib/api/auth';
 	import { clearTasks } from '$lib/api/tasks';
 	import { user } from '$lib/stores/auth';
 
-	async function handleLogout() {
+	import Link from '$lib/components/link.svelte';
+
+	async function handleLogout(ev: MouseEvent) {
+		ev.preventDefault();
+
 		await getCsrfCookie();
 		await logout();
 		await clearTasks();
@@ -21,19 +26,18 @@
 
 <header>
 	<h1>
-		<img width="50" src="/favicon.png" alt="The afrek logo showing a calendar." /><a href="/"
-			>Afrek</a
-		>
+		<img width="50" src="/favicon.png" alt="The afrek logo showing a calendar." />
+		<Link href="/">Afrek</Link>
 	</h1>
 	<nav>
 		<ul>
 			{#if $user}
-				<li><a href="/tasks">Tasks</a></li>
-				<li><a href="/logout" on:click|preventDefault={handleLogout}>Logout</a></li>
+				<li><Link href="/tasks">Tasks</Link></li>
+				<li><Link href="/logout" onClick={handleLogout}>Logout</Link></li>
 				<li>{$user.email}</li>
 			{:else}
-				<li><a href="/login">Login</a></li>
-				<li><a href="/register">Register</a></li>
+				<li><Link href="/login">Login</Link></li>
+				<li><Link href="/register">Register</Link></li>
 			{/if}
 		</ul>
 	</nav>
@@ -43,12 +47,14 @@
 
 <footer>
 	<div>
-		<p><a href="/blog">Blog</a></p>
-		<p><a href="/privacy">Privacy</a></p>
-		<p><a href="mailto:contact@afrek.app">Contact</a></p>
+		<p><Link href="/blog">Blog</Link></p>
+		<p><Link href="/privacy">Privacy</Link></p>
+		<p><Link href="mailto:contact@afrek.app">Contact</Link></p>
 	</div>
 
-	<p>Developed with &lt;3 by <a href="https://www.thorlaksson.com">Kristófer Reykjalín</a></p>
+	<p>
+		Developed with &lt;3 by <Link href="https://www.thorlaksson.com">Kristófer Reykjalín</Link>
+	</p>
 </footer>
 
 <style>
@@ -66,20 +72,12 @@
 	}
 
 	footer {
-		background-color: #334155;
+		background-color: #250048;
 		color: white;
 		text-align: center;
 		padding: 5rem;
 		margin-block: 5rem;
 		margin-inline: 0;
-
-		& a {
-			color: lightblue;
-
-			&:visited {
-				color: violet;
-			}
-		}
 	}
 
 	:global(body) {
