@@ -22,8 +22,7 @@
 			(e) => (error = e),
 		);
 
-		const user = await getUser();
-		$user = user;
+		$user = await getUser();
 	}
 
 	$: {
