@@ -45,6 +45,7 @@
 <form on:submit|preventDefault={handleSubmit}>
 	{#if error}<p class="error">{error}</p>{/if}
 
+	<label for="email"><b>Email</b></label>
 	<input
 		type="email"
 		name="email"
@@ -52,7 +53,11 @@
 		placeholder="afrek@example.com"
 		bind:value={email}
 	/>
+
+	<label for="password"><b>Password</b></label>
 	<input type="password" name="password" id="password" bind:value={password} />
+
+	<label for="confirm_password"><b>Confirm password</b></label>
 	<input
 		type="password"
 		name="confirm_password"
@@ -67,6 +72,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+
+		max-width: 540px;
+		margin: auto;
+		border: 1px solid gray;
+		border-radius: 0.25rem;
+		padding: 5rem;
 
 		& .error {
 			color: red;

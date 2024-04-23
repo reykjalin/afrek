@@ -42,7 +42,7 @@
 <form on:submit|preventDefault={handleSubmit}>
 	{#if error}<p>{error}</p>{/if}
 
-	<label for="email">Email</label>
+	<label for="email"><b>Email</b></label>
 	<input
 		type="email"
 		name="email"
@@ -51,11 +51,13 @@
 		bind:value={email}
 	/>
 
-	<label for="password">Password</label>
+	<label for="password"><b>Password</b></label>
 	<input type="password" name="password" id="password" bind:value={password} />
 
-	<label for="remember-me">Remember me?</label>
-	<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
+	<div>
+		<label for="remember-me"><b>Remember me?</b></label>
+		<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
+	</div>
 
 	<input type="submit" value="Login" />
 </form>
@@ -65,5 +67,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		max-width: 540px;
+		margin: auto;
+		border: 1px solid gray;
+		border-radius: 0.25rem;
+		padding: 5rem;
+
+		& div {
+			text-align: center;
+		}
 	}
 </style>
