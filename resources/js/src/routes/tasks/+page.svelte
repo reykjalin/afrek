@@ -118,6 +118,7 @@
 
 {#await fetchTasks()}
 	<p>Loading…</p>
+	<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
 {:then _}
 	<ul>
 		{#each tasks as task (task.id)}
