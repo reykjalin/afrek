@@ -131,7 +131,7 @@
 				on:dragover|preventDefault={() => {}}
 			>
 				<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
-				<button tabindex="-1" on:mousedown={enableDragging}>⠛</button>
+				<button class="anchor" tabindex="-1" on:mousedown={enableDragging}>⠛</button>
 				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 			</li>
 		{/each}
@@ -143,6 +143,10 @@
 <style>
 	h2 {
 		text-align: center;
+	}
+
+	button.anchor {
+		cursor: move;
 	}
 
 	ul {
