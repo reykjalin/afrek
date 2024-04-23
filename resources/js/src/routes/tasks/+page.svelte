@@ -118,7 +118,8 @@
 <h2>Tasks</h2>
 
 <p style={'text-align: center'}>
-	<Pill onClick={() => {}}>Default</Pill>
+	<Pill onClick={() => {}}>All</Pill>
+	<Pill onClick={() => {}}>Personal</Pill>
 	<Pill onClick={() => {}}>Completed</Pill>
 </p>
 
