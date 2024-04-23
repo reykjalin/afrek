@@ -41,16 +41,49 @@
 
 <slot></slot>
 
+<footer>
+	<div>
+		<p><a href="/blog">Blog</a></p>
+		<p><a href="/privacy">Privacy</a></p>
+		<p><a href="mailto:contact@afrek.app">Contact</a></p>
+	</div>
+
+	<p>Developed with &lt;3 by <a href="https://www.thorlaksson.com">Kristófer Reykjalín</a></p>
+</footer>
+
 <style>
 	header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		margin: 1rem;
 
 		& nav ul {
 			list-style: none;
 			display: flex;
 			gap: 0.5rem;
 		}
+	}
+
+	footer {
+		background-color: #334155;
+		color: white;
+		text-align: center;
+		padding: 5rem;
+		margin-block: 5rem;
+		margin-inline: 0;
+
+		& a {
+			color: lightblue;
+
+			&:visited {
+				color: violet;
+			}
+		}
+	}
+
+	:global(body) {
+		margin: 0;
+		font-size: 16px;
 	}
 </style>
