@@ -6,6 +6,7 @@
 	import { getTasks, createTask, moveTask, deleteTask } from '$lib/api/tasks';
 	import Task from '$lib/components/task.svelte';
 	import Pill from '$lib/components/pill.svelte';
+	import PageTitle from '$lib/components/pagetitle.svelte';
 
 	const { user } = getContext('auth');
 
@@ -115,7 +116,7 @@
 	</form>
 </dialog>
 
-<h2>Tasks</h2>
+<PageTitle>Tasks</PageTitle>
 
 <p style={'text-align: center'}>
 	<Pill onClick={() => {}}>All</Pill>

@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { isAxiosError } from 'axios';
 	import { goto } from '$app/navigation';
-	import { getCsrfCookie, login, getUser } from '$lib/api/auth';
 	import { getContext } from 'svelte';
+
+	import { getCsrfCookie, login, getUser } from '$lib/api/auth';
+	import PageTitle from '$lib/components/pagetitle.svelte';
 
 	const { user } = getContext('auth');
 
@@ -35,7 +37,7 @@
 	let remember = false;
 </script>
 
-<h2>Login</h2>
+<PageTitle>Login</PageTitle>
 
 <form on:submit|preventDefault={handleSubmit}>
 	{#if error}<p>{error}</p>{/if}
