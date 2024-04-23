@@ -6,7 +6,7 @@
 	export let isDragging = false;
 	export let onDelete: (t: typeof task) => void;
 
-	function buttonHandler(ev: MouseEvent) {
+	function buttonHandler(_ev: MouseEvent) {
 		onDelete(task);
 	}
 </script>

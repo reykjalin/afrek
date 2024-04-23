@@ -40,7 +40,7 @@
 	}
 
 	function onDragEnd(id: number) {
-		return async function (ev: DragEvent) {
+		return async function (_ev: DragEvent) {
 			const movedToIndex = tasks.findIndex((task) => task.id === id);
 			const taskBeingMoved = tasks.find((t) => t.id === itemBeingDragged);
 
@@ -55,7 +55,7 @@
 	}
 
 	function swapOnEnter(id: number) {
-		return function (ev: DragEvent) {
+		return function (_ev: DragEvent) {
 			// Don't swap if we just entered the item we're dragging, or if nothing is dragging.
 			if (itemBeingDragged === null || itemBeingDragged === id) {
 				return;
@@ -118,7 +118,6 @@
 
 {#await fetchTasks()}
 	<p>Loading…</p>
-	<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
 {:then _}
 	<ul>
 		{#each tasks as task (task.id)}
