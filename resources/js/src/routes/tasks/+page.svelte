@@ -7,6 +7,7 @@
 	import Task from '$lib/components/task.svelte';
 	import Pill from '$lib/components/pill.svelte';
 	import PageTitle from '$lib/components/pagetitle.svelte';
+	import Button from '$lib/components/button.svelte';
 
 	const { user } = getContext('auth');
 
@@ -139,7 +140,14 @@
 				on:dragover|preventDefault={() => {}}
 			>
 				<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
-				<button class="anchor" tabindex="-1" on:mousedown={enableDragging}>⠛</button>
+				<Button
+					variant="tertiary"
+					className="anchor"
+					tabindex={-1}
+					cursorStyle="move"
+					onMouseDown={enableDragging}
+					>⠛
+				</Button>
 				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 			</li>
 		{/each}
@@ -149,10 +157,6 @@
 {/await}
 
 <style>
-	h2 {
-		text-align: center;
-	}
-
 	button.anchor {
 		cursor: move;
 	}
@@ -168,18 +172,6 @@
 			flex-direction: row;
 			gap: 0.5rem;
 			align-items: center;
-		}
-
-		& button {
-			background-color: white;
-			border: 1px solid lightgray;
-			border-radius: 0.25rem;
-			padding: 0.25rem 0.5rem;
-
-			&:hover,
-			&:focus {
-				background-color: lightgray;
-			}
 		}
 
 		& li.is-dragging * {

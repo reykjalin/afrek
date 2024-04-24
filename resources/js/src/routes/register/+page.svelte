@@ -4,6 +4,7 @@
 
 	import { getCsrfCookie, getUser, register } from '$lib/api/auth';
 	import PageTitle from '$lib/components/pagetitle.svelte';
+	import Button from '$lib/components/button.svelte';
 
 	const { user } = getContext('auth');
 
@@ -64,7 +65,8 @@
 		id="confirm_password"
 		bind:value={confirmPassword}
 	/>
-	<input type="submit" value="Register" />
+
+	<Button type="submit">Register</Button>
 </form>
 
 <style>
@@ -81,6 +83,10 @@
 
 		& .error {
 			color: red;
+		}
+
+		& button {
+			margin: auto;
 		}
 	}
 </style>

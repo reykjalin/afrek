@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { type Task } from '$lib/api/tasks';
 
+	import Button from '$lib/components/button.svelte';
+
 	export let task: Task;
 
 	export let isDragging = false;
@@ -13,7 +15,7 @@
 
 <div class={`${isDragging ? 'is-dragging ' : ''}task`}>
 	<div>
-		<button on:click={buttonHandler}>✅</button>
+		<Button variant="tertiary" onClick={buttonHandler}>✅</Button>
 		<p>{task.description}</p>
 	</div>
 
@@ -39,18 +41,6 @@
 		& p {
 			padding: 0;
 			margin: 0.5rem 0;
-		}
-
-		& button {
-			background-color: white;
-			border: 1px solid lightgray;
-			border-radius: 0.25rem;
-			padding: 0.25rem 0.5rem;
-
-			&:hover,
-			&:focus {
-				background-color: lightgray;
-			}
 		}
 
 		& div:not(.meta) {

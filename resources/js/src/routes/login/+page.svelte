@@ -5,6 +5,7 @@
 
 	import { getCsrfCookie, login, getUser } from '$lib/api/auth';
 	import PageTitle from '$lib/components/pagetitle.svelte';
+	import Button from '$lib/components/button.svelte';
 
 	const { user } = getContext('auth');
 
@@ -59,7 +60,7 @@
 		<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
 	</div>
 
-	<input type="submit" value="Login" />
+	<Button type="submit">Login</Button>
 </form>
 
 <style>
@@ -75,6 +76,10 @@
 
 		& div {
 			text-align: center;
+		}
+
+		& button {
+			margin: auto;
 		}
 	}
 </style>
