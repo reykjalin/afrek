@@ -22,7 +22,7 @@
 		background-color: #efefef;
 	}
 
-	.pill:hover {
+	button.pill:hover {
 		background-color: lightgray;
 		cursor: pointer;
 	}

@@ -3,6 +3,7 @@ export interface Task {
 	description: string;
 	details?: string;
 	order: number;
+	tags: string[];
 }
 
 let tasks: Task[] = [];
@@ -23,14 +24,17 @@ function loadTasks(user: Partial<{ id: number }>) {
 	}
 }
 
-async function getTasks(user: Partial<{ id: number }>) {
+async function getTasks(user: Partial<{ id: number }>, tag?: string) {
 	loadTasks(user);
 
 	tasks = tasks.sort((a, b) => a.order - b.order);
+	if (tag) {
+		return tasks.filter((t) => t.tags.indexOf(tag) !== -1);
+	}
 	return tasks;
 }
 
-async function createTask(user: Partial<{ id: number }>, description: string) {
+async function createTask(user: Partial<{ id: number }>, description: string, tags?: string[]) {
 	loadTasks(user);
 
 	const task = {
@@ -39,6 +43,7 @@ async function createTask(user: Partial<{ id: number }>, description: string) {
 		order: 0,
 		details: '',
 		created_at: Date.now().toString(),
+		tags: tags ?? [],
 	};
 
 	tasks = [task, ...tasks.map((t) => ({ ...t, order: t.order + 1 }))];

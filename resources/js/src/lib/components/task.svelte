@@ -2,6 +2,7 @@
 	import { type Task } from '$lib/api/tasks';
 
 	import Button from '$lib/components/button.svelte';
+	import Pill from '$lib/components/pill.svelte';
 
 	export let task: Task;
 
@@ -17,6 +18,12 @@
 	<div>
 		<Button variant="tertiary" onClick={buttonHandler}>✅</Button>
 		<p>{task.description}</p>
+	</div>
+
+	<div class="tags">
+		{#each task.tags as tag}
+			<Pill>{tag}</Pill>
+		{/each}
 	</div>
 
 	{#if import.meta.env.MODE === 'development'}
@@ -43,7 +50,14 @@
 			margin: 0.5rem 0;
 		}
 
-		& div:not(.meta) {
+		& div.tags {
+			margin-block-start: 0.5rem;
+			display: flex;
+			flex-direction: row;
+			gap: 0.5rem;
+		}
+
+		& div:not(.meta):not(.tags) {
 			border: none;
 			display: flex;
 			flex-direction: row;

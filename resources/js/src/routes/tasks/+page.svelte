@@ -18,10 +18,17 @@
 	}
 
 	let tasks: Awaited<ReturnType<typeof getTasks>>;
+	let selectedTag: string | undefined = undefined;
+	let tags: string[] = [];
 
 	let fetchTasks = async () => {
 		tasks = await getTasks($user);
+		tags = [...new Set(tasks.flatMap((t) => t.tags))];
 	};
+
+	$: {
+		getTasks($user, selectedTag).then((t) => (tasks = t));
+	}
 
 	// List props.
 	let itemBeingDragged: number | null = null;
@@ -50,6 +57,7 @@
 			if (taskBeingMoved) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
 				tasks = await moveTask($user, taskBeingMoved, movedToIndex);
+				tasks = await getTasks($user, selectedTag);
 			}
 
 			itemBeingDragged = null;
@@ -94,12 +102,25 @@
 
 	async function createNewTask() {
 		dialog.close();
-		tasks = await createTask($user, taskDescription);
+		const index = taskDescription.trimEnd().search(/( #[a-zA-Z\-_\d]+)+$/);
+		if (index !== -1) {
+			const newTags = taskDescription
+				.substring(index)
+				.split(' ')
+				.filter((t) => t)
+				.map((t) => t.substring(1));
+
+			tasks = await createTask($user, taskDescription.substring(0, index), newTags);
+			tags = [...new Set(tasks.flatMap((t) => t.tags))];
+		} else {
+			tasks = await createTask($user, taskDescription);
+		}
 		taskDescription = '';
 	}
 
 	async function onDelete(task: (typeof tasks)[0]) {
 		tasks = await deleteTask($user, task);
+		tags = [...new Set(tasks.flatMap((t) => t.tags))];
 	}
 </script>
 
@@ -119,15 +140,18 @@
 
 <PageTitle>Tasks</PageTitle>
 
-<p style={'text-align: center'}>
-	<Pill onClick={() => {}}>All</Pill>
-	<Pill onClick={() => {}}>Personal</Pill>
-	<Pill onClick={() => {}}>Completed</Pill>
-</p>
-
 {#await fetchTasks()}
 	<p>Loading…</p>
 {:then _}
+	<p
+		style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
+	>
+		<Pill onClick={() => (selectedTag = undefined)}>All</Pill>
+		{#each tags as tag}
+			<Pill onClick={() => (selectedTag = tag)}>{tag}</Pill>
+		{/each}
+	</p>
+
 	<ul>
 		{#each tasks as task (task.id)}
 			<li
