@@ -26,8 +26,9 @@
 
 <header>
 	<h1>
-		<img width="50" src="/favicon.png" alt="The afrek logo showing a calendar." />
-		<Link href="/">Afrek</Link>
+		<Link href="/"
+			><img width="150" src="/logo.png" alt="The afrek logo showing a calendar." /></Link
+		>
 	</h1>
 	<nav>
 		<ul>
