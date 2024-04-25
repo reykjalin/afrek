@@ -134,7 +134,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <dialog bind:this={dialog}>
-	<form on:submit={createNewTask}>
+	<form on:submit|preventDefault={createNewTask}>
 		<label for="description"><b>New task:</b></label>
 		<input
 			name="description"
