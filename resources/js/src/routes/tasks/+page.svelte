@@ -115,12 +115,19 @@
 		} else {
 			tasks = await createTask($user, taskDescription);
 		}
+
+		tasks = await getTasks($user, selectedTag);
+
 		taskDescription = '';
 	}
 
 	async function onDelete(task: (typeof tasks)[0]) {
 		tasks = await deleteTask($user, task);
+
+		// Tags recalculation must happen before fetching updated list of tags to make sure all tags are available.
 		tags = [...new Set(tasks.flatMap((t) => t.tags))];
+
+		tasks = await getTasks($user, selectedTag);
 	}
 </script>
 
