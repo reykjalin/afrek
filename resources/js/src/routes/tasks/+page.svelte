@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { flip } from 'svelte/animate';
+	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 
 	import { getTasks, createTask, moveTask, deleteTask } from '$lib/api/tasks';
@@ -163,7 +164,8 @@
 		{#each tasks as task (task.id)}
 			<li
 				class={itemBeingDragged ? 'is-dragging' : ''}
-				animate:flip={{ duration: 300 }}
+				animate:flip={{ duration: 200 }}
+				in:fade
 				draggable={draggingEnabled}
 				on:dragstart={onDragStart(task.id)}
 				on:dragend={onDragEnd(task.id)}
