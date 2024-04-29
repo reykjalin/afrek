@@ -77,7 +77,7 @@
 		color: white;
 		text-align: center;
 		padding: 5rem;
-		margin-block: 5rem;
+		margin-block-start: 5rem;
 		margin-inline: 0;
 	}
 
