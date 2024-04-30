@@ -38,30 +38,32 @@
 	let remember = false;
 </script>
 
-<PageTitle>Login</PageTitle>
+<main>
+	<PageTitle>Login</PageTitle>
 
-<form on:submit|preventDefault={handleSubmit}>
-	{#if error}<p>{error}</p>{/if}
+	<form on:submit|preventDefault={handleSubmit}>
+		{#if error}<p>{error}</p>{/if}
 
-	<label for="email"><b>Email</b></label>
-	<input
-		type="email"
-		name="email"
-		id="email"
-		placeholder="afrek@example.com"
-		bind:value={email}
-	/>
+		<label for="email"><b>Email</b></label>
+		<input
+			type="email"
+			name="email"
+			id="email"
+			placeholder="afrek@example.com"
+			bind:value={email}
+		/>
 
-	<label for="password"><b>Password</b></label>
-	<input type="password" name="password" id="password" bind:value={password} />
+		<label for="password"><b>Password</b></label>
+		<input type="password" name="password" id="password" bind:value={password} />
 
-	<div>
-		<label for="remember-me"><b>Remember me?</b></label>
-		<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
-	</div>
+		<div>
+			<label for="remember-me"><b>Remember me?</b></label>
+			<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
+		</div>
 
-	<Button type="submit">Login</Button>
-</form>
+		<Button type="submit">Login</Button>
+	</form>
+</main>
 
 <style>
 	form {

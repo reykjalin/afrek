@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../style.css';
 	import { setContext } from 'svelte';
 
 	import { getCsrfCookie, logout } from '$lib/api/auth';
@@ -79,79 +80,5 @@
 		padding: 5rem;
 		margin-block-start: 5rem;
 		margin-inline: 0;
-	}
-
-	/* Fonts. */
-
-	@font-face {
-		font-family: 'Atkinson Hyperlegible';
-		src:
-			url('/fonts/Atkinson-Hyperlegible-Regular-102a.woff2') format('woff2'),
-			url('/fonts/Atkinson-Hyperlegible-Regular-102.woff') format('woff');
-		font-weight: normal;
-		font-style: normal;
-	}
-	@font-face {
-		font-family: 'Atkinson Hyperlegible';
-		src:
-			url('/fonts/Atkinson-Hyperlegible-Bold-102a.woff2') format('woff2'),
-			url('/fonts/Atkinson-Hyperlegible-Bold-102.woff') format('woff');
-		font-weight: bold;
-		font-style: normal;
-	}
-	@font-face {
-		font-family: 'Atkinson Hyperlegible';
-		src:
-			url('/fonts/Atkinson-Hyperlegible-Italic-102a.woff2') format('woff2'),
-			url('/fonts/Atkinson-Hyperlegible-Italic-102.woff') format('woff');
-		font-weight: normal;
-		font-style: italic;
-	}
-	@font-face {
-		font-family: 'Atkinson Hyperlegible';
-		src:
-			url('/fonts/Atkinson-Hyperlegible-BoldItalic-102a.woff2') format('woff2'),
-			url('/fonts/Atkinson-Hyperlegible-BoldItalic-102.woff') format('woff');
-		font-weight: bold;
-		font-style: italic;
-	}
-
-	@font-face {
-		font-family: 'JetBrains Mono';
-		src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
-		font-weight: normal;
-		font-style: normal;
-	}
-	@font-face {
-		font-family: 'JetBrains Mono';
-		src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
-		font-weight: bold;
-		font-style: normal;
-	}
-	@font-face {
-		font-family: 'JetBrains Mono';
-		src: url('/fonts/JetBrainsMono-Italic.woff2') format('woff2');
-		font-weight: normal;
-		font-style: italic;
-	}
-	@font-face {
-		font-family: 'JetBrains Mono';
-		src: url('/fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');
-		font-weight: bold;
-		font-style: italic;
-	}
-
-	/* Global styles. */
-	:global(body) {
-		margin: 0;
-	}
-
-	:global(body, input, textarea, button) {
-		font-size: 18px;
-		font-family: 'Atkinson Hyperlegible', sans-serif;
-	}
-
-	:global(h1, h2, h3, h4, h5, h6) {
-		font-family: Charter, serif;
 	}
 </style>

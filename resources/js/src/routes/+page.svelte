@@ -3,11 +3,13 @@
 	import Link from '$lib/components/link.svelte';
 </script>
 
-<PageTitle>Welcome to Afrek</PageTitle>
+<main>
+	<PageTitle>Welcome to Afrek</PageTitle>
 
-<p>
-	Visit <Link href="https://afrek.app/blog">afrek.app/blog</Link> to learn more about this project.
-</p>
+	<p>
+		Visit <Link href="https://afrek.app/blog">afrek.app/blog</Link> to learn more about this project.
+	</p>
+</main>
 
 <style>
 	p {

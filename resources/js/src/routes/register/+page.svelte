@@ -41,33 +41,35 @@
 	let confirmPassword = '';
 </script>
 
-<PageTitle>Register</PageTitle>
+<main>
+	<PageTitle>Register</PageTitle>
 
-<form on:submit|preventDefault={handleSubmit}>
-	{#if error}<p class="error">{error}</p>{/if}
+	<form on:submit|preventDefault={handleSubmit}>
+		{#if error}<p class="error">{error}</p>{/if}
 
-	<label for="email"><b>Email</b></label>
-	<input
-		type="email"
-		name="email"
-		id="email"
-		placeholder="afrek@example.com"
-		bind:value={email}
-	/>
+		<label for="email"><b>Email</b></label>
+		<input
+			type="email"
+			name="email"
+			id="email"
+			placeholder="afrek@example.com"
+			bind:value={email}
+		/>
 
-	<label for="password"><b>Password</b></label>
-	<input type="password" name="password" id="password" bind:value={password} />
+		<label for="password"><b>Password</b></label>
+		<input type="password" name="password" id="password" bind:value={password} />
 
-	<label for="confirm_password"><b>Confirm password</b></label>
-	<input
-		type="password"
-		name="confirm_password"
-		id="confirm_password"
-		bind:value={confirmPassword}
-	/>
+		<label for="confirm_password"><b>Confirm password</b></label>
+		<input
+			type="password"
+			name="confirm_password"
+			id="confirm_password"
+			bind:value={confirmPassword}
+		/>
 
-	<Button type="submit">Register</Button>
-</form>
+		<Button type="submit">Register</Button>
+	</form>
+</main>
 
 <style>
 	form {

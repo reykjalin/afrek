@@ -134,60 +134,62 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 
-<dialog bind:this={dialog}>
-	<form on:submit|preventDefault={createNewTask}>
-		<label for="description"><b>New task:</b></label>
-		<input
-			name="description"
-			type="text"
-			placeholder="fib the frobbler"
-			bind:value={taskDescription}
-		/>
-	</form>
-</dialog>
+<main>
+	<dialog bind:this={dialog}>
+		<form on:submit|preventDefault={createNewTask}>
+			<label for="description"><b>New task:</b></label>
+			<input
+				name="description"
+				type="text"
+				placeholder="fib the frobbler"
+				bind:value={taskDescription}
+			/>
+		</form>
+	</dialog>
 
-<PageTitle>Tasks</PageTitle>
+	<PageTitle>Tasks</PageTitle>
 
-{#await fetchTasks()}
-	<p>Loading…</p>
-{:then _}
-	<p
-		style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
-	>
-		<Pill onClick={() => (selectedTag = undefined)}>All</Pill>
-		{#each tags as tag}
-			<Pill onClick={() => (selectedTag = tag)}>{tag}</Pill>
-		{/each}
-	</p>
+	{#await fetchTasks()}
+		<p>Loading…</p>
+	{:then _}
+		<p
+			style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
+		>
+			<Pill onClick={() => (selectedTag = undefined)}>All</Pill>
+			{#each tags as tag}
+				<Pill onClick={() => (selectedTag = tag)}>{tag}</Pill>
+			{/each}
+		</p>
 
-	<ul>
-		{#each tasks as task (task.id)}
-			<li
-				class={itemBeingDragged ? 'is-dragging' : ''}
-				animate:flip={{ duration: 200 }}
-				in:fade
-				draggable={draggingEnabled}
-				on:dragstart={onDragStart(task.id)}
-				on:dragend={onDragEnd(task.id)}
-				on:dragenter|preventDefault={swapOnEnter(task.id)}
-				on:dragover|preventDefault={() => {}}
-			>
-				<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
-				<Button
-					variant="tertiary"
-					className="anchor"
-					tabindex={-1}
-					cursorStyle="move"
-					onMouseDown={enableDragging}
-					>⠛
-				</Button>
-				<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
-			</li>
-		{/each}
-	</ul>
-{:catch error}
-	<p class="error">Failed to load tasks: {error}.</p>
-{/await}
+		<ul>
+			{#each tasks as task (task.id)}
+				<li
+					class={itemBeingDragged ? 'is-dragging' : ''}
+					animate:flip={{ duration: 200 }}
+					in:fade
+					draggable={draggingEnabled}
+					on:dragstart={onDragStart(task.id)}
+					on:dragend={onDragEnd(task.id)}
+					on:dragenter|preventDefault={swapOnEnter(task.id)}
+					on:dragover|preventDefault={() => {}}
+				>
+					<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
+					<Button
+						variant="tertiary"
+						className="anchor"
+						tabindex={-1}
+						cursorStyle="move"
+						onMouseDown={enableDragging}
+						>⠛
+					</Button>
+					<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
+				</li>
+			{/each}
+		</ul>
+	{:catch error}
+		<p class="error">Failed to load tasks: {error}.</p>
+	{/await}
+</main>
 
 <style>
 	button.anchor {
@@ -197,8 +199,6 @@
 	ul {
 		list-style-type: none;
 		padding-inline-start: 0;
-		max-width: 760px;
-		margin: auto;
 
 		& li {
 			display: flex;
