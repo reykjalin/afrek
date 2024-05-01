@@ -3,6 +3,7 @@
 
 	import Button from '$lib/components/button.svelte';
 	import Pill from '$lib/components/pill.svelte';
+	import Icon from '$lib/components/icon.svelte';
 
 	export let task: Task;
 
@@ -16,7 +17,7 @@
 
 <div class={`${isDragging ? 'is-dragging ' : ''}task`}>
 	<div>
-		<Button variant="tertiary" onClick={buttonHandler}>✅</Button>
+		<Button variant="tertiary" onClick={buttonHandler}><Icon icon="2714" width="25" /></Button>
 		<p>{task.description}</p>
 	</div>
 

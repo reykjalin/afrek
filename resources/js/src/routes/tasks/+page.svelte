@@ -9,6 +9,7 @@
 	import Pill from '$lib/components/pill.svelte';
 	import PageTitle from '$lib/components/pagetitle.svelte';
 	import Button from '$lib/components/button.svelte';
+	import Icon from '$lib/components/icon.svelte';
 
 	const { user } = getContext('auth');
 
@@ -180,7 +181,8 @@
 						tabindex={-1}
 						cursorStyle="move"
 						onMouseDown={enableDragging}
-						>⠛
+					>
+						<span><Icon icon="E265" width="25" /></span>
 					</Button>
 					<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 				</li>
