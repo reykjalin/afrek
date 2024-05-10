@@ -41,6 +41,7 @@
 		&.tertiary {
 			padding: 0.25rem 0.5rem;
 			border: 1px solid lightgray;
+			background-color: white;
 
 			&:hover {
 				background-color: lightgray;

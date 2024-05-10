@@ -76,6 +76,8 @@
 		border-radius: 0.25rem;
 		padding: 5rem;
 
+		background-color: white;
+
 		& div {
 			text-align: center;
 		}

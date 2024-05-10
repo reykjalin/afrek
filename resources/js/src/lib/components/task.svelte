@@ -46,6 +46,8 @@
 		margin: 0.5rem;
 		width: 100%;
 
+		background-color: white;
+
 		& p {
 			padding: 0;
 			margin: 0.5rem 0;

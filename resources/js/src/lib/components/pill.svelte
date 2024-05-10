@@ -16,10 +16,10 @@
 
 <style>
 	.pill {
-		padding: 0.25rem;
+		padding: 0.25rem 0.5rem;
 		border-radius: 0.25rem;
 		border: none;
-		background-color: #efefef;
+		background-color: #f0f0f0;
 	}
 
 	button.pill:hover {
