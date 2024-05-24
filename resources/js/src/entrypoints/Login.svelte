@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { isAxiosError } from 'axios';
-	import { goto } from '$app/navigation';
-	import { getContext } from 'svelte';
 
-	import { getCsrfCookie, login, getUser } from '$lib/api/auth';
-	import PageTitle from '$lib/components/pagetitle.svelte';
-	import Button from '$lib/components/button.svelte';
-
-	const { user } = getContext('auth');
+	import { getCsrfCookie, login, getUser } from '../lib/api/auth';
+	import PageTitle from '../lib/components/pagetitle.svelte';
+	import Button from '../lib/components/button.svelte';
+	import { user } from '../lib/stores/auth';
 
 	async function handleSubmit() {
 		try {
@@ -27,7 +24,7 @@
 
 	$: {
 		if ($user) {
-			goto('/tasks');
+			window.location.href = '/tasks';
 		}
 	}
 

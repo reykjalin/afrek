@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { type Task } from '$lib/api/tasks';
+	import { type Task } from '../api/tasks';
 
-	import Button from '$lib/components/button.svelte';
-	import Pill from '$lib/components/pill.svelte';
-	import Icon from '$lib/components/icon.svelte';
+	import Button from '../components/button.svelte';
+	import Pill from '../components/pill.svelte';
+	import Icon from '../components/icon.svelte';
 
 	export let task: Task;
 

@@ -1,4 +1,4 @@
-import axios from '$lib/axios';
+import axios from '../axios';
 import { isAxiosError } from 'axios';
 import { z } from 'zod';
 

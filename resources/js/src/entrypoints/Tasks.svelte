@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
-	import { goto } from '$app/navigation';
 
-	import { getTasks, createTask, moveTask, deleteTask } from '$lib/api/tasks';
-	import Task from '$lib/components/task.svelte';
-	import Pill from '$lib/components/pill.svelte';
-	import PageTitle from '$lib/components/pagetitle.svelte';
-	import Button from '$lib/components/button.svelte';
-	import Icon from '$lib/components/icon.svelte';
+	import { getTasks, createTask, moveTask, deleteTask } from '../lib/api/tasks';
+	import Task from '../lib/components/task.svelte';
+	import Pill from '../lib/components/pill.svelte';
+	import PageTitle from '../lib/components/pagetitle.svelte';
+	import Button from '../lib/components/button.svelte';
+	import Icon from '../lib/components/icon.svelte';
 
-	const { user } = getContext('auth');
+	import { user } from '../lib/stores/auth';
 
 	$: {
 		if (!$user) {
-			goto('/login');
+			// goto('/login');
+			console.log('goto login page');
+			window.location.replace('/login');
 		}
 	}
 
@@ -24,12 +24,16 @@
 	let tags: string[] = [];
 
 	let fetchTasks = async () => {
-		tasks = await getTasks($user);
-		tags = [...new Set(tasks.flatMap((t) => t.tags))];
+		if ($user) {
+			tasks = await getTasks($user);
+			tags = [...new Set(tasks.flatMap((t) => t.tags))];
+		}
 	};
 
 	$: {
-		getTasks($user, selectedTag).then((t) => (tasks = t));
+		if ($user) {
+			getTasks($user, selectedTag).then((t) => (tasks = t));
+		}
 	}
 
 	// List props.
@@ -56,7 +60,7 @@
 			const movedToIndex = tasks.findIndex((task) => task.id === id);
 			const taskBeingMoved = tasks.find((t) => t.id === itemBeingDragged);
 
-			if (taskBeingMoved) {
+			if (taskBeingMoved && $user) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
 				tasks = await moveTask($user, taskBeingMoved, movedToIndex);
 				tasks = await getTasks($user, selectedTag);
@@ -104,6 +108,10 @@
 
 	async function createNewTask() {
 		dialog.close();
+		if (!$user) {
+			return;
+		}
+
 		const index = taskDescription.trimEnd().search(/( #[a-zA-Z\-_\d]+)+$/);
 		if (index !== -1) {
 			const newTags = taskDescription
@@ -124,6 +132,10 @@
 	}
 
 	async function onDelete(task: (typeof tasks)[0]) {
+		if (!$user) {
+			return;
+		}
+
 		tasks = await deleteTask($user, task);
 
 		// Tags recalculation must happen before fetching updated list of tags to make sure all tags are available.
