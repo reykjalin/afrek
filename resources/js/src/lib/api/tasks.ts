@@ -1,137 +1,47 @@
-export interface Task {
-	id: number;
-	description: string;
-	details?: string;
-	order: number;
-	tags: string[];
-}
+import axios from '../axios';
+import z from 'zod';
 
-let tasks: Task[] = [];
+const taskSchema = z.object({
+	id: z.number(),
+	description: z.string(),
+	details: z.string().optional(),
+	order: z.number(),
+	tags: z.array(z.string()).optional(),
+});
 
-function getNewId(tasks: Task[]) {
-	// Default to ID 1 if there are no tasks.
-	if (tasks.length === 0) {
-		return 1;
-	}
+export type Task = z.infer<typeof taskSchema>;
 
-	return Math.max(...tasks.map((t) => t.id)) + 1;
-}
+const tasksResponseSchema = z.array(taskSchema);
 
-function loadTasks(user: Partial<{ id: number }>) {
-	if (tasks.length === 0) {
-		// Try to get from localStorage.
-		tasks = JSON.parse(localStorage.getItem(`tasks-${user.id}`) ?? '[]');
-	}
-}
+async function getTasks(tag?: string) {
+	const response = await axios.get('/api/tasks');
+	const tasks = tasksResponseSchema.parse(response.data);
 
-async function getTasks(user: Partial<{ id: number }>, tag?: string) {
-	loadTasks(user);
-
-	tasks = tasks.sort((a, b) => a.order - b.order);
 	if (tag) {
-		return tasks.filter((t) => t.tags.indexOf(tag) !== -1);
+		return tasks.filter((t) => t.tags?.indexOf(tag) !== -1);
 	}
 	return tasks;
 }
 
-async function createTask(user: Partial<{ id: number }>, description: string, tags?: string[]) {
-	loadTasks(user);
-
-	const task = {
-		id: getNewId(tasks),
+async function createTask(description: string, tags?: string[]) {
+	const newTaskData = {
 		description,
-		order: 0,
 		details: '',
-		created_at: Date.now().toString(),
 		tags: tags ?? [],
 	};
 
-	tasks = [task, ...tasks.map((t) => ({ ...t, order: t.order + 1 }))];
-
-	if (user) {
-		localStorage.setItem(`tasks-${user.id}`, JSON.stringify(tasks));
-	}
-
-	return tasks;
+	const response = await axios.post('/api/tasks', newTaskData);
+	const task = taskSchema.parse(response.data);
+	return task;
 }
 
-async function moveTask(user: Partial<{ id: number }>, task: Task, to: number) {
-	if (to < 0 || to > tasks.length) {
-		throw new Error('Cannot move task outside array bounds.');
-	}
-
-	// Nothing to do.
-	if (task.order === to) {
-		return tasks;
-	}
-
-	tasks = tasks
-		.map((t) => {
-			// If it's the task we're moving, just update the order prop.
-			if (t.id === task.id) {
-				return {
-					...task,
-					order: to,
-				};
-			}
-
-			if (task.order < to) {
-				if (t.order <= to && t.order > task.order) {
-					return {
-						...t,
-						order: t.order - 1,
-					};
-				}
-
-				return t;
-			}
-
-			if (task.order > to) {
-				if (t.order >= to && t.order < task.order) {
-					return {
-						...t,
-						order: t.order + 1,
-					};
-				}
-
-				return t;
-			}
-
-			// Should never reach here.
-			throw new Error('moveTask: Reached code that should not be reached.');
-		})
-		.sort((a, b) => a.order - b.order);
-
-	if (user) {
-		localStorage.setItem(`tasks-${user.id}`, JSON.stringify(tasks));
-	}
-
-	return tasks;
+async function moveTask(task: Task, order: number) {
+	// FIXME: Implement me here.
+	console.log(`move task ${task.id} to ${order}`)
 }
 
-async function deleteTask(user: Partial<{ id: number }>, task: (typeof tasks)[0]) {
-	tasks = tasks
-		.filter((t) => t.id !== task.id)
-		.map((t) => {
-			if (t.order < task.order) {
-				return t;
-			}
-
-			return {
-				...t,
-				order: t.order - 1,
-			};
-		});
-
-	if (user) {
-		localStorage.setItem(`tasks-${user.id}`, JSON.stringify(tasks));
-	}
-
-	return tasks;
+async function deleteTask(task: Task) {
+	await axios.delete(`/api/tasks/${task.id}`);
 }
 
-async function clearTasks() {
-	tasks = [];
-}
-
-export { getTasks, createTask, moveTask, deleteTask, clearTasks };
+export { getTasks, createTask, moveTask, deleteTask };

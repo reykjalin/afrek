@@ -2,15 +2,16 @@
 	import Link from '../lib/components/link.svelte';
 	import { user } from '../lib/stores/auth';
 	import { getCsrfCookie, logout } from '../lib/api/auth';
-	import { clearTasks } from '../lib/api/tasks';
+	import { tasks } from '../lib/stores/tasks';
 
 	async function handleLogout(ev: MouseEvent) {
 		ev.preventDefault();
 
 		await getCsrfCookie();
 		await logout();
-		await clearTasks();
+
 		$user = undefined;
+		$tasks = [];
 	}
 </script>
 

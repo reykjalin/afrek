@@ -10,6 +10,8 @@
 	import Icon from '../lib/components/icon.svelte';
 
 	import { user } from '../lib/stores/auth';
+	import { tasks } from '../lib/stores/tasks';
+	import type { Task as TaskType } from '../lib/api/tasks';
 
 	$: {
 		if (!$user) {
@@ -19,20 +21,20 @@
 		}
 	}
 
-	let tasks: Awaited<ReturnType<typeof getTasks>>;
 	let selectedTag: string | undefined = undefined;
 	let tags: string[] = [];
 
 	let fetchTasks = async () => {
 		if ($user) {
-			tasks = await getTasks($user);
-			tags = [...new Set(tasks.flatMap((t) => t.tags))];
+			$tasks = await getTasks();
+			// tags = [...new Set(tasks.flatMap((t) => t.tags))];
+			tags = [];
 		}
 	};
 
 	$: {
 		if ($user) {
-			getTasks($user, selectedTag).then((t) => (tasks = t));
+			getTasks(selectedTag).then((t) => ($tasks = t));
 		}
 	}
 
@@ -57,13 +59,13 @@
 
 	function onDragEnd(id: number) {
 		return async function (_ev: DragEvent) {
-			const movedToIndex = tasks.findIndex((task) => task.id === id);
-			const taskBeingMoved = tasks.find((t) => t.id === itemBeingDragged);
+			const movedToIndex = $tasks.findIndex((task) => task.id === id);
+			const taskBeingMoved = $tasks.find((t) => t.id === itemBeingDragged);
 
 			if (taskBeingMoved && $user) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
-				tasks = await moveTask($user, taskBeingMoved, movedToIndex);
-				tasks = await getTasks($user, selectedTag);
+				await moveTask(taskBeingMoved, movedToIndex);
+				$tasks = await getTasks(selectedTag);
 			}
 
 			itemBeingDragged = null;
@@ -78,12 +80,12 @@
 				return;
 			}
 
-			const enteredIndex = tasks.findIndex((t) => t.id === id);
-			const draggingIndex = tasks.findIndex((t) => t.id === itemBeingDragged);
+			const enteredIndex = $tasks.findIndex((t) => t.id === id);
+			const draggingIndex = $tasks.findIndex((t) => t.id === itemBeingDragged);
 
-			const tmp = tasks[enteredIndex];
-			tasks[enteredIndex] = tasks[draggingIndex];
-			tasks[draggingIndex] = tmp;
+			const tmp = $tasks[enteredIndex];
+			$tasks[enteredIndex] = $tasks[draggingIndex];
+			$tasks[draggingIndex] = tmp;
 		};
 	}
 
@@ -120,28 +122,31 @@
 				.filter((t) => t)
 				.map((t) => t.substring(1));
 
-			tasks = await createTask($user, taskDescription.substring(0, index), newTags);
-			tags = [...new Set(tasks.flatMap((t) => t.tags))];
+			await createTask(taskDescription.substring(0, index), newTags);
+			$tasks = await getTasks(selectedTag);
+			// tags = [...new Set(tasks.flatMap((t) => t.tags))];
+			tags = [];
 		} else {
-			tasks = await createTask($user, taskDescription);
+			await createTask(taskDescription);
 		}
 
-		tasks = await getTasks($user, selectedTag);
+		$tasks = await getTasks(selectedTag);
 
 		taskDescription = '';
 	}
 
-	async function onDelete(task: (typeof tasks)[0]) {
+	async function onDelete(task: TaskType) {
 		if (!$user) {
 			return;
 		}
 
-		tasks = await deleteTask($user, task);
+		await deleteTask(task);
 
 		// Tags recalculation must happen before fetching updated list of tags to make sure all tags are available.
-		tags = [...new Set(tasks.flatMap((t) => t.tags))];
+		// tags = [...new Set(tasks.flatMap((t) => t.tags))];
+		tags = [];
 
-		tasks = await getTasks($user, selectedTag);
+		$tasks = await getTasks(selectedTag);
 	}
 </script>
 
@@ -175,7 +180,7 @@
 		</p>
 
 		<ul>
-			{#each tasks as task (task.id)}
+			{#each $tasks as task (task.id)}
 				<li
 					class={itemBeingDragged ? 'is-dragging' : ''}
 					animate:flip={{ duration: 200 }}

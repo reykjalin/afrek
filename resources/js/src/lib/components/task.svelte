@@ -22,7 +22,8 @@
 	</div>
 
 	<div class="tags">
-		{#each task.tags as tag}
+		<!-- {#each task.tags as tag} -->
+		{#each [] as tag}
 			<Pill>{tag}</Pill>
 		{/each}
 	</div>
