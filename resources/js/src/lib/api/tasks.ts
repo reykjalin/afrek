@@ -37,7 +37,7 @@ async function createTask(description: string, tags?: string[]) {
 
 async function moveTask(task: Task, order: number) {
 	// FIXME: Implement me here.
-	console.log(`move task ${task.id} to ${order}`)
+	console.log(`move task ${task.id} to ${order}`);
 }
 
 async function deleteTask(task: Task) {
