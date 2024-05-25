@@ -4,7 +4,7 @@ Simple task management and focusing software.
 
 ## Start developing Afrek
 
-Afrek has a separate frontend and backend that both live in this repo. To start developing you need to:
+Afrek's frontend and backend have to be served via separate commands:
 
 ### Run the backend
 
