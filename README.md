@@ -20,7 +20,6 @@ php artisan serve
 ### Prepare the frontend
 
 ```shell
-cd resources/js
 npm i
 ```
 
@@ -30,7 +29,7 @@ npm i
 npm run dev
 ```
 
-And now the app should be available on http://localhost:5173/.
+And now the app should be available on http://localhost:8000/.
 
 ## About Laravel
 
