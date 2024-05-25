@@ -10,6 +10,17 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::get('/tasks', function (Request $request) {
+	$tag = $request->query('tag');
+	if ( ! empty( $tag ) ) {
+		return Task::with('tags')
+			->where('user_id', $request->user()->id)
+			->whereHas('tags', function ($query) use ($tag) {
+				$query->where('id', $tag);
+			})
+			->orderByDesc('order')
+			->get();
+	}
+
 	return Task::with('tags')
 		->where('user_id', $request->user()->id)
 		->orderByDesc('order')
@@ -18,6 +29,7 @@ Route::get('/tasks', function (Request $request) {
 
 Route::get('/tags', function (Request $request) {
 	return Tag::where('user_id', $request->user()->id)
+		->orderBy('name')
 		->get();
 })->middleware('auth:sanctum');
 

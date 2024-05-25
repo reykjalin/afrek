@@ -28,7 +28,15 @@ async function getTags() {
 }
 
 async function getTasks(tag?: Tag) {
-	const response = await axios.get('/api/tasks');
+	const getUrl = () => {
+		if ( tag ) {
+			return `api/tasks?tag=${tag.id}`
+		}
+
+		return '/api/tasks';
+	};
+
+	const response = await axios.get(getUrl());
 	const tasks = tasksResponseSchema.parse(response.data);
 
 	return tasks;
