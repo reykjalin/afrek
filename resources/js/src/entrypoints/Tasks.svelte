@@ -2,7 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 
-	import { getTasks, createTask, moveTask, deleteTask } from '../lib/api/tasks';
+	import { getTasks, getTags, createTask, moveTask, deleteTask } from '../lib/api/tasks';
 	import Task from '../lib/components/task.svelte';
 	import Pill from '../lib/components/pill.svelte';
 	import PageTitle from '../lib/components/pagetitle.svelte';
@@ -11,32 +11,32 @@
 
 	import { user } from '../lib/stores/auth';
 	import { tasks } from '../lib/stores/tasks';
-	import type { Task as TaskType } from '../lib/api/tasks';
+	import type { Task as TaskType, Tag } from '../lib/api/tasks';
 
 	$: {
 		if (!$user) {
 			// goto('/login');
 			console.log('goto login page');
 			window.location.replace('/login');
+		} else {
+			getTasks(selectedTag).then(t => $tasks = t);
 		}
 	}
 
-	let selectedTag: string | undefined = undefined;
-	let tags: string[] = [];
+	let selectedTag: Tag | undefined = undefined;
+	let tags: Tag[] = [];
 
 	let fetchTasks = async () => {
 		if ($user) {
 			$tasks = await getTasks();
-			// tags = [...new Set(tasks.flatMap((t) => t.tags))];
-			tags = [];
 		}
 	};
 
-	$: {
+	let fetchTags = async () => {
 		if ($user) {
-			getTasks(selectedTag).then((t) => ($tasks = t));
+			tags = await getTags();
 		}
-	}
+	};
 
 	// List props.
 	let itemBeingDragged: number | null = null;
@@ -131,6 +131,7 @@
 		}
 
 		$tasks = await getTasks(selectedTag);
+		tags = await getTags();
 
 		taskDescription = '';
 	}
@@ -147,6 +148,7 @@
 		tags = [];
 
 		$tasks = await getTasks(selectedTag);
+		tags = await getTags();
 	}
 </script>
 
@@ -167,18 +169,22 @@
 
 	<PageTitle>Tasks</PageTitle>
 
-	{#await fetchTasks()}
-		<p>Loading…</p>
-	{:then _}
+	{#await fetchTags() then _}
 		<p
 			style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
 		>
 			<Pill onClick={() => (selectedTag = undefined)}>All</Pill>
 			{#each tags as tag}
-				<Pill onClick={() => (selectedTag = tag)}>{tag}</Pill>
+				<Pill onClick={() => (selectedTag = tag)}>{tag.name}</Pill>
 			{/each}
 		</p>
+	{:catch error}
+		<p class="error">Failed to load tags: {error}</p>
+	{/await}
 
+	{#await fetchTasks()}
+		<p>Loading…</p>
+	{:then _}
 		<ul>
 			{#each $tasks as task (task.id)}
 				<li

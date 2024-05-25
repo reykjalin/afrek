@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Tag;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -9,7 +10,15 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::get('/tasks', function (Request $request) {
-	return Task::where('user_id', $request->user()->id)->orderByDesc('order')->get();
+	return Task::with('tags')
+		->where('user_id', $request->user()->id)
+		->orderByDesc('order')
+		->get();
+})->middleware('auth:sanctum');
+
+Route::get('/tags', function (Request $request) {
+	return Tag::where('user_id', $request->user()->id)
+		->get();
 })->middleware('auth:sanctum');
 
 Route::post('/tasks', function (Request $request) {
@@ -24,6 +33,18 @@ Route::post('/tasks', function (Request $request) {
 	$task->user_id = $request->user()->id;
 	$task->order = $max_order + 1;
 	$task->save();
+
+	$tags = $request->tags;
+	if ( ! empty( $tags ) ) {
+		foreach( $tags as $tag ) {
+			$tag = Tag::firstOrCreate( [
+				'name'    => $tag,
+				'user_id' => $request->user()->id,
+			] );
+
+			$task->tags()->save( $tag );
+		}
+	}
 
 	return $task;
 })->middleware('auth:sanctum');
