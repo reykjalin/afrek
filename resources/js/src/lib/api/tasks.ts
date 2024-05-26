@@ -29,8 +29,8 @@ async function getTags() {
 
 async function getTasks(tag?: Tag) {
 	const getUrl = () => {
-		if ( tag ) {
-			return `api/tasks?tag=${tag.id}`
+		if (tag) {
+			return `api/tasks?tag=${tag.id}`;
 		}
 
 		return '/api/tasks';

@@ -19,7 +19,7 @@
 			console.log('goto login page');
 			window.location.replace('/login');
 		} else {
-			getTasks(selectedTag).then(t => $tasks = t);
+			getTasks(selectedTag).then((t) => ($tasks = t));
 		}
 	}
 
@@ -40,6 +40,7 @@
 
 	// List props.
 	let itemBeingDragged: number | null = null;
+	let latestSwappedOrder: number | null = null;
 	let draggingEnabled = false;
 
 	// Create new task props.
@@ -62,17 +63,18 @@
 			const newIndex = $tasks.findIndex((t) => t.id === itemBeingDragged);
 			const taskBeingMoved = $tasks.find((t) => t.id === itemBeingDragged);
 
-			if ( newIndex === -1 || ! taskBeingMoved ) {
+			if (!latestSwappedOrder || !taskBeingMoved) {
 				return;
 			}
 
 			if (taskBeingMoved && $user) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
-				await moveTask(taskBeingMoved, $tasks.length - ( newIndex + 1 ) );
+				await moveTask(taskBeingMoved, latestSwappedOrder);
 				$tasks = await getTasks(selectedTag);
 			}
 
 			itemBeingDragged = null;
+			latestSwappedOrder = null;
 			draggingEnabled = false;
 		};
 	}
@@ -90,6 +92,8 @@
 			const tmp = $tasks[enteredIndex];
 			$tasks[enteredIndex] = $tasks[draggingIndex];
 			$tasks[draggingIndex] = tmp;
+
+			latestSwappedOrder = tmp.order;
 		};
 	}
 
