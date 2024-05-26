@@ -57,14 +57,18 @@
 		};
 	}
 
-	function onDragEnd(id: number) {
+	function onDragEnd() {
 		return async function (_ev: DragEvent) {
-			const movedToIndex = $tasks.findIndex((task) => task.id === id);
+			const newIndex = $tasks.findIndex((t) => t.id === itemBeingDragged);
 			const taskBeingMoved = $tasks.find((t) => t.id === itemBeingDragged);
+
+			if ( newIndex === -1 || ! taskBeingMoved ) {
+				return;
+			}
 
 			if (taskBeingMoved && $user) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
-				await moveTask(taskBeingMoved, movedToIndex);
+				await moveTask(taskBeingMoved, $tasks.length - ( newIndex + 1 ) );
 				$tasks = await getTasks(selectedTag);
 			}
 

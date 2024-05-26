@@ -61,6 +61,32 @@ Route::post('/tasks', function (Request $request) {
 	return $task;
 })->middleware('auth:sanctum');
 
+Route::patch('/tasks/move/{id}', function (Request $request, string $id) {
+	$request->validate([
+		'new_pos' => 'required|int',
+	]);
+	$new_pos = $request->new_pos;
+
+	$task = Task::where('user_id', $request->user()->id)->findOrFail($id);
+
+	if ( $new_pos < $task->order ) {
+		Task::where('user_id', $request->user()->id)
+			->where('order', '>=', $new_pos)
+			->where('order', '<', $task->order)
+			->increment('order');
+	} else {
+		Task::where('user_id', $request->user()->id)
+			->where('order', '>', $task->order)
+			->where('order', '<=', $new_pos)
+			->decrement('order');
+	}
+
+	$task->order = $new_pos;
+	$task->save();
+
+	return $task;
+})->middleware('auth:sanctum');
+
 Route::delete('/tasks/{id}', function (Request $request, string $id) {
 	$task = Task::where('user_id', $request->user()->id)->findOrFail($id);
 

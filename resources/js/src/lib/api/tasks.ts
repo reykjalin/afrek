@@ -55,8 +55,10 @@ async function createTask(description: string, tags?: string[]) {
 }
 
 async function moveTask(task: Task, order: number) {
-	// FIXME: Implement me here.
-	console.log(`move task ${task.id} to ${order}`);
+	const response = await axios.patch(`/api/tasks/move/${task.id}`, { new_pos: order });
+	const updatedTask = taskSchema.parse(response.data);
+
+	return updatedTask;
 }
 
 async function deleteTask(task: Task) {
