@@ -10,7 +10,7 @@
 		await getCsrfCookie();
 		await logout();
 
-		$user = undefined;
+		$user = new Promise((resolve) => resolve(undefined));
 		$tasks = [];
 	}
 </script>
@@ -23,14 +23,16 @@
 	</h1>
 	<nav>
 		<ul>
-			{#if $user}
-				<li><Link href="/tasks">Tasks</Link></li>
-				<li><Link href="/logout" onClick={handleLogout}>Logout</Link></li>
-				<li>{$user.email}</li>
-			{:else}
-				<li><Link href="/login">Login</Link></li>
-				<li><Link href="/register">Register</Link></li>
-			{/if}
+			{#await $user then u}
+				{#if u}
+					<li><Link href="/tasks">Tasks</Link></li>
+					<li><Link href="/logout" onClick={handleLogout}>Logout</Link></li>
+					<li>{u.email}</li>
+				{:else}
+					<li><Link href="/login">Login</Link></li>
+					<li><Link href="/register">Register</Link></li>
+				{/if}
+			{/await}
 		</ul>
 	</nav>
 </div>

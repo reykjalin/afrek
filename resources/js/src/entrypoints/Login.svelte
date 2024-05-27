@@ -13,7 +13,7 @@
 			await getCsrfCookie();
 			await login({ email, password, remember }, (e) => (error = e));
 
-			$user = await getUser();
+			$user = getUser();
 		} catch (e) {
 			if (isAxiosError(e)) {
 				console.log(e);
@@ -23,9 +23,11 @@
 	}
 
 	$: {
-		if ($user) {
-			window.location.href = '/tasks';
-		}
+		$user.then((u) => {
+			if (u) {
+				window.location.href = '/tasks';
+			}
+		});
 	}
 
 	let error = '';

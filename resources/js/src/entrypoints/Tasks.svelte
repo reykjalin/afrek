@@ -14,26 +14,26 @@
 	import type { Task as TaskType, Tag } from '../lib/api/tasks';
 
 	$: {
-		if (!$user) {
-			// goto('/login');
-			console.log('goto login page');
-			window.location.replace('/login');
-		} else {
-			getTasks(selectedTag).then((t) => ($tasks = t));
-		}
+		$user.then((u) => {
+			if (!u) {
+				window.location.href = '/login';
+			} else {
+				getTasks(selectedTag).then((t) => ($tasks = t));
+			}
+		});
 	}
 
 	let selectedTag: Tag | undefined = undefined;
 	let tags: Tag[] = [];
 
 	let fetchTasks = async () => {
-		if ($user) {
+		if (await $user) {
 			$tasks = await getTasks();
 		}
 	};
 
 	let fetchTags = async () => {
-		if ($user) {
+		if (await $user) {
 			tags = await getTags();
 		}
 	};
@@ -60,14 +60,13 @@
 
 	function onDragEnd() {
 		return async function (_ev: DragEvent) {
-			const newIndex = $tasks.findIndex((t) => t.id === itemBeingDragged);
 			const taskBeingMoved = $tasks.find((t) => t.id === itemBeingDragged);
 
 			if (!latestSwappedOrder || !taskBeingMoved) {
 				return;
 			}
 
-			if (taskBeingMoved && $user) {
+			if (taskBeingMoved && (await $user)) {
 				// FIXME: Add recovery code if move fails, e.g. by preserving original position in the drag event.
 				await moveTask(taskBeingMoved, latestSwappedOrder);
 				$tasks = await getTasks(selectedTag);
@@ -118,7 +117,7 @@
 
 	async function createNewTask() {
 		dialog.close();
-		if (!$user) {
+		if (!(await $user)) {
 			return;
 		}
 
@@ -145,7 +144,7 @@
 	}
 
 	async function onDelete(task: TaskType) {
-		if (!$user) {
+		if (!(await $user)) {
 			return;
 		}
 

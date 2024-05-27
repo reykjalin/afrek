@@ -22,13 +22,15 @@
 			(e) => (error = e),
 		);
 
-		$user = await getUser();
+		$user = getUser();
 	}
 
 	$: {
-		if ($user) {
-			window.location.href = '/tasks';
-		}
+		$user.then((u) => {
+			if (u) {
+				window.location.href = '/tasks';
+			}
+		});
 	}
 
 	let error = '';
