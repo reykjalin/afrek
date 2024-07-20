@@ -214,9 +214,13 @@
 		<p
 			style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
 		>
-			<Pill onClick={() => (selectedTag = undefined)}>All</Pill>
+			<Pill onClick={() => (selectedTag = undefined)} isSelected={selectedTag === undefined}
+				>All</Pill
+			>
 			{#each tags as tag}
-				<Pill onClick={() => (selectedTag = tag)}>{tag.name}</Pill>
+				<Pill onClick={() => (selectedTag = tag)} isSelected={selectedTag === tag}
+					>{tag.name}</Pill
+				>
 			{/each}
 		</p>
 	{:catch error}
