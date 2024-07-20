@@ -7,6 +7,7 @@
 
 	export let onClick: ((ev: MouseEvent) => void) | undefined = undefined;
 	export let onMouseDown: ((ev: MouseEvent) => void) | undefined = undefined;
+	export let disabled: boolean = false;
 </script>
 
 <button
@@ -15,6 +16,7 @@
 	on:click={onClick}
 	on:mousedown={onMouseDown}
 	{tabindex}
+	{disabled}
 >
 	<slot></slot>
 </button>
@@ -50,6 +52,11 @@
 
 		&.move {
 			cursor: move;
+		}
+
+		&:disabled {
+			cursor: not-allowed;
+			opacity: 0.5;
 		}
 	}
 </style>

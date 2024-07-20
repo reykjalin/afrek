@@ -9,6 +9,7 @@
 	async function handleSubmit() {
 		try {
 			error = '';
+			isLoggingIn = true;
 
 			await getCsrfCookie();
 			await login({ email, password, remember }, (e) => (error = e));
@@ -20,6 +21,8 @@
 				error = e?.response?.data?.message ?? e.message;
 			}
 		}
+
+		isLoggingIn = false;
 	}
 
 	$: {
@@ -35,6 +38,8 @@
 	let email = '';
 	let password = '';
 	let remember = false;
+
+	let isLoggingIn = false;
 </script>
 
 <main>
@@ -60,7 +65,7 @@
 			<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
 		</div>
 
-		<Button type="submit">Login</Button>
+		<Button type="submit" disabled={isLoggingIn}>Login</Button>
 	</form>
 </main>
 
