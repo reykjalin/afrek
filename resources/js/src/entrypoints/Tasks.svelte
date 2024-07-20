@@ -183,7 +183,6 @@
 
 			await deleteTask(task);
 
-			$tasks = await getTasks(selectedTag);
 			tags = await getTags();
 		} catch (_) {
 			$tasks.splice(indexOfTask, 0, task);
