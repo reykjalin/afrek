@@ -146,10 +146,18 @@
 			return;
 		}
 
-		await deleteTask(task);
+		const indexOfTask = $tasks.findIndex((t) => t.id === task.id);
 
-		$tasks = await getTasks(selectedTag);
-		tags = await getTags();
+		try {
+			$tasks = $tasks.filter((t) => t.id !== task.id);
+
+			await deleteTask(task);
+
+			$tasks = await getTasks(selectedTag);
+			tags = await getTags();
+		} catch (_) {
+			$tasks.splice(indexOfTask, 0, task);
+		}
 	}
 </script>
 
