@@ -131,8 +131,6 @@
 
 			await createTask(taskDescription.substring(0, index), newTags);
 			$tasks = await getTasks(selectedTag);
-			// tags = [...new Set(tasks.flatMap((t) => t.tags))];
-			tags = [];
 		} else {
 			await createTask(taskDescription);
 		}
@@ -149,10 +147,6 @@
 		}
 
 		await deleteTask(task);
-
-		// Tags recalculation must happen before fetching updated list of tags to make sure all tags are available.
-		// tags = [...new Set(tasks.flatMap((t) => t.tags))];
-		tags = [];
 
 		$tasks = await getTasks(selectedTag);
 		tags = await getTags();
