@@ -129,10 +129,40 @@
 				.filter((t) => t)
 				.map((t) => t.substring(1));
 
-			await createTask(taskDescription.substring(0, index), newTags);
-			$tasks = await getTasks(selectedTag);
+			const description = taskDescription.substring(0, index);
+
+			const task: TaskType = {
+				id: -1, // ID doesn't exist yet, use -1 for temporary tasks.
+				description,
+				tags: newTags.map((t) => ({ id: 0, name: t })),
+				order: -1, // Order doesn't matter or exist yet.
+			};
+			$tasks = [task, ...$tasks];
+
+			// FIXME: fix flashing when the full task list is loaded.
+			try {
+				await createTask(description, newTags);
+				$tasks = await getTasks(selectedTag);
+			} catch (_) {
+				// Remove all temporary tasks.
+				$tasks = $tasks.filter((t) => t.id !== -1);
+			}
 		} else {
-			await createTask(taskDescription);
+			const task: TaskType = {
+				id: -1, // ID doesn't exist yet, use -1 for temporary tasks.
+				description: taskDescription,
+				tags: [],
+				order: -1, // Order doesn't matter or exist yet.
+			};
+			$tasks = [task, ...$tasks];
+
+			// FIXME: fix flashing when the full task list is loaded.
+			try {
+				await createTask(taskDescription);
+			} catch (_) {
+				// Remove all temporary tasks.
+				$tasks = $tasks.filter((t) => t.id !== -1);
+			}
 		}
 
 		$tasks = await getTasks(selectedTag);
