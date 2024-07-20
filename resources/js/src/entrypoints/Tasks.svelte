@@ -121,19 +121,22 @@
 			return;
 		}
 
-		const index = taskDescription.trimEnd().search(/( #[a-zA-Z\-_\d]+)+$/);
+		const description = taskDescription.trim();
+		taskDescription = '';
+
+		const index = description.search(/( #[a-zA-Z\-_\d]+)+$/);
 		if (index !== -1) {
-			const newTags = taskDescription
+			const newTags = description
 				.substring(index)
 				.split(' ')
 				.filter((t) => t)
 				.map((t) => t.substring(1));
 
-			const description = taskDescription.substring(0, index);
+			const descriptionWithoutTags = description.substring(0, index);
 
 			const task: TaskType = {
 				id: -1, // ID doesn't exist yet, use -1 for temporary tasks.
-				description,
+				description: descriptionWithoutTags,
 				tags: newTags.map((t) => ({ id: 0, name: t })),
 				order: -1, // Order doesn't matter or exist yet.
 			};
@@ -141,16 +144,17 @@
 
 			// FIXME: fix flashing when the full task list is loaded.
 			try {
-				await createTask(description, newTags);
+				await createTask(descriptionWithoutTags, newTags);
 				$tasks = await getTasks(selectedTag);
 			} catch (_) {
 				// Remove all temporary tasks.
 				$tasks = $tasks.filter((t) => t.id !== -1);
+				taskDescription = description;
 			}
 		} else {
 			const task: TaskType = {
 				id: -1, // ID doesn't exist yet, use -1 for temporary tasks.
-				description: taskDescription,
+				description,
 				tags: [],
 				order: -1, // Order doesn't matter or exist yet.
 			};
@@ -158,17 +162,16 @@
 
 			// FIXME: fix flashing when the full task list is loaded.
 			try {
-				await createTask(taskDescription);
+				await createTask(description);
 			} catch (_) {
 				// Remove all temporary tasks.
 				$tasks = $tasks.filter((t) => t.id !== -1);
+				taskDescription = description;
 			}
 		}
 
 		$tasks = await getTasks(selectedTag);
 		tags = await getTags();
-
-		taskDescription = '';
 	}
 
 	async function onDelete(task: TaskType) {
