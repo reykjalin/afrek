@@ -194,7 +194,7 @@
 					in:fade
 					draggable={draggingEnabled}
 					on:dragstart={onDragStart(task.id)}
-					on:dragend={onDragEnd(task.id)}
+					on:dragend={onDragEnd()}
 					on:dragenter|preventDefault={swapOnEnter(task.id)}
 					on:dragover|preventDefault={() => {}}
 				>
