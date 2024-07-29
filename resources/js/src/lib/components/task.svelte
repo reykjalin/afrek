@@ -17,8 +17,8 @@
 
 <div class={`${isDragging ? 'is-dragging ' : ''}task`}>
 	<div>
-		<Button variant="tertiary" onClick={buttonHandler}><Icon icon="2714" width="25" /></Button>
 		<p>{task.description}</p>
+		<Button variant="tertiary" onClick={buttonHandler}>&#10003;</Button>
 	</div>
 
 	<div class="tags">

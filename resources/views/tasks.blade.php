@@ -1,4 +1,4 @@
-<x-layout>
+<x-app-layout>
 	<div id="tasks">
 	</div>
-</x-layout>
+</x-app-layout>

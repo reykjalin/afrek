@@ -17,9 +17,7 @@
 
 <div class="header">
 	<h1>
-		<Link href="/"
-			><img width="150" src="/logo.png" alt="The afrek logo showing a calendar." /></Link
-		>
+		<Link href="/">Afrek</Link>
 	</h1>
 	<nav>
 		<ul>
@@ -42,7 +40,24 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin: 1rem;
+		padding: 0.5rem 1rem;
+
+		border-block-end: 1px solid black;
+
+		& h1 {
+			margin: 0;
+			padding: 0;
+
+			& a {
+				text-decoration: none;
+				color: black;
+
+				&:hover {
+					text-decoration: underline;
+					color: gray;
+				}
+			}
+		}
 
 		& nav ul {
 			list-style: none;

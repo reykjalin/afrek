@@ -196,74 +196,116 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <main>
-	<dialog bind:this={dialog}>
-		<form on:submit|preventDefault={createNewTask}>
-			<label for="description"><b>New task:</b></label>
-			<input
-				name="description"
-				type="text"
-				placeholder="fib the frobbler"
-				bind:value={taskDescription}
-			/>
-		</form>
-	</dialog>
+	<div>
+		<div class="task-list">
+			<div class="add-task">
+				<Button onClick={() => !dialog.open && dialog.showModal()}>Add task</Button>
+			</div>
 
-	<PageTitle>Tasks</PageTitle>
+			<div class="task-search">
+				<input type="text" placeholder="Search..." />
+			</div>
 
-	{#await fetchTags() then _}
-		<p
-			style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
-		>
-			<Pill onClick={() => (selectedTag = undefined)} isSelected={selectedTag === undefined}
-				>All</Pill
-			>
-			{#each tags as tag}
-				<Pill onClick={() => (selectedTag = tag)} isSelected={selectedTag === tag}
-					>{tag.name}</Pill
+			{#await fetchTags() then _}
+				<p
+					style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
 				>
-			{/each}
-		</p>
-	{:catch error}
-		<p class="error">Failed to load tags: {error}</p>
-	{/await}
-
-	{#await fetchTasks()}
-		<p>Loading…</p>
-	{:then _}
-		<ul>
-			{#each $tasks as task (task.id)}
-				<li
-					class={itemBeingDragged ? 'is-dragging' : ''}
-					animate:flip={{ duration: 200 }}
-					in:fade
-					draggable={draggingEnabled}
-					on:dragstart={onDragStart(task.id)}
-					on:dragend={onDragEnd()}
-					on:dragenter|preventDefault={swapOnEnter(task.id)}
-					on:dragover|preventDefault={() => {}}
-				>
-					<!-- Use tabindex to make it so anchor can't be reached by tabbing through the page. -->
-					<Button
-						variant="tertiary"
-						className="anchor"
-						tabindex={-1}
-						cursorStyle="move"
-						onMouseDown={enableDragging}
+					<Pill
+						onClick={() => (selectedTag = undefined)}
+						isSelected={selectedTag === undefined}>All</Pill
 					>
-						<span><Icon icon="E265" width="25" /></span>
-					</Button>
-					<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
-				</li>
-			{/each}
-		</ul>
-	{:catch error}
-		<p class="error">Failed to load tasks: {error}.</p>
-	{/await}
+					{#each tags as tag}
+						<Pill onClick={() => (selectedTag = tag)} isSelected={selectedTag === tag}
+							>{tag.name}</Pill
+						>
+					{/each}
+				</p>
+			{:catch error}
+				<p class="error">Failed to load tags: {error}</p>
+			{/await}
+
+			{#await fetchTasks()}
+				<p>Loading…</p>
+			{:then _}
+				<ul>
+					{#each $tasks as task (task.id)}
+						<li
+							class={itemBeingDragged ? 'is-dragging' : ''}
+							animate:flip={{ duration: 200 }}
+							in:fade
+							draggable={draggingEnabled}
+							on:dragstart={onDragStart(task.id)}
+							on:dragend={onDragEnd()}
+							on:dragenter|preventDefault={swapOnEnter(task.id)}
+							on:dragover|preventDefault={() => {}}
+						>
+							<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
+						</li>
+					{/each}
+				</ul>
+			{:catch error}
+				<p class="error">Failed to load tasks: {error}.</p>
+			{/await}
+		</div>
+
+		<div class="task-details">
+			<input type="text" value="Fib the frobbler" />
+			<textarea>Testing 123 testing </textarea>
+		</div>
+	</div>
 </main>
 
 <style>
-	button.anchor {
-		cursor: move;
+	main {
+		max-width: 100vw;
+		height: 100%;
+
+		& > div {
+			display: grid;
+			grid-template-columns: 1fr 2fr;
+		}
+
+		& div.task-list {
+			overflow: auto;
+			height: 100svb;
+			border-inline-end: 1px solid black;
+
+			& div.task-search {
+				margin: 0.5rem 1rem;
+
+				& input {
+					width: 100%;
+					box-sizing: border-box;
+					padding: 0.5rem;
+				}
+			}
+
+			& div.add-task {
+				margin: 0.5rem 1rem;
+				& > * {
+					width: 100%;
+				}
+			}
+		}
+
+		& div.task-details {
+			padding: 1rem;
+			background-color: white;
+
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+
+			& input,
+			& textarea {
+				padding: 0.5rem;
+				border: none;
+			}
+
+			& textarea {
+				flex-grow: 1;
+			}
+		}
 	}
 
 	ul {
@@ -280,17 +322,6 @@
 		& li.is-dragging * {
 			/* Make sure dragenter and dragleave only fire once. */
 			pointer-events: none;
-		}
-	}
-
-	dialog {
-		max-width: 760px;
-		width: 90vw;
-
-		& input {
-			/* FIXME: The input isn't centered when width is 100% for some reason. */
-			width: 100%;
-			margin-block: 0.25rem;
 		}
 	}
 </style>
