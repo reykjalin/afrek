@@ -175,6 +175,11 @@
 
 		const indexOfTask = $tasks.findIndex((t) => t.id === task.id);
 
+		// Remove task info from details UI.
+		if (task.id === selectedTask?.id) {
+			selectedTask = undefined;
+		}
+
 		try {
 			$tasks = $tasks.filter((t) => t.id !== task.id);
 
