@@ -1,9 +1,9 @@
 <x-layout>
 	<main class="container">
-        <div class="title">
-            <h1>Introducing Afrek.app</h1>
-            <p><small><b>Last updated: 2024-02-01</b></small></p>
-        </div>
+        <p><a href="<?php echo route('blog'); ?>">&larr; Back to blog</a></p>
+
+        <h1>Introducing Afrek.app</h1>
+        <p><small><b>Last updated: 2024-02-01</b></small></p>
 
         <h2>Table of Contents</h2>
 

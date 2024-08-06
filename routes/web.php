@@ -26,8 +26,12 @@ Route::get('/privacy', function () {
 
 Route::get('/blog', function () {
 	return view('blog');
-});
+})->name('blog');
 
 Route::get('/blog/introduction', function () {
 	return view('blog_introduction');
-});
+})->name('blog.introduction');
+
+Route::get('/blog/2024-h2-updates', function () {
+	return view('blog/2024-h2-updates');
+})->name('blog.2024-h2-updates');
