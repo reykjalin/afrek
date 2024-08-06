@@ -38,4 +38,15 @@
 			within 30 days.
 		</p>
 	</main>
+
+    <style>
+        :root {
+            --pico-font-size: 18px;
+        }
+
+        main.container {
+            max-width: 760px;
+            margin: auto;
+        }
+    </style>
 </x-layout>

@@ -175,18 +175,9 @@
             --pico-font-size: 18px;
         }
 
-        main > * {
+        main.container {
             max-width: 760px;
             margin: auto;
-        }
-
-        h1, h2, h3, h4 {
-            margin-block-start: 2rem;
-            margin-block-end: 1rem;
-        }
-
-        p {
-            margin-block: 1rem;
         }
     </style>
 </x-layout>

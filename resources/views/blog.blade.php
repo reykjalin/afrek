@@ -11,10 +11,17 @@
         </article>
 	</main>
     <style>
-        article {
-            border: 1px solid var(--pico-color-violet-600);
+        :root {
+            --pico-font-size: 18px;
+        }
+
+        main.container {
             max-width: 760px;
             margin: auto;
+        }
+
+        article {
+            border: 1px solid var(--pico-color-violet-600);
 
             & header {
                 display: flex;
