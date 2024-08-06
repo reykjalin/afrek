@@ -22,6 +22,7 @@
 
 	let selectedTag: Tag | undefined = undefined;
 	let tags: Tag[] = [];
+	let selectedTask: TaskType | undefined = undefined;
 
 	let fetchTasks = async () => {
 		if (await $user) {
@@ -220,10 +221,13 @@
 			{:then _}
 				<ul>
 					{#each $tasks as task (task.id)}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 						<li
 							class={itemBeingDragged ? 'is-dragging' : ''}
 							animate:flip={{ duration: 200 }}
 							in:fade
+							on:click={() => (selectedTask = task)}
 							draggable="true"
 							on:dragstart={onDragStart(task.id)}
 							on:dragend={onDragEnd()}
@@ -240,8 +244,8 @@
 		</div>
 
 		<div class="task-details">
-			<input type="text" value="Fib the frobbler" />
-			<textarea>Testing 123 testing </textarea>
+			<input type="text" value={selectedTask?.description ?? ''} />
+			<textarea>{selectedTask?.details ?? ''}</textarea>
 		</div>
 	</div>
 </main>
