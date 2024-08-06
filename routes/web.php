@@ -27,3 +27,7 @@ Route::get('/privacy', function () {
 Route::get('/blog', function () {
 	return view('blog');
 });
+
+Route::get('/blog/introduction', function () {
+	return view('blog_introduction');
+});

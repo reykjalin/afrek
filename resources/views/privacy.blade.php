@@ -1,5 +1,5 @@
 <x-layout>
-	<main>
+	<main class="container">
 		<h1>Privacy</h1>
 
 		<p>Identifiable data collected by this website is limited to the following:</p>
