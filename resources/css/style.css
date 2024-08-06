@@ -58,44 +58,11 @@
   font-style: italic;
 }
 
-/* Style variables. */
+/* Pico CSS customizations. */
 
 :root {
-  /* Page layout. */
-  --max-width: 760px;
-  --line-height: 1.5;
-
-  /* Font configuration. */
-  --default-font-size: 18px;
-  --body-font: "Atkinson Hyperlegible", sans-serif;
-  --headings-font: Charter, serif;
+    --pico-font-family: "Atkinson Hyperlegible", var(--pico-font-family-sans-serif);
+    --pico-font-family-monospace: "JetBrains Mono", var(--pico-font-family-monospace);
+    --pico-font-size: 16px;
 }
 
-/* Global styles. */
-body {
-  margin: 0;
-  line-height: var(--line-height);
-  background-color: #f0f0f0;
-}
-
-main {
-  max-width: var(--max-width);
-  margin: auto;
-}
-
-body,
-input,
-textarea,
-button {
-  font-size: var(--default-font-size);
-  font-family: var(--body-font);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--headings-font);
-}

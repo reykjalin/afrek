@@ -1,23 +1,18 @@
-<script lang="ts">
-	import Link from '../lib/components/link.svelte';
-</script>
-
 <div class="footer">
 	<div>
-		<p><Link href="/blog">Blog</Link></p>
-		<p><Link href="/privacy">Privacy</Link></p>
-		<p><Link href="mailto:contact@afrek.app">Contact</Link></p>
+		<p><a href="/blog">Blog</a></p>
+		<p><a href="/privacy">Privacy</a></p>
+		<p><a href="mailto:contact@afrek.app">Contact</a></p>
 	</div>
 
 	<p>
-		Developed with &lt;3 by <Link href="https://www.thorlaksson.com">Kristófer Reykjalín</Link>
+		Developed with &lt;3 by <a href="https://www.thorlaksson.com">Kristófer Reykjalín</a>
 	</p>
 </div>
 
 <style>
 	div.footer {
-		background-color: #250048;
-		color: white;
+		border-block-start: 1px solid var(--pico-color-violet-600);
 		text-align: center;
 		padding: 5rem;
 		margin-block-start: 5rem;

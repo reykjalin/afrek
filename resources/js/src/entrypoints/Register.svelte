@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getCsrfCookie, getUser, register } from '../lib/api/auth';
 	import PageTitle from '../lib/components/pagetitle.svelte';
-	import Button from '../lib/components/button.svelte';
 
 	import { user } from '../lib/stores/auth';
 
@@ -40,56 +39,54 @@
 	let confirmPassword = '';
 </script>
 
-<main>
+<main class="container">
 	<PageTitle>Register</PageTitle>
 
-	<form on:submit|preventDefault={handleSubmit}>
-		{#if error}<p class="error">{error}</p>{/if}
+	<article>
+		<form on:submit|preventDefault={handleSubmit}>
+			{#if error}<p class="error">{error}</p>{/if}
 
-		<label for="email"><b>Email</b></label>
-		<input
-			type="email"
-			name="email"
-			id="email"
-			placeholder="afrek@example.com"
-			bind:value={email}
-		/>
+			<fieldset>
+				<label for="email"
+					>Email
+					<input
+						type="email"
+						name="email"
+						id="email"
+						placeholder="afrek@example.com"
+						bind:value={email}
+					/>
+				</label>
 
-		<label for="password"><b>Password</b></label>
-		<input type="password" name="password" id="password" bind:value={password} />
+				<label for="password"
+					>Password
+					<input type="password" name="password" id="password" bind:value={password} />
+				</label>
 
-		<label for="confirm_password"><b>Confirm password</b></label>
-		<input
-			type="password"
-			name="confirm_password"
-			id="confirm_password"
-			bind:value={confirmPassword}
-		/>
+				<label for="confirm_password"
+					>Confirm password
+					<input
+						type="password"
+						name="confirm_password"
+						id="confirm_password"
+						bind:value={confirmPassword}
+					/>
+				</label>
+			</fieldset>
 
-		<Button type="submit">Register</Button>
-	</form>
+			<button type="submit">Register</button>
+		</form>
+	</article>
 </main>
 
 <style>
+	article {
+		border: 1px solid var(--pico-color-violet-600);
+	}
+
 	form {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-
-		max-width: 540px;
-		margin: auto;
-		border: 1px solid gray;
-		border-radius: 0.25rem;
-		padding: 5rem;
-
-		background-color: white;
-
 		& .error {
 			color: red;
-		}
-
-		& button {
-			margin: auto;
 		}
 	}
 </style>

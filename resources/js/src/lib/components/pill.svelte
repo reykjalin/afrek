@@ -9,28 +9,7 @@
 	}
 </script>
 
-{#if onClick}
-	<button class={isSelected ? 'pill selected' : 'pill'} on:click={handleClick}
-		><slot></slot></button
-	>
-{:else}
-	<span class={isSelected ? 'pill selected' : 'pill'}><slot></slot></span>
-{/if}
+<button class={isSelected ? '' : 'outline'} on:click={handleClick}><slot></slot></button>
 
 <style>
-	.pill {
-		padding: 0.25rem 0.5rem;
-		border-radius: 0.25rem;
-		border: none;
-		background-color: #f0f0f0;
-	}
-
-	.selected {
-		background-color: lightgray;
-	}
-
-	button.pill:hover {
-		background-color: lightgray;
-		cursor: pointer;
-	}
 </style>

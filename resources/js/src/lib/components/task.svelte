@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { type Task } from '../api/tasks';
 
-	import Button from '../components/button.svelte';
 	import Pill from '../components/pill.svelte';
-	import Icon from '../components/icon.svelte';
 
 	export let task: Task;
 
@@ -15,38 +13,36 @@
 	}
 </script>
 
-<div class={`${isDragging ? 'is-dragging ' : ''}task`}>
-	<div>
-		<p>{task.description}</p>
-		<Button variant="tertiary" onClick={buttonHandler}>&#10003;</Button>
-	</div>
+<article class={`${isDragging ? 'is-dragging ' : ''}task`}>
+	<p>{task.description}</p>
 
-	<div class="tags">
-		{#each task.tags ?? [] as tag}
-			<Pill>{tag.name}</Pill>
-		{/each}
-	</div>
+	<footer>
+		<button class="outline" on:click={buttonHandler}>&#10003;</button>
 
-	{#if import.meta.env.MODE === 'development'}
-		<div class="meta">
-			<p><small><b>ID:</b> {task.id}</small></p>
-			<p><small><b>Order:</b> {task.order}</small></p>
-			<details>
-				<summary><small>Details</small></summary><small>{task.details}</small>
-			</details>
+		<div class="tags overflow-auto">
+			{#each task.tags ?? [] as tag}
+				<Pill>{tag.name}</Pill>
+			{/each}
 		</div>
-	{/if}
-</div>
+
+		{#if import.meta.env.MODE === 'development'}
+			<div class="meta">
+				<p><small><b>ID:</b> {task.id}</small></p>
+				<p><small><b>Order:</b> {task.order}</small></p>
+				<details>
+					<summary><small>Details</small></summary><small>{task.details}</small>
+				</details>
+			</div>
+		{/if}
+	</footer>
+</article>
 
 <style>
-	div.task {
-		border: 1px solid black;
+	article.task {
+		border: 1px solid var(--pico-color-violet-600);
 		border-radius: 0.25rem;
 		padding: 1rem;
-		margin: 0.5rem;
 		width: 100%;
-
-		background-color: white;
 
 		& p {
 			padding: 0;
@@ -60,24 +56,15 @@
 			gap: 0.5rem;
 		}
 
-		& div:not(.meta):not(.tags) {
-			border: none;
+		& footer {
 			display: flex;
 			flex-direction: row;
-			gap: 0.5rem;
 			justify-content: space-between;
-			align-items: center;
-
-			& p {
-				padding: 0;
-				margin: 0;
-				flex-grow: 1;
-			}
 		}
 	}
 
 	.is-dragging {
-		background-color: lightgray;
+		background-color: var(--pico-color-violet-400);
 
 		& > * {
 			opacity: 0;

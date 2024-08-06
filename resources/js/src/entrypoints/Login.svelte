@@ -3,7 +3,6 @@
 
 	import { getCsrfCookie, login, getUser } from '../lib/api/auth';
 	import PageTitle from '../lib/components/pagetitle.svelte';
-	import Button from '../lib/components/button.svelte';
 	import { user } from '../lib/stores/auth';
 
 	async function handleSubmit() {
@@ -42,52 +41,48 @@
 	let isLoggingIn = false;
 </script>
 
-<main>
+<main class="container">
 	<PageTitle>Login</PageTitle>
 
-	<form on:submit|preventDefault={handleSubmit}>
-		{#if error}<p>{error}</p>{/if}
+	<article>
+		<form on:submit|preventDefault={handleSubmit}>
+			{#if error}<p>{error}</p>{/if}
 
-		<label for="email"><b>Email</b></label>
-		<input
-			type="email"
-			name="email"
-			id="email"
-			placeholder="afrek@example.com"
-			bind:value={email}
-		/>
+			<fieldset>
+				<label for="email"
+					>Email
+					<input
+						type="email"
+						name="email"
+						id="email"
+						placeholder="afrek@example.com"
+						bind:value={email}
+					/>
+				</label>
 
-		<label for="password"><b>Password</b></label>
-		<input type="password" name="password" id="password" bind:value={password} />
+				<label for="password"
+					>Password
+					<input type="password" name="password" id="password" bind:value={password} />
+				</label>
 
-		<div>
-			<label for="remember-me"><b>Remember me?</b></label>
-			<input type="checkbox" name="remember-me" id="remember-me" bind:value={remember} />
-		</div>
+				<label for="remember-me"
+					>Remember me?
+					<input
+						type="checkbox"
+						name="remember-me"
+						id="remember-me"
+						bind:value={remember}
+					/>
+				</label>
+			</fieldset>
 
-		<Button type="submit" disabled={isLoggingIn}>Login</Button>
-	</form>
+			<button type="submit" disabled={isLoggingIn}>Login</button>
+		</form>
+	</article>
 </main>
 
 <style>
-	form {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		max-width: 540px;
-		margin: auto;
-		border: 1px solid gray;
-		border-radius: 0.25rem;
-		padding: 5rem;
-
-		background-color: white;
-
-		& div {
-			text-align: center;
-		}
-
-		& button {
-			margin: auto;
-		}
+	article {
+		border: 1px solid var(--pico-color-violet-600);
 	}
 </style>

@@ -5,9 +5,6 @@
 	import { getTasks, getTags, createTask, moveTask, deleteTask } from '../lib/api/tasks';
 	import Task from '../lib/components/task.svelte';
 	import Pill from '../lib/components/pill.svelte';
-	import PageTitle from '../lib/components/pagetitle.svelte';
-	import Button from '../lib/components/button.svelte';
-	import Icon from '../lib/components/icon.svelte';
 
 	import { user } from '../lib/stores/auth';
 	import { tasks } from '../lib/stores/tasks';
@@ -41,7 +38,6 @@
 	// List props.
 	let itemBeingDragged: number | null = null;
 	let latestSwappedOrder: number | null = null;
-	let draggingEnabled = false;
 
 	// Create new task props.
 	let dialog: HTMLDialogElement;
@@ -50,6 +46,7 @@
 	function onDragStart(id: number) {
 		return function (ev: DragEvent) {
 			itemBeingDragged = id;
+			console.log(ev);
 
 			if (ev.dataTransfer) {
 				ev.dataTransfer.effectAllowed = 'move';
@@ -63,6 +60,7 @@
 			const taskBeingMoved = $tasks.find((t) => t.id === itemBeingDragged);
 
 			if (!latestSwappedOrder || !taskBeingMoved) {
+				itemBeingDragged = null;
 				return;
 			}
 
@@ -74,7 +72,6 @@
 
 			itemBeingDragged = null;
 			latestSwappedOrder = null;
-			draggingEnabled = false;
 		};
 	}
 
@@ -94,10 +91,6 @@
 
 			latestSwappedOrder = tmp.order;
 		};
-	}
-
-	function enableDragging() {
-		draggingEnabled = true;
 	}
 
 	function handleKeyPress(ev: KeyboardEvent) {
@@ -195,11 +188,11 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 
-<main>
+<main class="container-fluid">
 	<div>
-		<div class="task-list">
+		<div class="task-list overflow-auto">
 			<div class="add-task">
-				<Button onClick={() => !dialog.open && dialog.showModal()}>Add task</Button>
+				<button on:click={() => !dialog.open && dialog.showModal()}>Add task</button>
 			</div>
 
 			<div class="task-search">
@@ -207,9 +200,7 @@
 			</div>
 
 			{#await fetchTags() then _}
-				<p
-					style={'text-align:center;display:flex;flex-direction:row;gap:0.5rem;justify-content:center;'}
-				>
+				<div class="tags-list overflow-auto">
 					<Pill
 						onClick={() => (selectedTag = undefined)}
 						isSelected={selectedTag === undefined}>All</Pill
@@ -219,7 +210,7 @@
 							>{tag.name}</Pill
 						>
 					{/each}
-				</p>
+				</div>
 			{:catch error}
 				<p class="error">Failed to load tags: {error}</p>
 			{/await}
@@ -233,7 +224,7 @@
 							class={itemBeingDragged ? 'is-dragging' : ''}
 							animate:flip={{ duration: 200 }}
 							in:fade
-							draggable={draggingEnabled}
+							draggable="true"
 							on:dragstart={onDragStart(task.id)}
 							on:dragend={onDragEnd()}
 							on:dragenter|preventDefault={swapOnEnter(task.id)}
@@ -266,22 +257,30 @@
 		}
 
 		& div.task-list {
-			overflow: auto;
 			height: 100svb;
-			border-inline-end: 1px solid black;
+			padding: 0.5rem 1rem;
+			border-inline-end: 1px solid var(--pico-color-violet-600);
+
+			& div.tags-list {
+				margin-block: 1rem;
+				display: flex;
+				flex-direction: row;
+				gap: 1rem;
+				flex-wrap: nowrap;
+			}
 
 			& div.task-search {
-				margin: 0.5rem 1rem;
+				margin-block: 1rem;
 
 				& input {
-					width: 100%;
 					box-sizing: border-box;
-					padding: 0.5rem;
+					margin: 0;
 				}
 			}
 
 			& div.add-task {
-				margin: 0.5rem 1rem;
+				margin-block: 1rem;
+
 				& > * {
 					width: 100%;
 				}
@@ -290,7 +289,6 @@
 
 		& div.task-details {
 			padding: 1rem;
-			background-color: white;
 
 			display: flex;
 			flex-direction: column;
