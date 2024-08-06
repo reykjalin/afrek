@@ -1,8 +1,8 @@
 <x-layout>
 	<main class="container-fluid">
         <section>
-            <article class="pico-background-orange-600">
-                <header class="pico-background-orange-700">
+            <article class="warning">
+                <header>
                     <a href="/blog/introduction">Afrek is still a work in progress</a>
                 </header>
 
@@ -16,8 +16,8 @@
         </section>
 
         <section>
-            <article class="pico-background-indigo-700">
-                <header class="pico-background-indigo-800">
+            <article>
+                <header>
                     <h2>Be productive with Afrek</h2>
                 </header>
 
@@ -57,8 +57,8 @@
 
         <section>
             <div class="grid">
-                <article class="pico-background-indigo-700">
-                    <header class="pico-background-indigo-800">
+                <article>
+                    <header>
                         <h3>Tasks are more than just short descriptions</h3>
                     </header>
 
@@ -75,8 +75,8 @@
                     <img src="" alt="Screenshot missing" />
                 </figure>
 
-                <article class="pico-background-indigo-700">
-                    <header class="pico-background-indigo-800">
+                <article>
+                    <header>
                         <h3>Scheduling that gets out of your way</h3>
                     </header>
 
@@ -95,8 +95,42 @@
             --pico-font-size: 18px;
         }
 
-        article > header > * {
-            margin: 0;
+        article {
+            background-color: var(--pico-color-indigo-100);
+
+            & > header {
+                background-color: var(--pico-color-indigo-200);
+
+                & > * {
+                    margin: 0;
+                }
+            }
+
+            &.warning {
+                background-color: var(--pico-color-orange-100);
+
+                & > header {
+                    background-color: var(--pico-color-orange-200);
+                }
+            }
+        }
+
+        @media(prefers-color-scheme: dark) {
+            article {
+                background-color: var(--pico-color-indigo-700);
+
+                & > header {
+                    background-color: var(--pico-color-indigo-800);
+                }
+
+                &.warning {
+                    background-color: var(--pico-color-orange-600);
+
+                    & > header {
+                        background-color: var(--pico-color-orange-700);
+                    }
+                }
+            }
         }
     </style>
 </x-layout>
