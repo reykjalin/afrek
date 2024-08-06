@@ -15,7 +15,5 @@
 		border-block-start: 1px solid var(--pico-color-violet-600);
 		text-align: center;
 		padding: 5rem;
-		margin-block-start: 5rem;
-		margin-inline: 0;
 	}
 </style>
