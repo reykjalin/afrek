@@ -34,14 +34,12 @@ Route::get('/tags', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/tasks', function (Request $request) {
-	$request->validate([
-		'description' => 'required|string',
-	]);
+	$request->validate([]);
 
 	$max_order = Task::where('user_id', $request->user()->id)->max('order') ?? - 1;
 
 	$task = new Task();
-	$task->description = $request->description;
+	$task->description = $request->description ?? '';
 	$task->user_id = $request->user()->id;
 	$task->order = $max_order + 1;
 	$task->save();

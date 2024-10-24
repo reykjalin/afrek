@@ -109,6 +109,15 @@
 		}
 	}
 
+	async function createEmptyTask() {
+		try {
+			await createTask('', []);
+			$tasks = await getTasks(selectedTag);
+		} catch (_) {
+			$tasks = $tasks.filter(t => t.id !== -1);
+		}
+	}
+
 	async function createNewTask() {
 		dialog.close();
 		if (!(await $user)) {
@@ -198,7 +207,7 @@
 	<div>
 		<div class="task-list overflow-auto">
 			<div class="add-task">
-				<button on:click={() => !dialog.open && dialog.showModal()}>Add task</button>
+				<button on:click={createEmptyTask}>Add task</button>
 			</div>
 
 			<div class="task-search">
@@ -249,8 +258,8 @@
 		</div>
 
 		<div class="task-details">
-			<input type="text" value={selectedTask?.description ?? ''} />
-			<textarea>{selectedTask?.details ?? ''}</textarea>
+			<input type="text" value={selectedTask?.description ?? ''} disabled={selectedTask == undefined} />
+			<textarea disabled={selectedTask == undefined}>{selectedTask?.details ?? ''}</textarea>
 		</div>
 	</div>
 </main>
