@@ -2,7 +2,14 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 
-	import { getTasks, getTags, createTask, moveTask, updateTask, deleteTask } from '../lib/api/tasks';
+	import {
+		getTasks,
+		getTags,
+		createTask,
+		moveTask,
+		updateTask,
+		deleteTask,
+	} from '../lib/api/tasks';
 	import Task from '../lib/components/task.svelte';
 	import Pill from '../lib/components/pill.svelte';
 
@@ -97,7 +104,6 @@
 		};
 	}
 
-
 	async function createEmptyTask() {
 		try {
 			selectedTask = await createTask('', []);
@@ -107,7 +113,7 @@
 
 			$tasks = await getTasks(selectedTag);
 		} catch (_) {
-			$tasks = $tasks.filter(t => t.id !== -1);
+			$tasks = $tasks.filter((t) => t.id !== -1);
 		}
 	}
 
@@ -117,7 +123,10 @@
 		}
 
 		try {
-			await updateTask(selectedTask, { description: selectedTaskDescription, details: selectedTaskDetails });
+			await updateTask(selectedTask, {
+				description: selectedTaskDescription,
+				details: selectedTaskDetails,
+			});
 		} catch (e) {
 			console.error(e);
 		} finally {
@@ -209,23 +218,23 @@
 
 	function debounce(func: Function, wait: number, immediate?: boolean) {
 		var timeout: number | undefined;
-	  return function(this: any) {
-	  	var context = this;
-	  	var args = arguments;
+		return function (this: any) {
+			var context = this;
+			var args = arguments;
 
-	  	clearTimeout(timeout);
+			clearTimeout(timeout);
 
-	  	if (immediate && !timeout) {
-		  	func.apply(context, args);
-	  	}
+			if (immediate && !timeout) {
+				func.apply(context, args);
+			}
 
-	  	timeout = setTimeout(function() {
-	  		timeout = undefined;
-	  		if (!immediate) {
-		  		func.apply(context, args);
-		  	}
-	  	}, wait);
-	  };
+			timeout = setTimeout(function () {
+				timeout = undefined;
+				if (!immediate) {
+					func.apply(context, args);
+				}
+			}, wait);
+		};
 	}
 </script>
 
@@ -242,9 +251,8 @@
 
 			{#await fetchTags() then _}
 				<div class="tags-list overflow-auto">
-					<Pill
-						onClick={() => (selectedTag = undefined)}
-						isSelected={selectedTag === undefined}>All</Pill
+					<Pill onClick={() => (selectedTag = undefined)} isSelected={selectedTag === undefined}
+						>All</Pill
 					>
 					{#each tags as tag}
 						<Pill onClick={() => (selectedTag = tag)} isSelected={selectedTag === tag}
@@ -267,14 +275,23 @@
 							class={itemBeingDragged ? 'is-dragging' : ''}
 							animate:flip={{ duration: 200 }}
 							in:fade
-							on:click={() => {selectedTask = task; selectedTaskDescription = task.description; selectedTaskDetails = task.details ?? '';}}
+							on:click={() => {
+								selectedTask = task;
+								selectedTaskDescription = task.description;
+								selectedTaskDetails = task.details ?? '';
+							}}
 							draggable="true"
 							on:dragstart={onDragStart(task.id)}
 							on:dragend={onDragEnd()}
 							on:dragenter|preventDefault={swapOnEnter(task.id)}
 							on:dragover|preventDefault={() => {}}
 						>
-							<Task isSelected={task.id === selectedTask?.id} isDragging={itemBeingDragged === task.id} {onDelete} {task} />
+							<Task
+								isSelected={task.id === selectedTask?.id}
+								isDragging={itemBeingDragged === task.id}
+								{onDelete}
+								{task}
+							/>
 						</li>
 					{/each}
 				</ul>
@@ -284,8 +301,19 @@
 		</div>
 
 		<div class="task-details">
-			<input type="text" bind:value={selectedTaskDescription} disabled={selectedTask == undefined} on:change={debounce(updateSelectedTask, 200)} on:input={debounce(updateSelectedTask, 1000)} />
-			<textarea disabled={selectedTask == undefined} bind:value={selectedTaskDetails} on:change={debounce(updateSelectedTask, 200)} on:input={debounce(updateSelectedTask, 1000)}></textarea>
+			<input
+				type="text"
+				bind:value={selectedTaskDescription}
+				disabled={selectedTask == undefined}
+				on:change={debounce(updateSelectedTask, 200)}
+				on:input={debounce(updateSelectedTask, 1000)}
+			/>
+			<textarea
+				disabled={selectedTask == undefined}
+				bind:value={selectedTaskDetails}
+				on:change={debounce(updateSelectedTask, 200)}
+				on:input={debounce(updateSelectedTask, 1000)}
+			></textarea>
 		</div>
 	</div>
 </main>
