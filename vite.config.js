@@ -7,6 +7,8 @@ export default defineConfig({
 		laravel({
 			input: [
 				'resources/css/style.css',
+				'resources/css/pico.colors.min.css',
+				'resources/css/pico.violet.min.css',
 				'resources/js/src/entrypoints/footer.ts',
 				'resources/js/src/entrypoints/header.ts',
 				'resources/js/src/entrypoints/register.ts',
