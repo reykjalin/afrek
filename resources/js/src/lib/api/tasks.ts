@@ -54,6 +54,11 @@ async function createTask(description: string, tags?: string[]) {
 	return task;
 }
 
+async function updateTask(task: Task, updatedTaskData: Partial<Task>) {
+	const response = await axios.patch(`/api/tasks/update/${task.id}`, updatedTaskData);
+	return taskSchema.parse(response.data);
+}
+
 async function moveTask(task: Task, order: number) {
 	const response = await axios.patch(`/api/tasks/move/${task.id}`, { new_pos: order });
 	const updatedTask = taskSchema.parse(response.data);
@@ -65,4 +70,4 @@ async function deleteTask(task: Task) {
 	await axios.delete(`/api/tasks/${task.id}`);
 }
 
-export { getTasks, getTags, createTask, moveTask, deleteTask };
+export { getTasks, getTags, createTask, moveTask, updateTask, deleteTask };

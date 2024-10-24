@@ -7,13 +7,14 @@
 
 	export let isDragging = false;
 	export let onDelete: (t: typeof task) => void;
+	export let isSelected = false;
 
 	function buttonHandler(_ev: MouseEvent) {
 		onDelete(task);
 	}
 </script>
 
-<article class={`${isDragging ? 'is-dragging ' : ''}task`}>
+<article class={`${isDragging ? 'is-dragging ' : ''}${isSelected ? 'selected ' : ''}task`}>
 	<p>{task.description}</p>
 
 	<footer>
@@ -69,5 +70,9 @@
 		& > * {
 			opacity: 0;
 		}
+	}
+
+	.selected {
+		outline: 3px solid var(--pico-color-violet-400);
 	}
 </style>

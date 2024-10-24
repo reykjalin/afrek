@@ -59,6 +59,33 @@ Route::post('/tasks', function (Request $request) {
 	return $task;
 })->middleware('auth:sanctum');
 
+Route::patch('/tasks/update/{id}', function (Request $request, string $id) {
+	$request->validate([
+		'description' => 'required|string',
+	]);
+
+	$task = Task::where('user_id', $request->user()->id)->findOrFail($id);
+
+	$task->description = $request->description ?? '';
+	$task->details = $request->details ?? '';
+	$task->save();
+
+	// FIXME: This only adds new tags, need to fix this such that tags can also be removed.
+	$tags = $request->tags;
+	if ( ! empty( $tags ) ) {
+		foreach( $tags as $tag ) {
+			$tag = Tag::firstOrCreate( [
+				'name'    => $tag,
+				'user_id' => $request->user()->id,
+			] );
+
+			$task->tags()->save( $tag );
+		}
+	}
+
+	return $task;
+})->middleware('auth:sanctum');
+
 Route::patch('/tasks/move/{id}', function (Request $request, string $id) {
 	$request->validate([
 		'new_pos' => 'required|int',

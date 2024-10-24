@@ -2,7 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
 
-	import { getTasks, getTags, createTask, moveTask, deleteTask } from '../lib/api/tasks';
+	import { getTasks, getTags, createTask, moveTask, updateTask, deleteTask } from '../lib/api/tasks';
 	import Task from '../lib/components/task.svelte';
 	import Pill from '../lib/components/pill.svelte';
 
@@ -23,6 +23,9 @@
 	let selectedTag: Tag | undefined = undefined;
 	let tags: Tag[] = [];
 	let selectedTask: TaskType | undefined = undefined;
+
+	let selectedTaskDescription: string = '';
+	let selectedTaskDetails: string = '';
 
 	let fetchTasks = async () => {
 		if (await $user) {
@@ -94,27 +97,31 @@
 		};
 	}
 
-	function handleKeyPress(ev: KeyboardEvent) {
-		// Make sure event propagates if the modal is already open
-		if (dialog.open) {
-			return;
-		}
-
-		const { key } = ev;
-
-		if (key === 'n') {
-			console.log('create new task');
-			ev.preventDefault();
-			dialog.showModal();
-		}
-	}
 
 	async function createEmptyTask() {
 		try {
-			await createTask('', []);
+			selectedTask = await createTask('', []);
+
+			selectedTaskDescription = '';
+			selectedTaskDetails = '';
+
 			$tasks = await getTasks(selectedTag);
 		} catch (_) {
 			$tasks = $tasks.filter(t => t.id !== -1);
+		}
+	}
+
+	async function updateSelectedTask() {
+		if (!selectedTask) {
+			return;
+		}
+
+		try {
+			await updateTask(selectedTask, { description: selectedTaskDescription, details: selectedTaskDetails });
+		} catch (e) {
+			console.error(e);
+		} finally {
+			$tasks = await getTasks(selectedTag);
 		}
 	}
 
@@ -199,9 +206,28 @@
 			$tasks.splice(indexOfTask, 0, task);
 		}
 	}
-</script>
 
-<svelte:window on:keydown={handleKeyPress} />
+	function debounce(func: Function, wait: number, immediate?: boolean) {
+		var timeout: number | undefined;
+	  return function(this: any) {
+	  	var context = this;
+	  	var args = arguments;
+
+	  	clearTimeout(timeout);
+
+	  	if (immediate && !timeout) {
+		  	func.apply(context, args);
+	  	}
+
+	  	timeout = setTimeout(function() {
+	  		timeout = undefined;
+	  		if (!immediate) {
+		  		func.apply(context, args);
+		  	}
+	  	}, wait);
+	  };
+	}
+</script>
 
 <main class="container-fluid">
 	<div>
@@ -241,14 +267,14 @@
 							class={itemBeingDragged ? 'is-dragging' : ''}
 							animate:flip={{ duration: 200 }}
 							in:fade
-							on:click={() => (selectedTask = task)}
+							on:click={() => {selectedTask = task; selectedTaskDescription = task.description; selectedTaskDetails = task.details ?? '';}}
 							draggable="true"
 							on:dragstart={onDragStart(task.id)}
 							on:dragend={onDragEnd()}
 							on:dragenter|preventDefault={swapOnEnter(task.id)}
 							on:dragover|preventDefault={() => {}}
 						>
-							<Task isDragging={itemBeingDragged === task.id} {onDelete} {task} />
+							<Task isSelected={task.id === selectedTask?.id} isDragging={itemBeingDragged === task.id} {onDelete} {task} />
 						</li>
 					{/each}
 				</ul>
@@ -258,8 +284,8 @@
 		</div>
 
 		<div class="task-details">
-			<input type="text" value={selectedTask?.description ?? ''} disabled={selectedTask == undefined} />
-			<textarea disabled={selectedTask == undefined}>{selectedTask?.details ?? ''}</textarea>
+			<input type="text" bind:value={selectedTaskDescription} disabled={selectedTask == undefined} on:change={debounce(updateSelectedTask, 200)} on:input={debounce(updateSelectedTask, 1000)} />
+			<textarea disabled={selectedTask == undefined} bind:value={selectedTaskDetails} on:change={debounce(updateSelectedTask, 200)} on:input={debounce(updateSelectedTask, 1000)}></textarea>
 		</div>
 	</div>
 </main>
