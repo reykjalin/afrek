@@ -33,6 +33,7 @@
 
 	let selectedTaskDescription: string = '';
 	let selectedTaskDetails: string = '';
+	let selectedTaskTags: string = '';
 
 	let fetchTasks = async () => {
 		if (await $user) {
@@ -106,7 +107,7 @@
 
 	async function createEmptyTask() {
 		try {
-			selectedTask = await createTask('', []);
+			selectedTask = await createTask('', selectedTag ? [selectedTag.name] : []);
 
 			selectedTaskDescription = '';
 			selectedTaskDetails = '';
@@ -123,14 +124,19 @@
 		}
 
 		try {
-			await updateTask(selectedTask, {
-				description: selectedTaskDescription,
-				details: selectedTaskDetails,
-			});
+			await updateTask(
+				selectedTask,
+				{
+					description: selectedTaskDescription,
+					details: selectedTaskDetails,
+				},
+				selectedTaskTags.split(', '),
+			);
 		} catch (e) {
 			console.error(e);
 		} finally {
 			$tasks = await getTasks(selectedTag);
+			tags = await getTags();
 		}
 	}
 
@@ -279,6 +285,7 @@
 								selectedTask = task;
 								selectedTaskDescription = task.description;
 								selectedTaskDetails = task.details ?? '';
+								selectedTaskTags = task.tags?.map((t) => t.name).join(', ') ?? '';
 							}}
 							draggable="true"
 							on:dragstart={onDragStart(task.id)}
@@ -301,7 +308,7 @@
 		</div>
 
 		<div class="task-details">
-			<label for="title">Title </label>
+			<label for="title">Title</label>
 			<input
 				type="text"
 				name="title"
@@ -311,7 +318,17 @@
 				on:input={debounce(updateSelectedTask, 1000)}
 			/>
 
-			<label for="details">Details </label>
+			<label for="tags">Tags</label>
+			<input
+				type="text"
+				name="tags"
+				bind:value={selectedTaskTags}
+				disabled={selectedTask == undefined}
+				on:change={debounce(updateSelectedTask, 200)}
+				on:input={debounce(updateSelectedTask, 1000)}
+			/>
+
+			<label for="details">Details</label>
 			<textarea
 				name="details"
 				disabled={selectedTask == undefined}

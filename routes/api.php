@@ -70,18 +70,25 @@ Route::patch('/tasks/update/{id}', function (Request $request, string $id) {
 	$task->details = $request->details ?? '';
 	$task->save();
 
-	// FIXME: This only adds new tags, need to fix this such that tags can also be removed.
-	$tags = $request->tags;
-	if ( ! empty( $tags ) ) {
-		foreach( $tags as $tag ) {
-			$tag = Tag::firstOrCreate( [
-				'name'    => $tag,
-				'user_id' => $request->user()->id,
-			] );
+    // Clear all the tags.
+    foreach( $task->tags as $tag ) {
+        // Remove the tag.
+        $task->tags()->detach($tag->id);
 
-			$task->tags()->save( $tag );
-		}
-	}
+        if ( $tag->tasks()->count() === 0 ) {
+            $tag->delete();
+        }
+    }
+
+    // Add the new tags.
+    foreach( $request->tags as $tag ) {
+        $tag = Tag::firstOrCreate( [
+            'name'    => $tag,
+            'user_id' => $request->user()->id,
+        ] );
+
+        $task->tags()->save( $tag );
+    }
 
 	return $task;
 })->middleware('auth:sanctum');

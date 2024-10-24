@@ -54,8 +54,8 @@ async function createTask(description: string, tags?: string[]) {
 	return task;
 }
 
-async function updateTask(task: Task, updatedTaskData: Partial<Task>) {
-	const response = await axios.patch(`/api/tasks/update/${task.id}`, updatedTaskData);
+async function updateTask(task: Task, updatedTaskData: Partial<Task>, tags?: string[]) {
+	const response = await axios.patch(`/api/tasks/update/${task.id}`, { ...updatedTaskData, tags });
 	return taskSchema.parse(response.data);
 }
 
