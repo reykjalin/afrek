@@ -301,14 +301,19 @@
 		</div>
 
 		<div class="task-details">
+			<label for="title">Title </label>
 			<input
 				type="text"
+				name="title"
 				bind:value={selectedTaskDescription}
 				disabled={selectedTask == undefined}
 				on:change={debounce(updateSelectedTask, 200)}
 				on:input={debounce(updateSelectedTask, 1000)}
 			/>
+
+			<label for="details">Details </label>
 			<textarea
+				name="details"
 				disabled={selectedTask == undefined}
 				bind:value={selectedTaskDetails}
 				on:change={debounce(updateSelectedTask, 200)}
@@ -329,7 +334,7 @@
 		}
 
 		& div.task-list {
-			height: 100svb;
+			height: 90svb;
 			padding: 0.5rem 1rem;
 			border-inline-end: 1px solid var(--pico-color-violet-600);
 
