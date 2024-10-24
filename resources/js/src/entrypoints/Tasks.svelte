@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
-
 	import {
 		getTasks,
 		getTags,
@@ -124,14 +123,21 @@
 		}
 
 		try {
-			await updateTask(
+			selectedTask = await updateTask(
 				selectedTask,
 				{
 					description: selectedTaskDescription,
 					details: selectedTaskDetails,
 				},
-				selectedTaskTags.split(', '),
+				selectedTaskTags
+					.split(',')
+					.map((t) => t.trim())
+					.filter((t) => t !== ''),
 			);
+
+			// The description and details should already be up-to-date, but we might
+			// have to refresh the tags.
+			selectedTaskTags = selectedTask.tags?.map((t) => t.name).join(', ') ?? '';
 		} catch (e) {
 			console.error(e);
 		} finally {

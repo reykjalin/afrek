@@ -90,7 +90,10 @@ Route::patch('/tasks/update/{id}', function (Request $request, string $id) {
         $task->tags()->save( $tag );
     }
 
-	return $task;
+    return Task::with('tags')
+        ->where('user_id', $request->user()->id)
+        ->where('id', $task->id)
+        ->first();
 })->middleware('auth:sanctum');
 
 Route::patch('/tasks/move/{id}', function (Request $request, string $id) {
