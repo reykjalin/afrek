@@ -69,7 +69,11 @@
                         <h3>Tasks are more than just short descriptions</h3>
                     </header>
 
-                    <p>Afrek has full rich-text editing capabilities allowing you to include all the details necessary to complete your task.</p>
+                    <p>(Still a work in progress)</p>
+                    <p>
+                        Afrek has full rich-text editing capabilities allowing you to include all the details necessary to complete your task.
+                        Take beautiful and functional notes that make it easier to complete your task when it's time to get to work!
+                    </p>
                 </article>
 
                 <figure>
@@ -84,15 +88,34 @@
 
                 <article>
                     <header>
-                        <h3>Scheduling that gets out of your way</h3>
+                        <h3>Organization that gets out of your way</h3>
                     </header>
 
                     <p>(Still a work in progress)</p>
                     <p>
-                        Scheduling your tasks is just a matter of dragging and dropping tasks on a calendar-like interface.
-                        Afrek will automatically shift tasks around to prevent any tasks from overlapping.
+                        Create task stacks to organize your tasks into manageable chunks.
+                        Stacks help you get through the day by explicitly creating little breaks throughout the day for you to enjoy.
                     </p>
                 </article>
+            </div>
+
+            <div class="grid">
+                <article>
+                    <header>
+                        <h3>Keep a complete history of what you've accomplished</h3>
+                    </header>
+
+                    <p>(Still a work in progress)</p>
+                    <p>
+                        Never again will you have to wonder what you worked on.
+                        Just look at the list of completed tasks, neatly sorted based on completion date.
+                        To make sure you always find what you need you can filter and search through the tasks based on tag or text.
+                    </p>
+                </article>
+
+                <figure>
+                    <img src="" height="300" width="300" alt="Screenshot missing" />
+                </figure>
             </div>
         </section>
 	</main>
