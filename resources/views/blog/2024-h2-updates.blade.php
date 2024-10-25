@@ -5,11 +5,24 @@
         <h1>Update on progress as of the second half of 2024</h1>
         <p><small><b>Published: 2024-10-25</b></small></p>
 
+        <h2>Table of Contents</h2>
+
+        <ol>
+            <li>
+                <a href="#overview">Quick Overview</a>
+                <ol>
+                    <li><a href="#new-features">✨ New features</a></li>
+                    <li><a href="#changes">📝 Changes</a></li>
+                </ol>
+            </li>
+            <li><a href="#how-is-afrek-coming-along">How is Afrek coming along?</a></li>
+        </ol>
+
+        <h2 id="overview">Quick Overview</h2>
+
         <p>It's been a while since the introduction blog post, so I thought it was time for a little update!</p>
 
-        <h2>Quick Overview</h2>
-
-        <h3>✨ New features</h3>
+        <h3 id="new-features">✨ New features</h3>
 
         <p>The following features should all make it in before the end of the year:</p>
 
@@ -19,7 +32,7 @@
             <li>Task search</li>
         </ul>
 
-        <h3>📝 Changes</h3>
+        <h3 id="changes">📝 Changes</h3>
 
         <ul>
             <li>Calendar-based scheduling will not be implemented. Focus on task stacks instead.</li>
@@ -27,7 +40,7 @@
             <li>New layout!</li>
         </ul>
 
-        <h2>How is Afrek coming along?</h2>
+        <h2 id="how-is-afrek-coming-along">How is Afrek coming along?</h2>
 
         <p>
             The initial implementation has been reworked using Laravel and Svelte instead of Phoenix and LiveView.
