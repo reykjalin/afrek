@@ -29,7 +29,7 @@ Route::get('/blog', function () {
 })->name('blog');
 
 Route::get('/blog/introduction', function () {
-	return view('blog_introduction');
+	return view('blog/blog_introduction');
 })->name('blog.introduction');
 
 Route::get('/blog/2024-h2-updates', function () {

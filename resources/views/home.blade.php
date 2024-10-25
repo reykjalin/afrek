@@ -3,7 +3,7 @@
         <section>
             <article class="warning">
                 <header>
-                    <a href="/blog/introduction">Afrek is still a work in progress</a>
+                    <a href="<?php echo( route( 'blog.2024-h2-updates' ) ); ?>">Afrek is still a work in progress</a>
                 </header>
 
                 <p>
@@ -23,7 +23,7 @@
 
                     <button>Sign up</button>
                     <p><small>It's free for now!</small></p>
-                    <p><small><a href="/blog/introduction">Eventually</a> this will be a 30-day free trial and then US$3/month or US$30/year.</small></p>
+                    <p><small><a href="<?php echo( route( 'blog.introduction' ) ); ?>">Eventually</a> this will be a 30-day free trial and then US$3/month or US$30/year.</small></p>
                 </div>
                 <div>
                     <figure>
