@@ -4,8 +4,8 @@
 
         <article>
             <header>
-                <h2><a href="<?php echo route('blog.2024-h2-updates'); ?>">Update on progress as of H2 2024</a></h2>
-                <small><b>Published: 2024-xx-xx</b></small>
+                <h2><a href="<?php echo route('blog.2024-h2-updates'); ?>">Update on progress as of the second half of 2024</a></h2>
+                <small><b>Published: 2024-10-25</b></small>
             </header>
             An update on the progress made so far since going live with pre-alpha in 2024.
         </article>
