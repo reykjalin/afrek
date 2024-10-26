@@ -6,7 +6,11 @@
 	</div>
 
 	<p>
-		Developed with &lt;3 by <a href="https://www.thorlaksson.com">Kristófer Reykjalín</a>
+		Developed with &lt;3 by <a href="https://www.thorlaksson.com">Kristófer Reykjalín</a>.
+	</p>
+	<p>
+		Afrek is open-source under the AGPL license.<br />Get the source code
+		<a href="https://sr.ht/~reykjalin/afrek">on Sourcehut</a>.
 	</p>
 </div>
 
