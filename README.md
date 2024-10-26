@@ -2,6 +2,8 @@
 
 Simple task management and focusing software.
 
+![Screenshot of Afrek's task list](./public/screenshots/dark-mode-task-list.webp)
+
 ## Start developing Afrek
 
 Afrek's frontend and backend have to be served via separate commands:
