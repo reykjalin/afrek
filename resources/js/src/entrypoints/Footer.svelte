@@ -10,7 +10,7 @@
 	</p>
 	<p>
 		Afrek is open-source under the AGPL license.<br />Get the source code
-		<a href="https://sr.ht/~reykjalin/afrek">on Sourcehut</a>.
+		<a href="https://sr.ht/~reykjalin/Afrek">on Sourcehut</a>.
 	</p>
 </div>
 
