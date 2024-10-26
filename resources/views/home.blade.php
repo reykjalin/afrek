@@ -62,7 +62,7 @@
             </div>
         </section>
 
-        <section>
+        <section id="features">
             <div class="grid">
                 <article>
                     <header>
@@ -82,10 +82,6 @@
             </div>
 
             <div class="grid">
-                <figure>
-                    <img src="" alt="Screenshot missing" />
-                </figure>
-
                 <article>
                     <header>
                         <h3>Organization that gets out of your way</h3>
@@ -97,6 +93,10 @@
                         Stacks help you get through the day by explicitly creating little breaks throughout the day for you to enjoy.
                     </p>
                 </article>
+
+                <figure>
+                    <img src="" alt="Screenshot missing" />
+                </figure>
             </div>
 
             <div class="grid">
@@ -153,6 +153,12 @@
             gap: 5rem;
         }
 
+        #features > div:nth-child(even) > article {
+            @media(min-width: 768px) {
+                order: 1;
+            }
+        }
+
         .column {
             display: flex;
             flex-direction: column;
@@ -166,7 +172,7 @@
 
         .call-to-action {
             padding-inline: var(--pico-spacing-horizontal);
-            @media(min-width: 760px) {
+            @media(min-width: 768px) {
                 padding-inline: 5rem;
             }
             align-items: center;
