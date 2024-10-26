@@ -165,7 +165,10 @@
         }
 
         .call-to-action {
-            padding-inline: 5rem;
+            padding-inline: var(--pico-spacing-horizontal);
+            @media(min-width: 760px) {
+                padding-inline: 5rem;
+            }
             align-items: center;
             gap: 5rem;
 
