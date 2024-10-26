@@ -1,6 +1,7 @@
 # Afrek
 
 Simple task management and focusing software.
+You can find the publicly hosted version at [afrek.app](https://afrek.app).
 
 ![Screenshot of Afrek's task list](./public/screenshots/dark-mode-task-list.webp)
 
