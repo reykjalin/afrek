@@ -5,7 +5,9 @@
 	import PageTitle from '../lib/components/pagetitle.svelte';
 	import { user } from '../lib/stores/auth';
 
-	async function handleSubmit() {
+	async function handleSubmit(ev: SubmitEvent) {
+		ev.preventDefault();
+
 		try {
 			error = '';
 			isLoggingIn = true;
@@ -19,33 +21,34 @@
 				console.log(e);
 				error = e?.response?.data?.message ?? e.message;
 			}
-		}
 
-		isLoggingIn = false;
+			// Only unblock the button if we failed to log in for some reason.
+			isLoggingIn = false;
+		}
 	}
 
-	$: {
+	$effect(() => {
 		$user.then((u) => {
 			if (u) {
 				window.location.href = '/tasks';
 			}
 		});
-	}
+	});
 
-	let error = '';
+	let error = $state('');
 
-	let email = '';
-	let password = '';
-	let remember = false;
+	let email = $state('');
+	let password = $state('');
+	let remember = $state(false);
 
-	let isLoggingIn = false;
+	let isLoggingIn = $state(false);
 </script>
 
 <main class="container">
 	<PageTitle>Login</PageTitle>
 
 	<article>
-		<form on:submit|preventDefault={handleSubmit}>
+		<form onsubmit={handleSubmit}>
 			{#if error}<p>{error}</p>{/if}
 
 			<fieldset>
@@ -67,12 +70,7 @@
 
 				<label for="remember-me"
 					>Remember me?
-					<input
-						type="checkbox"
-						name="remember-me"
-						id="remember-me"
-						bind:value={remember}
-					/>
+					<input type="checkbox" name="remember-me" id="remember-me" bind:checked={remember} />
 				</label>
 			</fieldset>
 

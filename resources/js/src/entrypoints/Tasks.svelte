@@ -15,24 +15,29 @@
 	import { user } from '../lib/stores/auth';
 	import { tasks } from '../lib/stores/tasks';
 	import type { Task as TaskType, Tag } from '../lib/api/tasks';
+	import { isAxiosError } from 'axios';
 
-	$: {
-		$user.then((u) => {
-			if (!u) {
-				window.location.href = '/login';
-			} else {
-				getTasks(selectedTag).then((t) => ($tasks = t));
-			}
-		});
-	}
+	let selectedTag: Tag | undefined = $state(undefined);
+	let tags: Tag[] = $state([]);
+	let selectedTask: TaskType | undefined = $state(undefined);
 
-	let selectedTag: Tag | undefined = undefined;
-	let tags: Tag[] = [];
-	let selectedTask: TaskType | undefined = undefined;
+	let selectedTaskDescription: string = $state('');
+	let selectedTaskDetails: string = $state('');
+	let selectedTaskTags: string = $state('');
 
-	let selectedTaskDescription: string = '';
-	let selectedTaskDetails: string = '';
-	let selectedTaskTags: string = '';
+	$effect(() => {
+		getTasks(selectedTag)
+			.then((t) => ($tasks = t))
+			.catch((e) => {
+				if (isAxiosError(e)) {
+					// We get a 401 unauhtorized if we're not logged in, so redirect to
+					// the login screen if that happens.
+					if (e.status === 401) {
+						window.location.href = '/login';
+					}
+				}
+			});
+	});
 
 	let fetchTasks = async () => {
 		if (await $user) {
@@ -47,7 +52,7 @@
 	};
 
 	// List props.
-	let itemBeingDragged: number | null = null;
+	let itemBeingDragged: number | null = $state(null);
 	let latestSwappedOrder: number | null = null;
 
 	// Create new task props.
@@ -87,7 +92,9 @@
 	}
 
 	function swapOnEnter(id: number) {
-		return function (_ev: DragEvent) {
+		return function (ev: DragEvent) {
+			ev.preventDefault();
+
 			// Don't swap if we just entered the item we're dragging, or if nothing is dragging.
 			if (itemBeingDragged === null || itemBeingDragged === id) {
 				return;
@@ -254,7 +261,7 @@
 	<div>
 		<div class="task-list overflow-auto">
 			<div class="add-task">
-				<button on:click={createEmptyTask}>Add task</button>
+				<button onclick={createEmptyTask}>Add task</button>
 			</div>
 
 			<div class="task-search">
@@ -281,23 +288,23 @@
 			{:then _}
 				<ul>
 					{#each $tasks as task (task.id)}
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 						<li
 							class={itemBeingDragged ? 'is-dragging' : ''}
 							animate:flip={{ duration: 200 }}
 							in:fade
-							on:click={() => {
+							onclick={() => {
 								selectedTask = task;
 								selectedTaskDescription = task.description;
 								selectedTaskDetails = task.details ?? '';
 								selectedTaskTags = task.tags?.map((t) => t.name).join(', ') ?? '';
 							}}
 							draggable="true"
-							on:dragstart={onDragStart(task.id)}
-							on:dragend={onDragEnd()}
-							on:dragenter|preventDefault={swapOnEnter(task.id)}
-							on:dragover|preventDefault={() => {}}
+							ondragstart={onDragStart(task.id)}
+							ondragend={onDragEnd()}
+							ondragenter={swapOnEnter(task.id)}
+							ondragover={(e) => e.preventDefault()}
 						>
 							<Task
 								isSelected={task.id === selectedTask?.id}
@@ -320,8 +327,8 @@
 				name="title"
 				bind:value={selectedTaskDescription}
 				disabled={selectedTask == undefined}
-				on:change={debounce(updateSelectedTask, 200)}
-				on:input={debounce(updateSelectedTask, 1000)}
+				onchange={debounce(updateSelectedTask, 200)}
+				oninput={debounce(updateSelectedTask, 1000)}
 			/>
 
 			<label for="tags">Tags</label>
@@ -330,8 +337,8 @@
 				name="tags"
 				bind:value={selectedTaskTags}
 				disabled={selectedTask == undefined}
-				on:change={debounce(updateSelectedTask, 200)}
-				on:input={debounce(updateSelectedTask, 1000)}
+				onchange={debounce(updateSelectedTask, 200)}
+				oninput={debounce(updateSelectedTask, 1000)}
 			/>
 
 			<label for="details">Details</label>
@@ -339,8 +346,8 @@
 				name="details"
 				disabled={selectedTask == undefined}
 				bind:value={selectedTaskDetails}
-				on:change={debounce(updateSelectedTask, 200)}
-				on:input={debounce(updateSelectedTask, 1000)}
+				onchange={debounce(updateSelectedTask, 200)}
+				oninput={debounce(updateSelectedTask, 1000)}
 			></textarea>
 		</div>
 	</div>

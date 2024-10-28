@@ -3,11 +3,20 @@
 
 	import Pill from '../components/pill.svelte';
 
-	export let task: Task;
 
-	export let isDragging = false;
-	export let onDelete: (t: typeof task) => void;
-	export let isSelected = false;
+	interface Props {
+		task: Task;
+		isDragging?: boolean;
+		onDelete: (t: typeof task) => void;
+		isSelected?: boolean;
+	}
+
+	let {
+		task,
+		isDragging = false,
+		onDelete,
+		isSelected = false
+	}: Props = $props();
 
 	function buttonHandler(_ev: MouseEvent) {
 		onDelete(task);
@@ -18,7 +27,7 @@
 	<p>{task.description}</p>
 
 	<footer>
-		<button class="outline" on:click={buttonHandler}>&#10003;</button>
+		<button class="outline" onclick={buttonHandler}>&#10003;</button>
 
 		<div class="tags overflow-auto">
 			{#each task.tags ?? [] as tag}

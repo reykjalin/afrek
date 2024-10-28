@@ -23,7 +23,7 @@
 			{#await $user then u}
 				{#if u}
 					<li><a href="/tasks">Tasks</a></li>
-					<li><a href="/logout" on:click={handleLogout}>Logout</a></li>
+					<li><a href="/logout" onclick={handleLogout}>Logout</a></li>
 					<li>{u.email}</li>
 				{:else}
 					<li><a href="/login">Login</a></li>

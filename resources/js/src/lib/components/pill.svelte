@@ -1,6 +1,11 @@
 <script lang="ts">
-	export let onClick: (() => void) | null = null;
-	export let isSelected: boolean = false;
+	interface Props {
+		onClick?: (() => void) | null;
+		isSelected?: boolean;
+		children?: import('svelte').Snippet;
+	}
+
+	let { onClick = null, isSelected = false, children }: Props = $props();
 
 	function handleClick(_ev: MouseEvent) {
 		if (onClick) {
@@ -9,7 +14,7 @@
 	}
 </script>
 
-<button class={isSelected ? '' : 'outline'} on:click={handleClick}><slot></slot></button>
+<button class={isSelected ? '' : 'outline'} onclick={handleClick}>{@render children?.()}</button>
 
 <style>
 </style>

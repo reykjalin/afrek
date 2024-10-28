@@ -1,9 +1,10 @@
 import Login from './Login.svelte';
+import { mount } from "svelte";
 
 const loginComponent = document.getElementById('login');
 
 if (loginComponent) {
-	new Login({
-		target: loginComponent,
-	});
+	mount(Login, {
+    		target: loginComponent,
+    	});
 }

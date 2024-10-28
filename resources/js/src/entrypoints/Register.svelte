@@ -4,8 +4,11 @@
 
 	import { user } from '../lib/stores/auth';
 
-	async function handleSubmit() {
+	async function handleSubmit(ev: SubmitEvent) {
+		ev.preventDefault();
+
 		error = '';
+		isRegistering = true;
 
 		if (password.length < 8) {
 			error = 'The password must be at least 8 characters';
@@ -15,35 +18,41 @@
 			return;
 		}
 
-		await getCsrfCookie();
-		await register(
-			{ email, password, password_confirmation: confirmPassword },
-			(e) => (error = e),
-		);
+		try {
+			await getCsrfCookie();
+			await register(
+				{ email, password, password_confirmation: confirmPassword },
+				(e) => (error = e),
+			);
 
-		$user = getUser();
+			$user = getUser();
+		} catch (_) {
+			isRegistering = false;
+		}
 	}
 
-	$: {
+	$effect(() => {
 		$user.then((u) => {
 			if (u) {
 				window.location.href = '/tasks';
 			}
 		});
-	}
+	});
 
-	let error = '';
+	let error = $state('');
 
-	let email = '';
-	let password = '';
-	let confirmPassword = '';
+	let email = $state('');
+	let password = $state('');
+	let confirmPassword = $state('');
+
+	let isRegistering = $state(false);
 </script>
 
 <main class="container">
 	<PageTitle>Register</PageTitle>
 
 	<article>
-		<form on:submit|preventDefault={handleSubmit}>
+		<form onsubmit={handleSubmit}>
 			{#if error}<p class="error">{error}</p>{/if}
 
 			<fieldset>
@@ -74,7 +83,7 @@
 				</label>
 			</fieldset>
 
-			<button type="submit">Register</button>
+			<button disabled={isRegistering} type="submit">Register</button>
 		</form>
 	</article>
 </main>
