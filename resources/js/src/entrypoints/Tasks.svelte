@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { fade } from 'svelte/transition';
+	import { router } from '../lib/router';
 	import {
 		getTasks,
 		getTags,
@@ -25,6 +26,7 @@
 	let selectedTaskDetails: string = $state('');
 	let selectedTaskTags: string = $state('');
 
+	// Update task list when `selectedTag` changes.
 	$effect(() => {
 		getTasks(selectedTag)
 			.then((t) => ($tasks = t))
@@ -33,9 +35,22 @@
 					// We get a 401 unauhtorized if we're not logged in, so redirect to
 					// the login screen if that happens.
 					if (e.status === 401) {
-						window.location.href = '/login';
+						router.route('/login');
 					}
 				}
+			});
+	});
+
+	// Redirect to login page when the user isn't logged in, or after they log out.
+	$effect(() => {
+		$user
+			.then((u) => {
+				if (!u) {
+					router.route('/login');
+				}
+			})
+			.catch((_) => {
+				router.route('/login');
 			});
 	});
 

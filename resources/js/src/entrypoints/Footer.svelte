@@ -1,4 +1,4 @@
-<div class="footer">
+<footer>
 	<div>
 		<p><a href="/blog">Blog</a></p>
 		<p><a href="/privacy">Privacy</a></p>
@@ -12,10 +12,10 @@
 		Afrek is open-source under the AGPL license.<br />Get the source code
 		<a href="https://sr.ht/~reykjalin/Afrek">on Sourcehut</a>.
 	</p>
-</div>
+</footer>
 
 <style>
-	div.footer {
+	footer {
 		border-block-start: 1px solid var(--pico-color-violet-600);
 		text-align: center;
 		padding: 5rem;

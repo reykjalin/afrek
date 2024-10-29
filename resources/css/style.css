@@ -8,6 +8,7 @@
 	font-weight: normal;
 	font-style: normal;
 }
+
 @font-face {
 	font-family: 'Atkinson Hyperlegible';
 	src:
@@ -16,6 +17,7 @@
 	font-weight: bold;
 	font-style: normal;
 }
+
 @font-face {
 	font-family: 'Atkinson Hyperlegible';
 	src:
@@ -24,6 +26,7 @@
 	font-weight: normal;
 	font-style: italic;
 }
+
 @font-face {
 	font-family: 'Atkinson Hyperlegible';
 	src:
@@ -39,18 +42,21 @@
 	font-weight: normal;
 	font-style: normal;
 }
+
 @font-face {
 	font-family: 'JetBrains Mono';
 	src: url('../fonts/JetBrainsMono-Bold.woff2') format('woff2');
 	font-weight: bold;
 	font-style: normal;
 }
+
 @font-face {
 	font-family: 'JetBrains Mono';
 	src: url('../fonts/JetBrainsMono-Italic.woff2') format('woff2');
 	font-weight: normal;
 	font-style: italic;
 }
+
 @font-face {
 	font-family: 'JetBrains Mono';
 	src: url('../fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { router } from '../lib/router';
 	import { getCsrfCookie, getUser, register } from '../lib/api/auth';
 	import PageTitle from '../lib/components/pagetitle.svelte';
 
@@ -34,7 +35,8 @@
 	$effect(() => {
 		$user.then((u) => {
 			if (u) {
-				window.location.href = '/tasks';
+				// Redirect to task list after successful login.
+				router.route('/');
 			}
 		});
 	});

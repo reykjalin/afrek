@@ -12,16 +12,13 @@
             'resources/css/style.css',
 			'resources/js/src/entrypoints/header.ts',
 			'resources/js/src/entrypoints/footer.ts',
-			'resources/js/src/entrypoints/login.ts',
-			'resources/js/src/entrypoints/register.ts',
-			'resources/js/src/entrypoints/tasks.ts',
 		])
 	</head>
 	<body>
-		<header id="header"></header>
+		<div id="header"></div>
 
 		{{ $slot }}
 
-		<footer id="footer"></footer>
+		<div id="footer"></div>
 	</body>
 </html>

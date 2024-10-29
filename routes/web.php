@@ -8,16 +8,19 @@ Route::get("/", function () {
     return view("home");
 });
 
-Route::get("/tasks", function () {
-	return view("tasks");
-});
+// SPA app routes.
+Route::prefix('app')->group(function () {
+    Route::get("/", function () {
+        return view("app");
+    });
 
-Route::get("/login", function () {
-	return view("login");
-});
+    Route::get('/login', function () {
+        return view("app");
+    });
 
-Route::get("/register", function () {
-	return view("register");
+    Route::get('/register', function () {
+        return view("app");
+    });
 });
 
 Route::get('/privacy', function () {

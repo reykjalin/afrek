@@ -14,7 +14,7 @@
 	}
 </script>
 
-<div class="header">
+<header>
 	<nav>
 		<ul>
 			<li><h1><a href="/">Afrek</a></h1></li>
@@ -22,22 +22,23 @@
 		<ul>
 			{#await $user then u}
 				{#if u}
-					<li><a href="/tasks">Tasks</a></li>
+					<li><a href="/app/">Tasks</a></li>
 					<li><a href="/logout" onclick={handleLogout}>Logout</a></li>
 					<li>{u.email}</li>
 				{:else}
-					<li><a href="/login">Login</a></li>
-					<li><a href="/register">Register</a></li>
+					<li><a href="/app/login">Login</a></li>
+					<li><a href="/app/register">Register</a></li>
 				{/if}
 			{/await}
 		</ul>
 	</nav>
-</div>
+</header>
 
 <style>
-	div.header {
+	header {
 		padding: 0.5rem 1rem;
 		border-block-end: 1px solid var(--pico-color-violet-600);
+		margin-block-end: 2rem;
 
 		& h1 {
 			margin: 0;

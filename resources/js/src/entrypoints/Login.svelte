@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { isAxiosError } from 'axios';
+	import { router } from '../lib/router';
 
 	import { getCsrfCookie, login, getUser } from '../lib/api/auth';
 	import PageTitle from '../lib/components/pagetitle.svelte';
@@ -30,7 +31,8 @@
 	$effect(() => {
 		$user.then((u) => {
 			if (u) {
-				window.location.href = '/tasks';
+				// Redirect to task list after succesful login.
+				router.route('/');
 			}
 		});
 	});

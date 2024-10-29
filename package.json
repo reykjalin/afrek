@@ -30,6 +30,7 @@
 	},
 	"dependencies": {
 		"axios": "^1.6.8",
+		"navaid": "^1.2.0",
 		"zod": "^3.22.5"
 	}
 }
