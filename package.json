@@ -1,0 +1,20 @@
+{
+	"name": "@afrek/root",
+	"version": "1.0.0",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"test": "turbo run test",
+		"prisma": "pnpm --filter @afrek/prisma run prisma",
+		"generate": "pnpm --filter @afrek/verdant run generate",
+		"preflight": "pnpm --filter @afrek/verdant run preflight"
+	},
+	"devDependencies": {
+		"turbo": "^1.6.1"
+	}
+}
