@@ -10,13 +10,15 @@
 		"build": "pnpm run preflight"
 	},
 	"peerDependencies": {
-		"react": "^18.2.0"
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
 	},
 	"dependencies": {
+		"@paralleldrive/cuid2": "^2.2.2",
 		"@verdant-web/cli": "^4.8.2",
 		"@verdant-web/common": "^2.8.0",
 		"@verdant-web/react": "^41.0.0",
 		"@verdant-web/store": "^4.2.0",
-		"cuid": "^2.1.8"
+		"@verdant-web/tiptap": "^1.0.1"
 	}
 }

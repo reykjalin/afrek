@@ -105,3 +105,9 @@ dist
 *.sqlite.bak
 
 .DS_Store
+
+# Turbo
+.turbo
+
+# Verdant
+temp-*

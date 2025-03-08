@@ -10,8 +10,8 @@ import type {
 export * from "@verdant-web/store";
 
 export class Client<Presence = any, Profile = any> {
-  /** Collection access for Item. Load queries, put and delete documents. */
-  readonly items: CollectionQueries<Item, ItemInit, ItemFilter>;
+  /** Collection access for Note. Load queries, put and delete documents. */
+  readonly notes: CollectionQueries<Note, NoteInit, NoteFilter>;
 
   /**
    * Turn on and off sync, or adjust the sync protocol and other settings.
@@ -130,46 +130,189 @@ import {
   EntityFileSnapshot,
 } from "@verdant-web/store";
 
-/** Generated types for Item */
+/** Generated types for Note */
 
-export type Item = ObjectEntity<ItemInit, ItemDestructured, ItemSnapshot>;
-export type ItemId = string;
-export type ItemContent = string;
-export type ItemDone = boolean;
-export type ItemCreatedAt = number;
-export type ItemInit = {
+export type Note = ObjectEntity<NoteInit, NoteDestructured, NoteSnapshot>;
+export type NoteId = string;
+export type NoteContent = ObjectEntity<
+  NoteContentInit,
+  NoteContentDestructured,
+  NoteContentSnapshot
+>;
+export type NoteContentType = string;
+export type NoteContentFrom = number;
+export type NoteContentTo = number;
+export type NoteContentAttrs = ObjectEntity<
+  NoteContentAttrsInit,
+  NoteContentAttrsDestructured,
+  NoteContentAttrsSnapshot
+>;
+export type NoteContentAttrsValue = any;
+export type NoteContentContent = ListEntity<
+  NoteContentContentInit,
+  NoteContentContentDestructured,
+  NoteContentContentSnapshot
+>;
+export type NoteContentContentItem = ObjectEntity<
+  NoteContentContentItemInit,
+  NoteContentContentItemDestructured,
+  NoteContentContentItemSnapshot
+>;
+export type NoteContentContentItemType = string;
+export type NoteContentContentItemFrom = number;
+export type NoteContentContentItemTo = number;
+export type NoteContentContentItemAttrs = ObjectEntity<
+  NoteContentContentItemAttrsInit,
+  NoteContentContentItemAttrsDestructured,
+  NoteContentContentItemAttrsSnapshot
+>;
+export type NoteContentContentItemAttrsValue = any;
+export type NoteContentContentItemContent = ListEntity<
+  NoteContentContentItemContentInit,
+  NoteContentContentItemContentDestructured,
+  NoteContentContentItemContentSnapshot
+>;
+
+export type NoteContentContentItemText = string;
+export type NoteContentContentItemMarks = ListEntity<
+  NoteContentContentItemMarksInit,
+  NoteContentContentItemMarksDestructured,
+  NoteContentContentItemMarksSnapshot
+>;
+
+export type NoteContentText = string;
+export type NoteContentMarks = ListEntity<
+  NoteContentMarksInit,
+  NoteContentMarksDestructured,
+  NoteContentMarksSnapshot
+>;
+export type NoteIsTask = boolean;
+export type NoteDone = boolean;
+export type NoteCreatedAt = number;
+export type NoteCompletedAt = number;
+export type NoteInit = {
   id?: string;
-  content?: string;
+  content?: NoteContentInit;
+  isTask?: boolean;
   done?: boolean;
   createdAt?: number;
+  completedAt?: number;
 };
 
-export type ItemDestructured = {
+export type NoteContentAttrsInit = { [key: string]: NoteContentAttrsValueInit };
+export type NoteContentContentItemAttrsInit = {
+  [key: string]: NoteContentContentItemAttrsValueInit;
+};
+export type NoteContentContentItemContentInit = NoteContentContentInit[];
+export type NoteContentContentItemMarksInit = NoteContentContentInit[];
+export type NoteContentContentItemInit = {
+  type: string;
+  from?: number | null;
+  to?: number | null;
+  attrs?: NoteContentContentItemAttrsInit;
+  content?: NoteContentContentItemContentInit;
+  text?: string | null;
+  marks?: NoteContentContentItemMarksInit;
+};
+export type NoteContentContentInit = NoteContentContentItemInit[];
+export type NoteContentMarksInit = NoteContentContentInit[];
+export type NoteContentInit = {
+  type: string;
+  from?: number | null;
+  to?: number | null;
+  attrs?: NoteContentAttrsInit;
+  content?: NoteContentContentInit;
+  text?: string | null;
+  marks?: NoteContentMarksInit;
+};
+export type NoteDestructured = {
   id: string;
-  content: string;
+  content: NoteContent;
+  isTask: boolean;
   done: boolean;
   createdAt: number;
+  completedAt: number;
 };
 
-export type ItemSnapshot = {
+export type NoteContentAttrsDestructured = {
+  [key: string]: NoteContentAttrsValue | undefined;
+};
+export type NoteContentContentItemAttrsDestructured = {
+  [key: string]: NoteContentContentItemAttrsValue | undefined;
+};
+export type NoteContentContentItemContentDestructured = NoteContentContent[];
+export type NoteContentContentItemMarksDestructured = NoteContentContent[];
+export type NoteContentContentItemDestructured = {
+  type: string;
+  from: number | null;
+  to: number | null;
+  attrs: NoteContentContentItemAttrs;
+  content: NoteContentContentItemContent;
+  text: string | null;
+  marks: NoteContentContentItemMarks;
+};
+export type NoteContentContentDestructured = NoteContentContentItem[];
+export type NoteContentMarksDestructured = NoteContentContent[];
+export type NoteContentDestructured = {
+  type: string;
+  from: number | null;
+  to: number | null;
+  attrs: NoteContentAttrs;
+  content: NoteContentContent;
+  text: string | null;
+  marks: NoteContentMarks;
+};
+export type NoteSnapshot = {
   id: string;
-  content: string;
+  content: NoteContentSnapshot;
+  isTask: boolean;
   done: boolean;
   createdAt: number;
+  completedAt: number;
 };
 
-/** Index filters for Item **/
+export type NoteContentAttrsSnapshot = {
+  [key: string]: NoteContentAttrsValueSnapshot;
+};
+export type NoteContentContentItemAttrsSnapshot = {
+  [key: string]: NoteContentContentItemAttrsValueSnapshot;
+};
+export type NoteContentContentItemContentSnapshot =
+  NoteContentContentSnapshot[];
+export type NoteContentContentItemMarksSnapshot = NoteContentContentSnapshot[];
+export type NoteContentContentItemSnapshot = {
+  type: string;
+  from: number | null;
+  to: number | null;
+  attrs: NoteContentContentItemAttrsSnapshot;
+  content: NoteContentContentItemContentSnapshot;
+  text: string | null;
+  marks: NoteContentContentItemMarksSnapshot;
+};
+export type NoteContentContentSnapshot = NoteContentContentItemSnapshot[];
+export type NoteContentMarksSnapshot = NoteContentContentSnapshot[];
+export type NoteContentSnapshot = {
+  type: string;
+  from: number | null;
+  to: number | null;
+  attrs: NoteContentAttrsSnapshot;
+  content: NoteContentContentSnapshot;
+  text: string | null;
+  marks: NoteContentMarksSnapshot;
+};
 
-export interface ItemCreatedAtSortFilter {
+/** Index filters for Note **/
+
+export interface NoteCreatedAtSortFilter {
   where: "createdAt";
   order: "asc" | "desc";
 }
-export interface ItemCreatedAtMatchFilter {
+export interface NoteCreatedAtMatchFilter {
   where: "createdAt";
   equals: number;
   order?: "asc" | "desc";
 }
-export interface ItemCreatedAtRangeFilter {
+export interface NoteCreatedAtRangeFilter {
   where: "createdAt";
   gte?: number;
   gt?: number;
@@ -177,7 +320,7 @@ export interface ItemCreatedAtRangeFilter {
   lt?: number;
   order?: "asc" | "desc";
 }
-export type ItemFilter =
-  | ItemCreatedAtSortFilter
-  | ItemCreatedAtMatchFilter
-  | ItemCreatedAtRangeFilter;
+export type NoteFilter =
+  | NoteCreatedAtSortFilter
+  | NoteCreatedAtMatchFilter
+  | NoteCreatedAtRangeFilter;

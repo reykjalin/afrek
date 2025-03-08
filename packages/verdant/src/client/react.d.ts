@@ -20,8 +20,8 @@ import type {
   EntityDestructured,
   EntityInit,
   EntityFile,
-  Item,
-  ItemFilter,
+  Note,
+  NoteFilter,
 } from "./index.js";
 
 type HookConfig<F> = {
@@ -142,32 +142,32 @@ export interface GeneratedHooks<Presence, Profile> {
    */
   useSync(isOn: boolean): void;
 
-  useItem(id: string, config?: { skip?: boolean }): Item | null;
-  useItemUnsuspended(
+  useNote(id: string, config?: { skip?: boolean }): Note | null;
+  useNoteUnsuspended(
     id: string,
     config?: { skip?: boolean },
-  ): { data: Item | null; status: QueryStatus };
-  useOneItem: <Config extends HookConfig<ItemFilter>>(
+  ): { data: Note | null; status: QueryStatus };
+  useOneNote: <Config extends HookConfig<NoteFilter>>(
     config?: Config,
-  ) => Item | null;
-  useOneItemsUnsuspended: <Config extends HookConfig<ItemFilter>>(
+  ) => Note | null;
+  useOneNotesUnsuspended: <Config extends HookConfig<NoteFilter>>(
     config?: Config,
-  ) => { data: Item | null; status: QueryStatus };
-  useAllItems: <Config extends HookConfig<ItemFilter>>(
+  ) => { data: Note | null; status: QueryStatus };
+  useAllNotes: <Config extends HookConfig<NoteFilter>>(
     config?: Config,
-  ) => Item[];
-  useAllItemsUnsuspended: <Config extends HookConfig<ItemFilter>>(
+  ) => Note[];
+  useAllNotesUnsuspended: <Config extends HookConfig<NoteFilter>>(
     config?: Config,
-  ) => { data: Item[]; status: QueryStatus };
-  useAllItemsPaginated: <
-    Config extends HookConfig<ItemFilter> & {
+  ) => { data: Note[]; status: QueryStatus };
+  useAllNotesPaginated: <
+    Config extends HookConfig<NoteFilter> & {
       pageSize?: number;
       suspend?: false;
     },
   >(
     config?: Config,
   ) => [
-    Item[],
+    Note[],
     {
       next: () => void;
       previous: () => void;
@@ -177,15 +177,15 @@ export interface GeneratedHooks<Presence, Profile> {
       status: QueryStatus;
     },
   ];
-  useAllItemsInfinite: <
-    Config extends HookConfig<ItemFilter> & {
+  useAllNotesInfinite: <
+    Config extends HookConfig<NoteFilter> & {
       pageSize?: number;
       suspend?: false;
     },
   >(
     config?: Config,
   ) => [
-    Item[],
+    Note[],
     { loadMore: () => void; hasMore: boolean; status: QueryStatus },
   ];
 }

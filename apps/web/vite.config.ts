@@ -1,40 +1,42 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'url';
-import { VitePWA } from 'vite-plugin-pwa';
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "url";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     VitePWA({
       includeManifestIcons: true,
-      strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'service-worker.ts',
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "service-worker.ts",
       manifest: {
-        name: 'afrek',
-        short_name: 'afrek',
-        description: '',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        name: "afrek",
+        short_name: "afrek",
+        description: "",
+        theme_color: "#ffffff",
+        background_color: "#ffffff",
         icons: [
           {
-            src: '192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
+            src: "192x192.png",
+            sizes: "192x192",
+            type: "image/png",
           },
           {
-            src: '512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
+            src: "512x512.png",
+            sizes: "512x512",
+            type: "image/png",
           },
         ],
         categories: [],
-        display: 'standalone',
-        start_url: '/',
+        display: "standalone",
+        start_url: "/",
       } as any,
-      includeAssets: ['fonts/**/*', 'images/**/*'],
+      includeAssets: ["fonts/**/*", "images/**/*"],
 
       workbox: {
         sourcemap: true,
@@ -42,18 +44,18 @@ export default defineConfig({
 
       devOptions: {
         enabled: false,
-        type: 'module',
-        navigateFallback: 'index.html',
+        type: "module",
+        navigateFallback: "index.html",
       },
     }),
   ],
   optimizeDeps: {
     exclude: [],
-    include: ['react/jsx-runtime', 'react', 'react-dom'],
+    include: ["react/jsx-runtime", "react", "react-dom"],
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   server: {

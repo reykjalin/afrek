@@ -2,21 +2,31 @@
 
 // src/schema.ts
 import { schema } from "@verdant-web/store";
-import cuid from "cuid";
-var items = schema.collection({
-  name: "item",
+import { createTipTapFieldSchema } from "@verdant-web/tiptap";
+import { createId } from "@paralleldrive/cuid2";
+var notes = schema.collection({
+  name: "note",
   primaryKey: "id",
   fields: {
     id: schema.fields.string({
-      default: cuid
+      default: createId
     }),
-    content: schema.fields.string({
-      default: ""
+    content: createTipTapFieldSchema({
+      default: {
+        type: "doc",
+        content: []
+      }
+    }),
+    isTask: schema.fields.boolean({
+      default: false
     }),
     done: schema.fields.boolean({
       default: false
     }),
     createdAt: schema.fields.number({
+      default: () => Date.now()
+    }),
+    completedAt: schema.fields.number({
       default: () => Date.now()
     })
   },
@@ -29,7 +39,7 @@ var items = schema.collection({
 var schema_default = schema({
   version: 1,
   collections: {
-    items
+    notes
   }
 });
 export {

@@ -1,5 +1,6 @@
-import { schema } from '@verdant-web/store';
-import cuid from 'cuid';
+import { schema } from "@verdant-web/store";
+import { createTipTapFieldSchema } from "@verdant-web/tiptap";
+import { createId } from "@paralleldrive/cuid2";
 
 /**
  * Welcome to your Verdant schema!
@@ -19,33 +20,42 @@ import cuid from 'cuid';
  * For subsequent changes to your schema, use just `pnpm generate`.
  */
 
-const items = schema.collection({
-	name: 'item',
-	primaryKey: 'id',
-	fields: {
-		id: schema.fields.string({
-			default: cuid,
-		}),
-		content: schema.fields.string({
-			default: '',
-		}),
-		done: schema.fields.boolean({
-			default: false,
-		}),
-		createdAt: schema.fields.number({
-			default: () => Date.now(),
-		}),
-	},
-	indexes: {
-		createdAt: {
-			field: 'createdAt',
-		},
-	},
+const notes = schema.collection({
+  name: "note",
+  primaryKey: "id",
+  fields: {
+    id: schema.fields.string({
+      default: createId,
+    }),
+    content: createTipTapFieldSchema({
+      default: {
+        type: "doc",
+        content: [],
+      },
+    }),
+    isTask: schema.fields.boolean({
+      default: false,
+    }),
+    done: schema.fields.boolean({
+      default: false,
+    }),
+    createdAt: schema.fields.number({
+      default: () => Date.now(),
+    }),
+    completedAt: schema.fields.number({
+      default: () => Date.now(),
+    }),
+  },
+  indexes: {
+    createdAt: {
+      field: "createdAt",
+    },
+  },
 });
 
 export default schema({
-	version: 1,
-	collections: {
-		items,
-	},
+  version: 1,
+  collections: {
+    notes,
+  },
 });
