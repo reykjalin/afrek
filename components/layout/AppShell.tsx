@@ -1,4 +1,3 @@
-import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 
 interface AppShellProps {
@@ -7,12 +6,9 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <TopNav />
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
+    <div className="flex h-screen flex-col">
+      <TopNav />
+      <main className="flex-1 overflow-auto">{children}</main>
     </div>
   );
 }
