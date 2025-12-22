@@ -91,7 +91,7 @@ export function WeeklyView({
         <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h2 className="text-lg font-semibold min-w-fit">{formatWeekRange()}</h2>
+        <h2 className="text-lg font-semibold w-[160px] text-center">{formatWeekRange()}</h2>
         <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
           <ChevronRight className="h-4 w-4" />
         </Button>
