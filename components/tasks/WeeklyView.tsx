@@ -92,7 +92,8 @@ export function WeeklyView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-between">
+        <div />
         <div className="flex items-center gap-1">
           <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
             <ChevronLeft className="h-4 w-4" />
