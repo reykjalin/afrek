@@ -44,6 +44,15 @@ export default function TasksPage() {
 
   const hasActiveFilters = !!search || selectedTags.length > 0;
 
+  const isCurrentWeek = () => {
+    const currentWeekStart = getStartOfWeek(new Date());
+    return weekStart.toDateString() === currentWeekStart.toDateString();
+  };
+
+  const goToCurrentWeek = () => {
+    setWeekStart(getStartOfWeek(new Date()));
+  };
+
   // Set top nav content
   useEffect(() => {
     setLeftContent(
@@ -84,11 +93,16 @@ export default function TasksPage() {
             </TooltipContent>
           </Tooltip>
         )}
+        {!isCurrentWeek() && (
+          <Button size="sm" onClick={goToCurrentWeek}>
+            Go to current week
+          </Button>
+        )}
       </div>
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart]);
 
   // Keyboard shortcuts
   useEffect(() => {

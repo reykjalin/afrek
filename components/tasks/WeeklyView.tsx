@@ -69,11 +69,6 @@ export function WeeklyView({
     onWeekChange(getStartOfWeek(new Date()));
   };
 
-  const isCurrentWeek = () => {
-    const currentWeekStart = getStartOfWeek(new Date());
-    return weekStart.toDateString() === currentWeekStart.toDateString();
-  };
-
   const formatWeekRange = () => {
     const endOfWeek = new Date(weekStart);
     endOfWeek.setDate(weekStart.getDate() + 6);
@@ -92,22 +87,14 @@ export function WeeklyView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div />
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="text-lg font-semibold min-w-fit">{formatWeekRange()}</h2>
-          <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        {!isCurrentWeek() && (
-          <Button onClick={goToCurrentWeek}>
-            Go to current week
-          </Button>
-        )}
+      <div className="flex items-center justify-center gap-1">
+        <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-lg font-semibold min-w-fit">{formatWeekRange()}</h2>
+        <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
       <div className="flex flex-col gap-6">
