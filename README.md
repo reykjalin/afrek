@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Afrek
 
-## Getting Started
+A task management app that helps you turn your backlog into accomplishments.
 
-First, run the development server:
+*Afrek (Icelandic): feat, accomplishment, achievement.*
+
+## Overview
+
+Afrek is a weekly task planner with rich markdown notes. Schedule tasks to specific days, keep a backlog for later, and add detailed notes to each task with a WYSIWYG editor.
+
+**Key features:**
+- Weekly view with Monday–Sunday layout
+- Expandable tasks with markdown notes
+- Tags, search, and filtering
+- Backlog for unscheduled work
+- $3/month or $30/year subscription
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16, React 19 |
+| Styling | Tailwind 4, Shadcn/Base UI |
+| Auth & Billing | Clerk |
+| Database | Convex |
+| Editor | @uiw/react-md-editor |
+
+## Development
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) (or Node.js 20+)
+- [Convex CLI](https://docs.convex.dev/getting-started)
+- Clerk account
+- Stripe account (for billing)
+
+### Setup
+
+1. Clone the repository
+
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+
+3. Copy environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Configure `.env.local` with your Clerk and Convex keys
+
+5. Start the Convex dev server (in a separate terminal):
+   ```bash
+   npx convex dev
+   ```
+
+6. Start the Next.js dev server:
+   ```bash
+   bun run dev
+   ```
+
+7. Open [http://localhost:3000](http://localhost:3000)
+
+### Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun run dev       # Start Next.js dev server
+bun run build     # Production build
+bun run lint      # Run ESLint
+npx convex dev    # Start Convex dev server
+npx convex deploy # Deploy Convex to production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/              # Next.js pages and routes
+components/       # React components
+features/         # Feature modules (hooks, API wrappers, types)
+lib/              # Utilities
+convex/           # Convex backend (schema, functions)
+docs/             # Documentation
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentation
 
-## Learn More
+- [docs/PLAN.md](docs/PLAN.md) — Implementation plan and phases
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Technical decisions
+- [docs/AI_AGENTS.md](docs/AI_AGENTS.md) — Guidelines for AI agents
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is developed primarily by AI agents. See [docs/AI_AGENTS.md](docs/AI_AGENTS.md) for conventions and guidelines.
