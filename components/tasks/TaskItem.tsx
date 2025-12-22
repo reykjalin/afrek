@@ -169,7 +169,7 @@ export function TaskItem({
             {task.priority}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
-            {(["Lowest", "Low", "Normal", "Medium", "High", "Highest"] as TaskPriority[]).map((priority) => (
+            {(["Highest", "High", "Medium", "Normal", "Low", "Lowest"] as TaskPriority[]).map((priority) => (
               <DropdownMenuItem
                 key={priority}
                 onClick={(e) => {
