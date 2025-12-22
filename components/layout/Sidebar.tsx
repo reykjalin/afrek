@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckSquare, Settings } from "lucide-react";
+import { CheckSquare, Settings, Archive, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
+  { href: "/backlog", label: "Backlog", icon: Archive },
+  { href: "/completed", label: "Completed", icon: CheckCircle2 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

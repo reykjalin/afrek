@@ -6,19 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { TaskFilters, WeeklyView } from "@/components/tasks";
+import { TaskFilters, BacklogView } from "@/components/tasks";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
-import { getStartOfWeek, getTodayString } from "@/lib/date";
 
-const today = getTodayString();
-
-export default function TasksPage() {
+export default function BacklogPage() {
   const { search, setSearch, selectedTags, setSelectedTags, statusFilter, setStatusFilter, handleTagToggle } = useTaskFilter();
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
-  const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [showNewTask, setShowNewTask] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -145,8 +141,7 @@ export default function TasksPage() {
       title: newTaskTitle.trim(),
       notesMarkdown: "",
       tags: [],
-      status: "scheduled" as const,
-      scheduledDate: today,
+      status: "backlog" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       userId: "demo",
@@ -159,11 +154,9 @@ export default function TasksPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
-      {/* Weekly view */}
-      <WeeklyView
+      {/* Backlog view */}
+      <BacklogView
         tasks={filteredTasks}
-        weekStart={weekStart}
-        onWeekChange={setWeekStart}
         onToggleDone={handleToggleDone}
         onUpdateTitle={handleUpdateTitle}
         onUpdateNotes={handleUpdateNotes}

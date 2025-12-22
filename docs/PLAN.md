@@ -88,7 +88,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 1: Static UI with Local State
+### Phase 1: Static UI with Local State ✅ Completed
 **Time estimate:** 1–3 hours
 
 **Goal:** Build complete UI with mock data and useState, no backend.

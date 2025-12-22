@@ -7,6 +7,7 @@ export interface Task {
   tags: string[];
   status: TaskStatus;
   scheduledDate?: string; // ISO date string (YYYY-MM-DD)
+  completedAt?: number; // timestamp when task was marked as done
   createdAt: number;
   updatedAt: number;
   userId: string;

@@ -1,24 +1,20 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Plus, Search, Sliders } from "lucide-react";
+import { Search, Sliders } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { TaskFilters, WeeklyView } from "@/components/tasks";
+import { TaskFilters } from "@/components/tasks";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
-import { getStartOfWeek, getTodayString } from "@/lib/date";
 
-const today = getTodayString();
-
-export default function TasksPage() {
+export default function CompletedPage() {
   const { search, setSearch, selectedTags, setSelectedTags, statusFilter, setStatusFilter, handleTagToggle } = useTaskFilter();
-  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
+  const { tasks, updateTask, deleteTask } = useTaskState();
   const { setLeftContent } = useTopNavActions();
-  const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [showNewTask, setShowNewTask] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -30,34 +26,25 @@ export default function TasksPage() {
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      if (search && !task.title.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
-      if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
-        return false;
-      }
-      if (statusFilter !== "all" && task.status !== statusFilter) {
-        return false;
-      }
-      return true;
-    });
-  }, [tasks, search, selectedTags, statusFilter]);
+    return tasks
+      .filter((task) => task.status === "done")
+      .filter((task) => {
+        if (search && !task.title.toLowerCase().includes(search.toLowerCase())) {
+          return false;
+        }
+        if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
+          return false;
+        }
+        return true;
+      });
+  }, [tasks, search, selectedTags]);
 
-  const hasActiveFilters = !!search || selectedTags.length > 0 || statusFilter !== "all";
+  const hasActiveFilters = !!search || selectedTags.length > 0;
 
   // Set top nav content
   useEffect(() => {
     setLeftContent(
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowNewTask(true)}
-          title="Press N to create task"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -72,7 +59,6 @@ export default function TasksPage() {
               onClick={() => {
                 setSearch("");
                 setSelectedTags([]);
-                setStatusFilter("all");
               }}
               className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >
@@ -83,7 +69,6 @@ export default function TasksPage() {
               <div className="text-xs space-y-1">
                 {search && <div>Search: {search}</div>}
                 {selectedTags.length > 0 && <div>Tags: {selectedTags.join(", ")}</div>}
-                {statusFilter !== "all" && <div>Status: {statusFilter}</div>}
               </div>
             </TooltipContent>
           </Tooltip>
@@ -92,16 +77,11 @@ export default function TasksPage() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, statusFilter, setSearch, setSelectedTags, setStatusFilter]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // N key for new task
-      if (e.key === "n" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
-        e.preventDefault();
-        setShowNewTask(true);
-      }
       // / key for search/filters
       if (e.key === "/" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
         e.preventDefault();
@@ -118,84 +98,84 @@ export default function TasksPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showNewTask, showFilters]);
 
-  const handleToggleDone = (id: string) => toggleTaskDone(id);
+  const handleToggleDone = (id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    if (task) {
+      updateTask(id, {
+        status: task.scheduledDate ? "scheduled" : "backlog",
+      });
+    }
+  };
 
   const handleUpdateTitle = (id: string, title: string) => {
     updateTask(id, { title });
   };
 
-  const handleUpdateNotes = (id: string, notesMarkdown: string) => {
-    updateTask(id, { notesMarkdown });
-  };
-
-  const handleSchedule = (id: string, date: string | null) => {
-    updateTask(id, {
-      scheduledDate: date ?? undefined,
-      status: date ? "scheduled" : "backlog",
-    });
-  };
-
   const handleDelete = (id: string) => deleteTask(id);
 
-  const handleAddTask = () => {
-    if (!newTaskTitle.trim()) return;
-
-    const newTask = {
-      id: crypto.randomUUID(),
-      title: newTaskTitle.trim(),
-      notesMarkdown: "",
-      tags: [],
-      status: "scheduled" as const,
-      scheduledDate: today,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      userId: "demo",
-    };
-
-    addTask(newTask);
-    setNewTaskTitle("");
-    setShowNewTask(false);
-  };
-
   return (
-    <div className="flex flex-col gap-6 p-6 h-full">
-      {/* Weekly view */}
-      <WeeklyView
-        tasks={filteredTasks}
-        weekStart={weekStart}
-        onWeekChange={setWeekStart}
-        onToggleDone={handleToggleDone}
-        onUpdateTitle={handleUpdateTitle}
-        onUpdateNotes={handleUpdateNotes}
-        onSchedule={handleSchedule}
-        onDelete={handleDelete}
-      />
-
-      {/* New task modal */}
-      <Dialog open={showNewTask} onOpenChange={setShowNewTask}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New Task</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <Input
-              placeholder="Task title..."
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddTask();
-              }}
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowNewTask(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddTask}>Create</Button>
-            </div>
+    <div className="flex flex-col gap-6 p-6">
+      {/* Completed tasks list */}
+      <div className="flex flex-col gap-2">
+        {filteredTasks.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No completed tasks</p>
           </div>
-        </DialogContent>
-      </Dialog>
+        ) : (
+          filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              className="flex items-start gap-3 rounded-md border p-3 hover:bg-muted/50 transition-colors group"
+            >
+              <button
+                onClick={() => handleToggleDone(task.id)}
+                className="mt-1 flex-shrink-0 h-5 w-5 rounded border-2 border-green-600 bg-green-600 flex items-center justify-center"
+                title="Mark as incomplete"
+              >
+                <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+              <div className="flex-1 min-w-0">
+                <div
+                  className="text-sm line-through text-muted-foreground cursor-pointer hover:text-foreground"
+                  onClick={() => handleToggleDone(task.id)}
+                >
+                  {task.title}
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">
+                    {task.completedAt
+                      ? new Date(task.completedAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : ""}
+                  </span>
+                </div>
+                {task.tags.length > 0 && (
+                  <div className="flex gap-1 mt-2 flex-wrap">
+                    {task.tags.map((tag) => (
+                      <span key={tag} className="text-xs bg-muted px-2 py-1 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => handleDelete(task.id)}
+                className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                title="Delete task"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Search and filters modal */}
       <Dialog open={showFilters} onOpenChange={setShowFilters}>
