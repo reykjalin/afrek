@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { toISODateString } from "@/lib/date";
 import type { Task } from "./types";
 
 interface TaskStateContextType {
@@ -13,6 +14,30 @@ interface TaskStateContextType {
 
 const TaskStateContext = createContext<TaskStateContextType | undefined>(undefined);
 
+function getTodayAndOtherDates() {
+  const now = new Date();
+  const today = toISODateString(now);
+  
+  // Calculate other dates by manipulating Date in local time
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const dayAfterTomorrow = new Date(now);
+  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+  
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  return {
+    today: toISODateString(now),
+    tomorrow: toISODateString(tomorrow),
+    dayAfterTomorrow: toISODateString(dayAfterTomorrow),
+    yesterday: toISODateString(yesterday),
+  };
+}
+
+const dates = getTodayAndOtherDates();
+
 const mockTasks: Task[] = [
   {
     id: "1",
@@ -20,7 +45,7 @@ const mockTasks: Task[] = [
     notesMarkdown: "Check the budget section and timeline",
     tags: ["work", "urgent"],
     status: "scheduled",
-    scheduledDate: new Date().toISOString().split('T')[0],
+    scheduledDate: dates.today,
     createdAt: Date.now() - 86400000,
     updatedAt: Date.now(),
     userId: "demo",
@@ -31,7 +56,7 @@ const mockTasks: Task[] = [
     notesMarkdown: "- Milk\n- Eggs\n- Bread",
     tags: ["personal"],
     status: "scheduled",
-    scheduledDate: new Date().toISOString().split('T')[0],
+    scheduledDate: dates.tomorrow,
     createdAt: Date.now() - 172800000,
     updatedAt: Date.now(),
     userId: "demo",
@@ -42,6 +67,7 @@ const mockTasks: Task[] = [
     notesMarkdown: "",
     tags: ["personal", "health"],
     status: "scheduled",
+    scheduledDate: dates.dayAfterTomorrow,
     createdAt: Date.now() - 259200000,
     updatedAt: Date.now(),
     userId: "demo",
@@ -72,7 +98,7 @@ const mockTasks: Task[] = [
     notesMarkdown: "The Design of Everyday Things",
     tags: ["reading"],
     status: "done",
-    scheduledDate: new Date().toISOString().split('T')[0],
+    scheduledDate: dates.yesterday,
     completedAt: Date.now() - 86400000,
     createdAt: Date.now() - 518400000,
     updatedAt: Date.now(),

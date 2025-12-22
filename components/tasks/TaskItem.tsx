@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { Check, ChevronDown, ChevronRight, Calendar } from "lucide-react";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { TaskItemExpanded } from "./TaskItemExpanded";
+import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
+import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
 
 interface TaskItemProps {
@@ -29,6 +34,8 @@ export function TaskItem({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(task.title);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const { handleTagToggle, selectedTags } = useTaskFilter();
 
   const isDone = task.status === "done";
 
@@ -43,7 +50,7 @@ export function TaskItem({
 
   const formatScheduledDate = (date?: string) => {
     if (!date) return "Backlog";
-    const d = new Date(date);
+    const d = parseDateString(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -63,29 +70,30 @@ export function TaskItem({
     });
   };
 
+  const toggleExpanded = () => setIsExpanded(!isExpanded);
+
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card transition-colors",
+        "rounded-lg border bg-card transition-colors cursor-pointer hover:bg-muted/50",
         isDone && "opacity-60"
       )}
+      onClick={toggleExpanded}
     >
       <div className="flex items-center gap-2 p-3">
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="shrink-0"
-        >
+        <div className="shrink-0">
           {isExpanded ? (
             <ChevronDown className="h-4 w-4" />
           ) : (
             <ChevronRight className="h-4 w-4" />
           )}
-        </Button>
+        </div>
 
         <button
-          onClick={() => onToggleDone(task.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleDone(task.id);
+          }}
           className={cn(
             "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
             isDone
@@ -108,14 +116,18 @@ export function TaskItem({
                 setIsEditingTitle(false);
               }
             }}
-            className="h-7 flex-1"
+            onClick={(e) => e.stopPropagation()}
+            className="h-7 min-w-0"
             autoFocus
           />
         ) : (
           <span
-            onClick={() => setIsEditingTitle(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditingTitle(true);
+            }}
             className={cn(
-              "flex-1 cursor-text truncate",
+              "cursor-text break-words",
               isDone && "line-through"
             )}
           >
@@ -123,18 +135,61 @@ export function TaskItem({
           </span>
         )}
 
+        <div className="flex-1" onClick={toggleExpanded} />
+
         <div className="flex items-center gap-1.5">
           {task.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
+            <Badge
+              key={tag}
+              variant={selectedTags.includes(tag) ? "default" : "secondary"}
+              className="text-xs cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTagToggle(tag);
+              }}
+            >
               {tag}
             </Badge>
           ))}
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Calendar className="h-3 w-3" />
-          {isDone ? formatCompletedDate(task.completedAt) : formatScheduledDate(task.scheduledDate)}
-        </div>
+        {isDone ? (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
+            {formatCompletedDate(task.completedAt)}
+          </div>
+        ) : (
+          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+            <PopoverTrigger
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer whitespace-nowrap"
+            >
+              <Calendar className="h-4 w-4" />
+              {task.scheduledDate
+                ? format(parseDateString(task.scheduledDate), "MMM d")
+                : "Backlog"}
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <CalendarComponent
+                mode="single"
+                selected={
+                  task.scheduledDate ? parseDateString(task.scheduledDate) : undefined
+                }
+                onSelect={(date) => {
+                  if (date) {
+                    // Ensure we're using local date values, not UTC
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const day = String(date.getDate()).padStart(2, "0");
+                    const dateString = `${year}-${month}-${day}`;
+                    onSchedule(task.id, dateString);
+                    setIsDatePickerOpen(false);
+                  }
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
 
       {isExpanded && (
@@ -143,6 +198,7 @@ export function TaskItem({
           onUpdateNotes={onUpdateNotes}
           onSchedule={onSchedule}
           onDelete={onDelete}
+          onToggleExpand={toggleExpanded}
         />
       )}
     </div>

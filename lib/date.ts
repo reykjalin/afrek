@@ -43,10 +43,13 @@ export function toISODateString(date: Date): string {
 }
 
 /**
- * Parse an ISO date string to a Date object.
+ * Parse an ISO date string (YYYY-MM-DD) to a Date object in local time.
+ * This ensures the date is interpreted as midnight in the user's local timezone,
+ * not UTC.
  */
 export function parseISODate(dateString: string): Date {
-  return new Date(dateString + "T00:00:00");
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /**
@@ -88,4 +91,13 @@ export function getTomorrowString(): string {
   const d = new Date();
   d.setDate(d.getDate() + 1);
   return toISODateString(d);
+}
+
+/**
+ * Parse ISO date string (YYYY-MM-DD) safely without timezone issues.
+ * This is a helper for parsing dates that ensures we work in local time.
+ */
+export function parseDateString(dateString: string): Date {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }

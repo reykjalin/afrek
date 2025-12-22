@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Trash2, Calendar, ArrowRight, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { toISODateString } from "@/lib/date";
+import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
 
 interface TaskItemExpandedProps {
@@ -12,6 +12,7 @@ interface TaskItemExpandedProps {
   onUpdateNotes: (id: string, notes: string) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
+  onToggleExpand?: () => void;
 }
 
 export function TaskItemExpanded({
@@ -19,6 +20,7 @@ export function TaskItemExpanded({
   onUpdateNotes,
   onSchedule,
   onDelete,
+  onToggleExpand,
 }: TaskItemExpandedProps) {
   const [notes, setNotes] = useState(task.notesMarkdown);
 
@@ -34,16 +36,38 @@ export function TaskItemExpanded({
     return toISODateString(date);
   };
 
-  const getEndOfWeekDate = () => {
-    const date = new Date();
+  const getNextDayDate = () => {
+    if (task.scheduledDate) {
+      // If already scheduled, add 1 day to the scheduled date
+      const currentDate = parseDateString(task.scheduledDate);
+      currentDate.setDate(currentDate.getDate() + 1);
+      return toISODateString(currentDate);
+    } else {
+      // If backlog, schedule for tomorrow
+      return getDateString(1);
+    }
+  };
+
+  const getNextWeekMondayDate = () => {
+    // Start from the current scheduled date, or today if backlog
+    const startDate = task.scheduledDate
+      ? parseDateString(task.scheduledDate)
+      : new Date();
+    
+    const date = new Date(startDate);
     const dayOfWeek = date.getDay();
-    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-    date.setDate(date.getDate() + daysUntilSunday);
+    
+    // Calculate days until next Monday from the start date
+    // If today is Sunday (0), next Monday is 1 day away
+    // If today is Monday (1), next Monday is 7 days away
+    // Otherwise it's (8 - dayOfWeek) days away
+    const daysUntilNextMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 7 : 8 - dayOfWeek;
+    date.setDate(date.getDate() + daysUntilNextMonday);
     return toISODateString(date);
   };
 
   return (
-    <div className="border-t px-3 pb-3 pt-2">
+    <div className="border-t px-3 pb-3 pt-2" onClick={(e) => e.stopPropagation()}>
       <Textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
@@ -67,18 +91,18 @@ export function TaskItemExpanded({
         <Button
           variant="outline"
           size="xs"
-          onClick={() => onSchedule(task.id, getDateString(1))}
+          onClick={() => onSchedule(task.id, getNextDayDate())}
         >
           <ArrowRight className="h-3 w-3" />
-          Tomorrow
+          Next day
         </Button>
         <Button
           variant="outline"
           size="xs"
-          onClick={() => onSchedule(task.id, getEndOfWeekDate())}
+          onClick={() => onSchedule(task.id, getNextWeekMondayDate())}
         >
           <Calendar className="h-3 w-3" />
-          This Week
+          Next week
         </Button>
         <Button
           variant="outline"
