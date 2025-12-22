@@ -29,14 +29,14 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 0: Repository Structure & Conventions
+### Phase 0: Repository Structure & Conventions ✅ Completed
 **Time estimate:** <1 hour
 
 **Goal:** Establish folder structure and conventions so AI agents work consistently.
 
 #### Deliverables
 
-1. Create folder structure:
+1. [x] Create folder structure:
    ```
    app/
      (marketing)/
@@ -75,16 +75,16 @@ Each phase produces a working, testable product.
      AI_AGENTS.md            # Instructions for AI agents
    ```
 
-2. Create documentation files:
+2. [x] Create documentation files:
    - `docs/ARCHITECTURE.md` - Stack overview, conventions
    - `docs/AI_AGENTS.md` - How agents should extend the codebase
    - `AGENTS.md` (root) - Quick reference for build/lint commands
 
-3. Create `.env.example` with placeholders for Clerk and Convex keys
+3. [x] Create `.env.example` with placeholders for Clerk and Convex keys
 
 #### Testing
-- `bun run build` succeeds
-- `bun run dev` shows landing page shell
+- [x] `bun run build` succeeds
+- [x] `bun run dev` shows landing page shell
 
 ---
 

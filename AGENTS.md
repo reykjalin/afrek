@@ -51,4 +51,6 @@ docs/                 # Documentation
 
 ## Current Phase
 
-Check `docs/PLAN.md` for current implementation phase.
+**Phase 1: Static UI with Local State** — Build the complete UI with mock data and useState.
+
+See `docs/PLAN.md` for full details.
