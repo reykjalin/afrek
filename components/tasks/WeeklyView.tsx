@@ -69,6 +69,11 @@ export function WeeklyView({
     onWeekChange(getStartOfWeek(new Date()));
   };
 
+  const isCurrentWeek = () => {
+    const currentWeekStart = getStartOfWeek(new Date());
+    return weekStart.toDateString() === currentWeekStart.toDateString();
+  };
+
   const formatWeekRange = () => {
     const endOfWeek = new Date(weekStart);
     endOfWeek.setDate(weekStart.getDate() + 6);
@@ -95,7 +100,10 @@ export function WeeklyView({
           <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <Button onClick={goToCurrentWeek}>
+          <Button 
+            variant={isCurrentWeek() ? "outline" : "default"}
+            onClick={goToCurrentWeek}
+          >
             Current week
           </Button>
         </div>
