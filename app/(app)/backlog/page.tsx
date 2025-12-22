@@ -10,6 +10,7 @@ import { TaskFilters, BacklogView } from "@/components/tasks";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import type { TaskPriority } from "@/features/tasks/types";
 
 export default function BacklogPage() {
   const { search, setSearch, selectedTags, setSelectedTags, statusFilter, setStatusFilter, handleTagToggle } = useTaskFilter();
@@ -133,6 +134,10 @@ export default function BacklogPage() {
 
   const handleDelete = (id: string) => deleteTask(id);
 
+  const handleUpdatePriority = (id: string, priority: TaskPriority) => {
+    updateTask(id, { priority });
+  };
+
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
 
@@ -142,6 +147,7 @@ export default function BacklogPage() {
       notesMarkdown: "",
       tags: [],
       status: "backlog" as const,
+      priority: "Normal" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       userId: "demo",
@@ -162,6 +168,7 @@ export default function BacklogPage() {
         onUpdateNotes={handleUpdateNotes}
         onSchedule={handleSchedule}
         onDelete={handleDelete}
+        onUpdatePriority={handleUpdatePriority}
       />
 
       {/* New task modal */}

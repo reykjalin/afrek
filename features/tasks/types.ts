@@ -1,4 +1,5 @@
 export type TaskStatus = "backlog" | "scheduled" | "done";
+export type TaskPriority = "Lowest" | "Low" | "Normal" | "Medium" | "High" | "Highest";
 
 export interface Task {
   id: string;
@@ -6,6 +7,7 @@ export interface Task {
   notesMarkdown: string;
   tags: string[];
   status: TaskStatus;
+  priority: TaskPriority;
   scheduledDate?: string; // ISO date string (YYYY-MM-DD)
   completedAt?: number; // timestamp when task was marked as done
   createdAt: number;
@@ -17,6 +19,7 @@ export interface CreateTaskInput {
   title: string;
   tags?: string[];
   scheduledDate?: string;
+  priority?: TaskPriority;
 }
 
 export interface UpdateTaskInput {
@@ -25,6 +28,7 @@ export interface UpdateTaskInput {
   notesMarkdown?: string;
   tags?: string[];
   status?: TaskStatus;
+  priority?: TaskPriority;
   scheduledDate?: string | null;
 }
 

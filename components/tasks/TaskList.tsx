@@ -1,7 +1,7 @@
 "use client";
 
 import { TaskItem } from "./TaskItem";
-import type { Task } from "@/features/tasks/types";
+import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface TaskListProps {
   tasks: Task[];
@@ -10,6 +10,7 @@ interface TaskListProps {
   onUpdateNotes: (id: string, notes: string) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
+  onUpdatePriority: (id: string, priority: TaskPriority) => void;
   emptyMessage?: string;
 }
 
@@ -20,6 +21,7 @@ export function TaskList({
   onUpdateNotes,
   onSchedule,
   onDelete,
+  onUpdatePriority,
   emptyMessage = "No tasks",
 }: TaskListProps) {
   if (tasks.length === 0) {
@@ -41,6 +43,7 @@ export function TaskList({
           onUpdateNotes={onUpdateNotes}
           onSchedule={onSchedule}
           onDelete={onDelete}
+          onUpdatePriority={onUpdatePriority}
         />
       ))}
     </div>

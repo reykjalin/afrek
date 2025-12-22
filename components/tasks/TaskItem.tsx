@@ -9,10 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { TaskItemExpanded } from "./TaskItemExpanded";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { toISODateString, parseDateString } from "@/lib/date";
-import type { Task } from "@/features/tasks/types";
+import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface TaskItemProps {
   task: Task;
@@ -21,6 +27,7 @@ interface TaskItemProps {
   onUpdateNotes: (id: string, notes: string) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
+  onUpdatePriority: (id: string, priority: TaskPriority) => void;
 }
 
 export function TaskItem({
@@ -30,6 +37,7 @@ export function TaskItem({
   onUpdateNotes,
   onSchedule,
   onDelete,
+  onUpdatePriority,
 }: TaskItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -152,6 +160,29 @@ export function TaskItem({
             </Badge>
           ))}
         </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+          >
+            {task.priority}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            {(["Lowest", "Low", "Normal", "Medium", "High", "Highest"] as TaskPriority[]).map((priority) => (
+              <DropdownMenuItem
+                key={priority}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdatePriority(task.id, priority);
+                }}
+                className="cursor-pointer"
+              >
+                {priority}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {isDone ? (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">

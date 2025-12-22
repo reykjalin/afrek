@@ -2,7 +2,7 @@
 
 import { Inbox } from "lucide-react";
 import { TaskList } from "./TaskList";
-import type { Task } from "@/features/tasks/types";
+import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface BacklogViewProps {
   tasks: Task[];
@@ -11,6 +11,7 @@ interface BacklogViewProps {
   onUpdateNotes: (id: string, notes: string) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
+  onUpdatePriority: (id: string, priority: TaskPriority) => void;
 }
 
 export function BacklogView({
@@ -20,6 +21,7 @@ export function BacklogView({
   onUpdateNotes,
   onSchedule,
   onDelete,
+  onUpdatePriority,
 }: BacklogViewProps) {
   const backlogTasks = tasks.filter((task) => task.status === "backlog");
 
@@ -40,6 +42,7 @@ export function BacklogView({
         onUpdateNotes={onUpdateNotes}
         onSchedule={onSchedule}
         onDelete={onDelete}
+        onUpdatePriority={onUpdatePriority}
         emptyMessage="No tasks in backlog. Add tasks or move scheduled tasks here."
       />
     </div>

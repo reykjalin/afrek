@@ -11,6 +11,7 @@ import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { getStartOfWeek, getTodayString } from "@/lib/date";
+import type { TaskPriority } from "@/features/tasks/types";
 
 const today = getTodayString();
 
@@ -137,6 +138,10 @@ export default function TasksPage() {
 
   const handleDelete = (id: string) => deleteTask(id);
 
+  const handleUpdatePriority = (id: string, priority: TaskPriority) => {
+    updateTask(id, { priority });
+  };
+
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
 
@@ -146,6 +151,7 @@ export default function TasksPage() {
       notesMarkdown: "",
       tags: [],
       status: "scheduled" as const,
+      priority: "Normal" as const,
       scheduledDate: today,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -169,6 +175,7 @@ export default function TasksPage() {
         onUpdateNotes={handleUpdateNotes}
         onSchedule={handleSchedule}
         onDelete={handleDelete}
+        onUpdatePriority={handleUpdatePriority}
       />
 
       {/* New task modal */}

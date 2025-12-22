@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TaskList } from "./TaskList";
 import { cn } from "@/lib/utils";
 import { toISODateString, getStartOfWeek, getTodayString } from "@/lib/date";
-import type { Task } from "@/features/tasks/types";
+import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface WeeklyViewProps {
   tasks: Task[];
@@ -16,6 +16,7 @@ interface WeeklyViewProps {
   onUpdateNotes: (id: string, notes: string) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
+  onUpdatePriority: (id: string, priority: TaskPriority) => void;
 }
 
 function getWeekDays(startMonday: Date): { label: string; date: string; isToday: boolean }[] {
@@ -48,6 +49,7 @@ export function WeeklyView({
   onUpdateNotes,
   onSchedule,
   onDelete,
+  onUpdatePriority,
 }: WeeklyViewProps) {
   const weekDays = getWeekDays(weekStart);
 
@@ -121,6 +123,7 @@ export function WeeklyView({
                   onUpdateNotes={onUpdateNotes}
                   onSchedule={onSchedule}
                   onDelete={onDelete}
+                  onUpdatePriority={onUpdatePriority}
                 />
               ) : (
                 <p className="text-sm text-muted-foreground/50 italic">No tasks</p>
