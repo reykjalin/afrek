@@ -81,9 +81,9 @@ export function WeeklyView({
     const endMonth = endOfWeek.toLocaleDateString("en-US", { month: "short" });
 
     if (startMonth === endMonth) {
-      return `${startMonth} ${weekStart.getDate()} - ${endOfWeek.getDate()}, ${weekStart.getFullYear()}`;
+      return `${startMonth} ${weekStart.getDate()} - ${endOfWeek.getDate()}`;
     }
-    return `${startMonth} ${weekStart.getDate()} - ${endMonth} ${endOfWeek.getDate()}, ${weekStart.getFullYear()}`;
+    return `${startMonth} ${weekStart.getDate()} - ${endMonth} ${endOfWeek.getDate()}`;
   };
 
   const getTasksForDay = (date: string) => {
@@ -92,22 +92,22 @@ export function WeeklyView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          {!isCurrentWeek() && (
-            <Button onClick={goToCurrentWeek}>
-              Go to current week
-            </Button>
-          )}
-        </div>
-        <h2 className="text-lg font-semibold">{formatWeekRange()}</h2>
+      <div className="flex items-center justify-center gap-4">
+        <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-lg font-semibold min-w-fit">{formatWeekRange()}</h2>
+        <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
+      {!isCurrentWeek() && (
+        <div className="flex justify-center">
+          <Button onClick={goToCurrentWeek}>
+            Go to current week
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
         {weekDays.map(({ label, date, isToday }) => {
