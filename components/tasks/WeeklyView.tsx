@@ -83,7 +83,7 @@ export function WeeklyView({
            <ChevronLeft className="h-4 w-4" />
          </Button>
          <Tooltip>
-           <TooltipTrigger asChild>
+           <TooltipTrigger>
              <h2 className="text-lg font-semibold w-[160px] text-center">
                Week {getWeekNumber(weekStart)}
              </h2>

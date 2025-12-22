@@ -174,8 +174,9 @@ export default function TasksPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
-      {/* Weekly view */}
-      <WeeklyView
+      <div className="mx-auto w-full max-w-4xl">
+        {/* Weekly view */}
+        <WeeklyView
         tasks={filteredTasks}
         weekStart={weekStart}
         onWeekChange={setWeekStart}
@@ -185,9 +186,10 @@ export default function TasksPage() {
         onSchedule={handleSchedule}
         onDelete={handleDelete}
         onUpdatePriority={handleUpdatePriority}
-      />
+        />
+        </div>
 
-      {/* New task modal */}
+        {/* New task modal */}
       <Dialog open={showNewTask} onOpenChange={setShowNewTask}>
         <DialogContent>
           <DialogHeader>
