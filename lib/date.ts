@@ -101,3 +101,31 @@ export function parseDateString(dateString: string): Date {
   const [year, month, day] = dateString.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
+
+/**
+ * Get the week number for a given date (1-53).
+ * Week 1 is the week containing January 1st.
+ */
+export function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const weekNum = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return weekNum;
+}
+
+/**
+ * Format week range as date string (e.g., "Jan 20 - Jan 26").
+ */
+export function formatWeekRange(startMonday: Date): string {
+  const endOfWeek = new Date(startMonday);
+  endOfWeek.setDate(startMonday.getDate() + 6);
+  const startMonth = startMonday.toLocaleDateString("en-US", { month: "short" });
+  const endMonth = endOfWeek.toLocaleDateString("en-US", { month: "short" });
+
+  if (startMonth === endMonth) {
+    return `${startMonth} ${startMonday.getDate()} - ${endOfWeek.getDate()}`;
+  }
+  return `${startMonth} ${startMonday.getDate()} - ${endMonth} ${endOfWeek.getDate()}`;
+}

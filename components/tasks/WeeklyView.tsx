@@ -2,9 +2,10 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TaskList } from "./TaskList";
 import { cn } from "@/lib/utils";
-import { toISODateString, getStartOfWeek, getTodayString } from "@/lib/date";
+import { toISODateString, getStartOfWeek, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface WeeklyViewProps {
@@ -69,17 +70,7 @@ export function WeeklyView({
     onWeekChange(getStartOfWeek(new Date()));
   };
 
-  const formatWeekRange = () => {
-    const endOfWeek = new Date(weekStart);
-    endOfWeek.setDate(weekStart.getDate() + 6);
-    const startMonth = weekStart.toLocaleDateString("en-US", { month: "short" });
-    const endMonth = endOfWeek.toLocaleDateString("en-US", { month: "short" });
 
-    if (startMonth === endMonth) {
-      return `${startMonth} ${weekStart.getDate()} - ${endOfWeek.getDate()}`;
-    }
-    return `${startMonth} ${weekStart.getDate()} - ${endMonth} ${endOfWeek.getDate()}`;
-  };
 
   const getTasksForDay = (date: string) => {
     return tasks.filter((task) => task.scheduledDate === date);
@@ -88,14 +79,21 @@ export function WeeklyView({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-center gap-1">
-        <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <h2 className="text-lg font-semibold w-[160px] text-center">{formatWeekRange()}</h2>
-        <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+         <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
+           <ChevronLeft className="h-4 w-4" />
+         </Button>
+         <Tooltip>
+           <TooltipTrigger asChild>
+             <h2 className="text-lg font-semibold w-[160px] text-center">
+               Week {getWeekNumber(weekStart)}
+             </h2>
+           </TooltipTrigger>
+           <TooltipContent>{formatWeekRange(weekStart)}</TooltipContent>
+         </Tooltip>
+         <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
+           <ChevronRight className="h-4 w-4" />
+         </Button>
+       </div>
 
       <div className="flex flex-col gap-6">
         {weekDays.map(({ label, date, isToday }) => {
