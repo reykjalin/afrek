@@ -100,12 +100,11 @@ export function WeeklyView({
           <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <Button 
-            variant={isCurrentWeek() ? "outline" : "default"}
-            onClick={goToCurrentWeek}
-          >
-            Current week
-          </Button>
+          {!isCurrentWeek() && (
+            <Button onClick={goToCurrentWeek}>
+              Go to current week
+            </Button>
+          )}
         </div>
         <h2 className="text-lg font-semibold">{formatWeekRange()}</h2>
       </div>
