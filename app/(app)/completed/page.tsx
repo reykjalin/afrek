@@ -12,7 +12,7 @@ import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 
 export default function CompletedPage() {
-  const { search, setSearch, selectedTags, setSelectedTags, statusFilter, setStatusFilter, handleTagToggle } = useTaskFilter();
+  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle } = useTaskFilter();
   const { tasks, updateTask, deleteTask } = useTaskState();
   const { setLeftContent } = useTopNavActions();
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -197,8 +197,6 @@ export default function CompletedPage() {
             selectedTags={selectedTags}
             onTagToggle={handleTagToggle}
             availableTags={availableTags}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
           />
         </DialogContent>
       </Dialog>

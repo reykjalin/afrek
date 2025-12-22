@@ -13,7 +13,7 @@ import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import type { TaskPriority } from "@/features/tasks/types";
 
 export default function BacklogPage() {
-  const { search, setSearch, selectedTags, setSelectedTags, statusFilter, setStatusFilter, handleTagToggle } = useTaskFilter();
+  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle } = useTaskFilter();
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -34,14 +34,11 @@ export default function BacklogPage() {
       if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
         return false;
       }
-      if (statusFilter !== "all" && task.status !== statusFilter) {
-        return false;
-      }
       return true;
     });
-  }, [tasks, search, selectedTags, statusFilter]);
+  }, [tasks, search, selectedTags]);
 
-  const hasActiveFilters = !!search || selectedTags.length > 0 || statusFilter !== "all";
+  const hasActiveFilters = !!search || selectedTags.length > 0;
 
   // Set top nav content
   useEffect(() => {
@@ -69,7 +66,6 @@ export default function BacklogPage() {
               onClick={() => {
                 setSearch("");
                 setSelectedTags([]);
-                setStatusFilter("all");
               }}
               className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >
@@ -80,7 +76,6 @@ export default function BacklogPage() {
               <div className="text-xs space-y-1">
                 {search && <div>Search: {search}</div>}
                 {selectedTags.length > 0 && <div>Tags: {selectedTags.join(", ")}</div>}
-                {statusFilter !== "all" && <div>Status: {statusFilter}</div>}
               </div>
             </TooltipContent>
           </Tooltip>
@@ -89,7 +84,7 @@ export default function BacklogPage() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, statusFilter, setSearch, setSelectedTags, setStatusFilter]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -217,8 +212,6 @@ export default function BacklogPage() {
             selectedTags={selectedTags}
             onTagToggle={handleTagToggle}
             availableTags={availableTags}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
           />
         </DialogContent>
       </Dialog>

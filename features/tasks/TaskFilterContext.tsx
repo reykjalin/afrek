@@ -1,15 +1,12 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import type { TaskStatus } from "./types";
 
 interface TaskFilterContextType {
   search: string;
   setSearch: (search: string) => void;
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
-  statusFilter: TaskStatus | "all";
-  setStatusFilter: (status: TaskStatus | "all") => void;
   handleTagToggle: (tag: string) => void;
 }
 
@@ -18,7 +15,6 @@ const TaskFilterContext = createContext<TaskFilterContextType | undefined>(undef
 export function TaskFilterProvider({ children }: { children: ReactNode }) {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [statusFilter, setStatusFilter] = useState<TaskStatus | "all">("all");
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
@@ -33,8 +29,6 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
         setSearch,
         selectedTags,
         setSelectedTags,
-        statusFilter,
-        setStatusFilter,
         handleTagToggle,
       }}
     >
