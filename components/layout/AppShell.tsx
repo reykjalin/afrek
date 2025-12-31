@@ -8,7 +8,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Kbd } from "@/components/ui/kbd";
+import { KbdGroup } from "@/components/ui/kbd";
 import { AppSidebar } from "./AppSidebar";
 import { TopNav } from "./TopNav";
 
@@ -27,9 +27,8 @@ export function AppShell({ children }: AppShellProps) {
             <TooltipContent side="bottom">
               <div className="flex items-center gap-2">
                 <span>Toggle sidebar</span>
-                <Kbd>⌘/Ctrl</Kbd>
-                <span className="text-xs text-muted-foreground">+</span>
-                <Kbd>B</Kbd>
+                <KbdGroup>^+B</KbdGroup>
+                <KbdGroup>⌘+B</KbdGroup>
               </div>
             </TooltipContent>
           </Tooltip>
