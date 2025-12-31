@@ -85,6 +85,24 @@ export function TaskItem({ task, onUpdate }: TaskItemProps) {
 }
 ```
 
+### UI Components (shadcn + Base UI)
+
+This project uses **shadcn with Base UI** instead of Radix UI. The key difference is component composition:
+
+```typescript
+// ❌ Don't use asChild (Radix UI pattern)
+<SidebarMenuButton asChild>
+  <Link href="/tasks">Tasks</Link>
+</SidebarMenuButton>
+
+// ✅ Use render prop (Base UI pattern)
+<SidebarMenuButton render={<Link href="/tasks" />}>
+  Tasks
+</SidebarMenuButton>
+```
+
+This applies to all shadcn components that support polymorphism (Sidebar, Button with links, etc.).
+
 ### Convex API Access
 
 ```typescript

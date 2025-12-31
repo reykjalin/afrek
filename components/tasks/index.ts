@@ -3,4 +3,3 @@ export { TaskItem } from "./TaskItem";
 export { TaskItemExpanded } from "./TaskItemExpanded";
 export { TaskList } from "./TaskList";
 export { WeeklyView } from "./WeeklyView";
-export { BacklogView } from "./BacklogView";

@@ -49,6 +49,13 @@ docs/                 # Documentation
 - Keep components small and focused
 - Always require `userId` in Convex functions
 
+## UI Components
+
+This project uses **shadcn with Base UI** (not Radix UI). Key difference:
+
+- Use `render` prop instead of `asChild` for component composition
+- Example: `<SidebarMenuButton render={<Link href="/tasks" />}>` instead of `<SidebarMenuButton asChild><Link>...</Link></SidebarMenuButton>`
+
 ## Current Phase
 
 **Phase 1: Static UI with Local State** — Build the complete UI with mock data and useState.
