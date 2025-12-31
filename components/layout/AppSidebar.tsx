@@ -45,24 +45,11 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={<Link href="/tasks" />}
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Home className="size-4" />
-              </div>
-              <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold">Afrek</span>
-                <span className="text-xs text-muted-foreground">
-                  Task Manager
-                </span>
-              </div>
-            </SidebarMenuButton>
+            <h1 className="text-xl font-semibold">Afrek</h1>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

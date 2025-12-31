@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { TaskFilterProvider } from "@/features/tasks/TaskFilterContext";
 import { TaskStateProvider } from "@/features/tasks/TaskStateContext";
@@ -10,11 +11,13 @@ export default function AppLayout({
 }) {
   return (
     <TaskStateProvider>
-      <TaskFilterProvider>
-        <TopNavActionsProvider>
-          <AppShell>{children}</AppShell>
-        </TopNavActionsProvider>
-      </TaskFilterProvider>
+      <Suspense fallback={null}>
+        <TaskFilterProvider>
+          <TopNavActionsProvider>
+            <AppShell>{children}</AppShell>
+          </TopNavActionsProvider>
+        </TaskFilterProvider>
+      </Suspense>
     </TaskStateProvider>
   );
 }
