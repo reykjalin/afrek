@@ -16,7 +16,7 @@ import type { TaskPriority } from "@/features/tasks/types";
 
 export default function BacklogPage() {
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
-  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle } = useTaskFilter();
+  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { setLeftContent } = useTopNavActions();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskTags, setNewTaskTags] = useState("");
@@ -79,10 +79,7 @@ export default function BacklogPage() {
         {hasActiveFilters && (
           <Tooltip>
             <TooltipTrigger
-              onClick={() => {
-                setSearch("");
-                setSelectedTags([]);
-              }}
+              onClick={() => clearFilters()}
               className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >
               <Sliders className="h-4 w-4" />

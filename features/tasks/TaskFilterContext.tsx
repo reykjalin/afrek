@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface TaskFilterContextType {
@@ -9,9 +16,12 @@ interface TaskFilterContextType {
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
   handleTagToggle: (tag: string) => void;
+  clearFilters: () => void;
 }
 
-const TaskFilterContext = createContext<TaskFilterContextType | undefined>(undefined);
+const TaskFilterContext = createContext<TaskFilterContextType | undefined>(
+  undefined,
+);
 
 export function TaskFilterProvider({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
@@ -30,9 +40,11 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
       if (newSearch) params.set("q", newSearch);
       if (newTags.length > 0) params.set("tags", newTags.join(","));
       const queryString = params.toString();
-      router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+      router.replace(`${pathname}${queryString ? `?${queryString}` : ""}`, {
+        scroll: false,
+      });
     },
-    [router, pathname]
+    [router, pathname],
   );
 
   const setSearch = useCallback(
@@ -40,7 +52,7 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
       setSearchState(newSearch);
       updateUrl(newSearch, selectedTags);
     },
-    [updateUrl, selectedTags]
+    [updateUrl, selectedTags],
   );
 
   const setSelectedTags = useCallback(
@@ -48,7 +60,7 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
       setSelectedTagsState(tags);
       updateUrl(search, tags);
     },
-    [updateUrl, search]
+    [updateUrl, search],
   );
 
   const handleTagToggle = useCallback(
@@ -58,8 +70,14 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
         : [...selectedTags, tag];
       setSelectedTags(newTags);
     },
-    [selectedTags, setSelectedTags]
+    [selectedTags, setSelectedTags],
   );
+
+  const clearFilters = useCallback(() => {
+    setSearchState("");
+    setSelectedTagsState([]);
+    updateUrl("", []);
+  }, [updateUrl]);
 
   useEffect(() => {
     const urlSearch = searchParams.get("q") ?? "";
@@ -72,7 +90,7 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     if (JSON.stringify(urlTagsArray) !== JSON.stringify(selectedTags)) {
       setSelectedTagsState(urlTagsArray);
     }
-  }, [searchParams]);
+  }, [searchParams, search, selectedTags]);
 
   return (
     <TaskFilterContext.Provider
@@ -82,6 +100,7 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
         selectedTags,
         setSelectedTags,
         handleTagToggle,
+        clearFilters,
       }}
     >
       {children}

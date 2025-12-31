@@ -17,7 +17,7 @@ import type { TaskPriority } from "@/features/tasks/types";
 const today = getTodayString();
 
 export default function TasksPage() {
-  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle } = useTaskFilter();
+  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
@@ -90,10 +90,7 @@ export default function TasksPage() {
         {hasActiveFilters && (
           <Tooltip>
             <TooltipTrigger
-              onClick={() => {
-                setSearch("");
-                setSelectedTags([]);
-              }}
+              onClick={() => clearFilters()}
               className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             >
               <Sliders className="h-4 w-4" />
