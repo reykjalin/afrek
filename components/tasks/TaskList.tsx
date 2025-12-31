@@ -15,6 +15,15 @@ interface TaskListProps {
   emptyMessage?: string;
 }
 
+const PRIORITY_ORDER: Record<TaskPriority, number> = {
+  Highest: 0,
+  High: 1,
+  Medium: 2,
+  Normal: 3,
+  Low: 4,
+  Lowest: 5,
+};
+
 export function TaskList({
   tasks,
   onToggleDone,
@@ -34,9 +43,13 @@ export function TaskList({
     );
   }
 
+  const sortedTasks = [...tasks].sort((a, b) => {
+    return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
+  });
+
   return (
     <div className="space-y-2">
-      {tasks.map((task) => (
+      {sortedTasks.map((task) => (
         <TaskItem
           key={task.id}
           task={task}
