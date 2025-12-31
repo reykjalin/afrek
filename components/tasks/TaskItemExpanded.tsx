@@ -113,14 +113,6 @@ export function TaskItemExpanded({
         <Button
           variant="outline"
           size="xs"
-          onClick={() => onSchedule(task.id, getDateString(0))}
-        >
-          <Calendar className="h-3 w-3" />
-          Today
-        </Button>
-        <Button
-          variant="outline"
-          size="xs"
           onClick={() => onSchedule(task.id, getNextDayDate())}
         >
           <ArrowRight className="h-3 w-3" />
