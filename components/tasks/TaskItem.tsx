@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TaskItemExpanded } from "./TaskItemExpanded";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
+import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
@@ -41,11 +42,12 @@ export function TaskItem({
   onDelete,
   onUpdatePriority,
 }: TaskItemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(task.title);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { handleTagToggle, selectedTags } = useTaskFilter();
+  const { expandedTaskIds, toggleTaskExpanded } = useTaskState();
+  const isExpanded = expandedTaskIds.has(task.id);
 
   const isDone = task.status === "done";
 
@@ -80,7 +82,7 @@ export function TaskItem({
     });
   };
 
-  const toggleExpanded = () => setIsExpanded(!isExpanded);
+  const toggleExpanded = () => toggleTaskExpanded(task.id);
 
   return (
     <div

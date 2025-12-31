@@ -10,6 +10,8 @@ interface TaskStateContextType {
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTaskDone: (id: string) => void;
+  expandedTaskIds: Set<string>;
+  toggleTaskExpanded: (id: string) => void;
 }
 
 const TaskStateContext = createContext<TaskStateContextType | undefined>(undefined);
@@ -114,6 +116,7 @@ const mockTasks: Task[] = [
 
 export function TaskStateProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
 
   const addTask = useCallback((task: Task) => {
     setTasks((prev) => [task, ...prev]);
@@ -146,6 +149,18 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const toggleTaskExpanded = useCallback((id: string) => {
+    setExpandedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
   return (
     <TaskStateContext.Provider
       value={{
@@ -154,6 +169,8 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         updateTask,
         deleteTask,
         toggleTaskDone,
+        expandedTaskIds,
+        toggleTaskExpanded,
       }}
     >
       {children}
