@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Trash2, Calendar, ArrowRight, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
@@ -10,6 +11,7 @@ import type { Task } from "@/features/tasks/types";
 interface TaskItemExpandedProps {
   task: Task;
   onUpdateNotes: (id: string, notes: string) => void;
+  onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
   onToggleExpand?: () => void;
@@ -18,15 +20,28 @@ interface TaskItemExpandedProps {
 export function TaskItemExpanded({
   task,
   onUpdateNotes,
+  onUpdateTags,
   onSchedule,
   onDelete,
   onToggleExpand,
 }: TaskItemExpandedProps) {
   const [notes, setNotes] = useState(task.notesMarkdown);
+  const [tags, setTags] = useState(task.tags.join(", "));
 
   const handleNotesBlur = () => {
     if (notes !== task.notesMarkdown) {
       onUpdateNotes(task.id, notes);
+    }
+  };
+
+  const handleTagsBlur = () => {
+    const newTags = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    const oldTags = task.tags;
+    if (JSON.stringify(newTags) !== JSON.stringify(oldTags)) {
+      onUpdateTags(task.id, newTags);
     }
   };
 
@@ -74,6 +89,13 @@ export function TaskItemExpanded({
         onBlur={handleNotesBlur}
         placeholder="Add notes..."
         className="min-h-24 resize-none"
+      />
+      <Input
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        onBlur={handleTagsBlur}
+        placeholder="Tags (comma-separated)..."
+        className="mt-3"
       />
 
       <div className="mt-3 flex flex-wrap items-center gap-2">

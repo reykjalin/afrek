@@ -21,6 +21,7 @@ export default function TasksPage() {
   const { setLeftContent } = useTopNavActions();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskTags, setNewTaskTags] = useState("");
   const [showNewTask, setShowNewTask] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -146,6 +147,10 @@ export default function TasksPage() {
     updateTask(id, { notesMarkdown });
   };
 
+  const handleUpdateTags = (id: string, tags: string[]) => {
+    updateTask(id, { tags });
+  };
+
   const handleSchedule = (id: string, date: string | null) => {
     updateTask(id, {
       scheduledDate: date ?? undefined,
@@ -162,11 +167,16 @@ export default function TasksPage() {
   const handleAddTask = () => {
     if (!newTaskTitle.trim()) return;
 
+    const tags = newTaskTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
     const newTask = {
       id: crypto.randomUUID(),
       title: newTaskTitle.trim(),
       notesMarkdown: "",
-      tags: [],
+      tags,
       status: "scheduled" as const,
       priority: "Normal" as const,
       scheduledDate: today,
@@ -177,6 +187,7 @@ export default function TasksPage() {
 
     addTask(newTask);
     setNewTaskTitle("");
+    setNewTaskTags("");
     setShowNewTask(false);
   };
 
@@ -191,6 +202,7 @@ export default function TasksPage() {
         onToggleDone={handleToggleDone}
         onUpdateTitle={handleUpdateTitle}
         onUpdateNotes={handleUpdateNotes}
+        onUpdateTags={handleUpdateTags}
         onSchedule={handleSchedule}
         onDelete={handleDelete}
         onUpdatePriority={handleUpdatePriority}
@@ -212,6 +224,14 @@ export default function TasksPage() {
                 if (e.key === "Enter") handleAddTask();
               }}
               autoFocus
+            />
+            <Input
+              placeholder="Tags (comma-separated)..."
+              value={newTaskTags}
+              onChange={(e) => setNewTaskTags(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAddTask();
+              }}
             />
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowNewTask(false)}>

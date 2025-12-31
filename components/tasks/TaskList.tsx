@@ -8,6 +8,7 @@ interface TaskListProps {
   onToggleDone: (id: string) => void;
   onUpdateTitle: (id: string, title: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
+  onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
@@ -19,6 +20,7 @@ export function TaskList({
   onToggleDone,
   onUpdateTitle,
   onUpdateNotes,
+  onUpdateTags,
   onSchedule,
   onDelete,
   onUpdatePriority,
@@ -41,6 +43,7 @@ export function TaskList({
           onToggleDone={onToggleDone}
           onUpdateTitle={onUpdateTitle}
           onUpdateNotes={onUpdateNotes}
+          onUpdateTags={onUpdateTags}
           onSchedule={onSchedule}
           onDelete={onDelete}
           onUpdatePriority={onUpdatePriority}
