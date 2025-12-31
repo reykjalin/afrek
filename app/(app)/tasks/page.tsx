@@ -60,27 +60,31 @@ export default function TasksPage() {
     setLeftContent(
       <div className="flex items-center gap-2">
         <Tooltip>
-          <TooltipTrigger>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowNewTask(true)}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowNewTask(true)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            }
+          />
           <TooltipContent>Press N to create task</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowFilters(true)}
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilters(true)}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            }
+          />
           <TooltipContent>Press / to search and filter</TooltipContent>
         </Tooltip>
         {hasActiveFilters && (
