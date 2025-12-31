@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Plus, Search, Sliders } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TaskFilters, WeeklyView } from "@/components/tasks";
@@ -216,23 +217,35 @@ export default function TasksPage() {
             <DialogTitle>New Task</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4">
-            <Input
-              placeholder="Task title..."
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddTask();
-              }}
-              autoFocus
-            />
-            <Input
-              placeholder="Tags (comma-separated)..."
-              value={newTaskTags}
-              onChange={(e) => setNewTaskTags(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddTask();
-              }}
-            />
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="task-title">
+                Title
+              </Label>
+              <Input
+                id="task-title"
+                placeholder="Task title..."
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddTask();
+                }}
+                autoFocus
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="task-tags">
+                Tags
+              </Label>
+              <Input
+                id="task-tags"
+                placeholder="Tags (comma-separated)..."
+                value={newTaskTags}
+                onChange={(e) => setNewTaskTags(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddTask();
+                }}
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowNewTask(false)}>
                 Cancel
