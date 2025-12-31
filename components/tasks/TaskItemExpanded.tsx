@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Trash2, Calendar, ArrowRight, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
@@ -82,21 +83,28 @@ export function TaskItemExpanded({
   };
 
   return (
-    <div className="border-t px-3 pb-3 pt-2" onClick={(e) => e.stopPropagation()}>
-      <Textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        onBlur={handleNotesBlur}
-        placeholder="Add notes..."
-        className="min-h-24 resize-none"
-      />
-      <Input
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-        onBlur={handleTagsBlur}
-        placeholder="Tags (comma-separated)..."
-        className="mt-3"
-      />
+    <div className="border-t px-3 pb-3 pt-2 space-y-3" onClick={(e) => e.stopPropagation()}>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="task-notes">Notes</Label>
+        <Textarea
+          id="task-notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          onBlur={handleNotesBlur}
+          placeholder="Add notes..."
+          className="min-h-24 resize-none"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="task-tags">Tags</Label>
+        <Input
+          id="task-tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          onBlur={handleTagsBlur}
+          placeholder="Tags (comma-separated)..."
+        />
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground">
