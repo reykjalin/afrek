@@ -73,7 +73,7 @@ export default function TasksPage() {
             }
           />
           <TooltipContent>
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
               <span>Create Task</span>
               <Kbd>N</Kbd>
             </div>
@@ -92,7 +92,7 @@ export default function TasksPage() {
             }
           />
           <TooltipContent>
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
               <span>Search</span>
               <Kbd>/</Kbd>
             </div>

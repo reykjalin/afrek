@@ -24,14 +24,12 @@ export function AppShell({ children }: AppShellProps) {
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <Tooltip>
             <TooltipTrigger render={<SidebarTrigger className="-ml-2" />} />
-            <TooltipContent side="right">
-              <div className="flex flex-col gap-2">
+            <TooltipContent side="bottom">
+              <div className="flex items-center gap-2">
                 <span>Toggle sidebar</span>
-                <div className="flex gap-1">
-                  <Kbd>⌘/Ctrl</Kbd>
-                  <span className="text-xs text-muted-foreground">+</span>
-                  <Kbd>B</Kbd>
-                </div>
+                <Kbd>⌘/Ctrl</Kbd>
+                <span className="text-xs text-muted-foreground">+</span>
+                <Kbd>B</Kbd>
               </div>
             </TooltipContent>
           </Tooltip>
