@@ -84,13 +84,9 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     const urlTags = searchParams.get("tags");
     const urlTagsArray = urlTags ? urlTags.split(",").filter(Boolean) : [];
 
-    if (urlSearch !== search) {
-      setSearchState(urlSearch);
-    }
-    if (JSON.stringify(urlTagsArray) !== JSON.stringify(selectedTags)) {
-      setSelectedTagsState(urlTagsArray);
-    }
-  }, [searchParams, search, selectedTags]);
+    setSearchState(urlSearch);
+    setSelectedTagsState(urlTagsArray);
+  }, [searchParams]);
 
   return (
     <TaskFilterContext.Provider
