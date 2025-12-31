@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, ChevronRight, Calendar } from "lucide-react";
+import { Check, Calendar, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
 import { TaskItemExpanded } from "./TaskItemExpanded";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
@@ -86,21 +90,24 @@ export function TaskItem({
   const toggleExpanded = () => toggleTaskExpanded(task.id);
 
   return (
-    <div
+    <Collapsible
+      open={isExpanded}
+      onOpenChange={toggleExpanded}
       className={cn(
-        "rounded-lg border bg-card transition-colors cursor-pointer hover:bg-muted/50",
+        "rounded-lg border bg-card transition-colors",
         isDone && "opacity-60"
       )}
-      onClick={toggleExpanded}
     >
-      <div className="flex items-center gap-2 p-3">
-        <div className="shrink-0">
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
+      <div
+        className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors"
+        onClick={toggleExpanded}
+      >
+        <ChevronRight
+          className={cn(
+            "h-4 w-4 shrink-0 transition-transform",
+            isExpanded && "rotate-90"
           )}
-        </div>
+        />
 
         <button
           onClick={(e) => {
@@ -148,7 +155,7 @@ export function TaskItem({
           </span>
         )}
 
-        <div className="flex-1" onClick={toggleExpanded} />
+        <div className="flex-1" onClick={(e) => e.stopPropagation()} />
 
         <div className="flex items-center gap-1.5">
           {task.tags.map((tag) => (
@@ -228,7 +235,7 @@ export function TaskItem({
         )}
       </div>
 
-      {isExpanded && (
+      <CollapsibleContent className="px-3 pb-4">
         <TaskItemExpanded
           task={task}
           onUpdateNotes={onUpdateNotes}
@@ -237,7 +244,7 @@ export function TaskItem({
           onDelete={onDelete}
           onToggleExpand={toggleExpanded}
         />
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
