@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd";
 import { TaskFilters, WeeklyView } from "@/components/tasks";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
@@ -71,7 +72,12 @@ export default function TasksPage() {
               </Button>
             }
           />
-          <TooltipContent>Press N to create task</TooltipContent>
+          <TooltipContent>
+            <div className="flex flex-col gap-2">
+              <span>Create Task</span>
+              <Kbd>N</Kbd>
+            </div>
+          </TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger
@@ -85,7 +91,12 @@ export default function TasksPage() {
               </Button>
             }
           />
-          <TooltipContent>Press / to search and filter</TooltipContent>
+          <TooltipContent>
+            <div className="flex flex-col gap-2">
+              <span>Search</span>
+              <Kbd>/</Kbd>
+            </div>
+          </TooltipContent>
         </Tooltip>
         {hasActiveFilters && (
           <Tooltip>

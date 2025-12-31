@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Search, Sliders } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Kbd } from "@/components/ui/kbd";
 import { TaskList } from "@/components/tasks/TaskList";
 import { TaskFilters } from "@/components/tasks";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
@@ -69,7 +70,12 @@ export default function CompletedPage() {
               </Button>
             }
           />
-          <TooltipContent>Press / to search and filter</TooltipContent>
+          <TooltipContent>
+            <div className="flex flex-col gap-2">
+              <span>Search</span>
+              <Kbd>/</Kbd>
+            </div>
+          </TooltipContent>
         </Tooltip>
         {hasActiveFilters && (
           <Tooltip>
