@@ -24,16 +24,18 @@ interface WeeklyViewProps {
 function getWeekDays(startMonday: Date): { label: string; date: string; isToday: boolean }[] {
   const days: { label: string; date: string; isToday: boolean }[] = [];
   const todayStr = getTodayString();
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startMonday);
     date.setDate(startMonday.getDate() + i);
     const dateStr = toISODateString(date);
     const dayLabel = date.toLocaleDateString("en-US", { weekday: "short" });
+    const monthLabel = monthNames[date.getMonth()];
     const dateLabel = date.getDate().toString();
 
     days.push({
-      label: `${dayLabel} ${dateLabel}`,
+      label: `${dayLabel} ${monthLabel} ${dateLabel}`,
       date: dateStr,
       isToday: dateStr === todayStr,
     });

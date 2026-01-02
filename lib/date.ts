@@ -18,12 +18,13 @@ export function getWeekDays(
 ): { label: string; date: string; dayName: string }[] {
   const days = [];
   const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(startMonday);
     d.setDate(d.getDate() + i);
     days.push({
-      label: `${dayNames[i]} ${d.getDate()}`,
+      label: `${dayNames[i]} ${monthNames[d.getMonth()]} ${d.getDate()}`,
       date: toISODateString(d),
       dayName: dayNames[i],
     });
@@ -53,12 +54,13 @@ export function parseISODate(dateString: string): Date {
 }
 
 /**
- * Format a date for display (e.g., "Mon 23").
+ * Format a date for display (e.g., "Mon Jan 23").
  */
 export function formatDateLabel(dateString: string): string {
   const date = parseISODate(dateString);
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  return `${dayNames[date.getDay()]} ${date.getDate()}`;
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${dayNames[date.getDay()]} ${monthNames[date.getMonth()]} ${date.getDate()}`;
 }
 
 /**
