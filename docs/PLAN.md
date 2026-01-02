@@ -233,45 +233,64 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 3: Clerk Authentication
+### Phase 3: Clerk Authentication ✅ Completed
 **Time estimate:** 1–3 hours
 
 **Goal:** Add user authentication, scope data to authenticated users.
 
 #### Deliverables
 
-1. **Install Clerk**
+1. [x] **Install Clerk**
    - `bun add @clerk/nextjs`
    - Configure environment variables
    - Wrap app with `ClerkProvider`
 
-2. **Middleware** (`middleware.ts`)
+2. [x] **Middleware** (`middleware.ts`)
    - Protect `(app)` routes
    - Allow `(marketing)` routes publicly
 
-3. **Auth Pages**
+3. [x] **Auth Pages**
    - `app/(marketing)/sign-in/[[...sign-in]]/page.tsx`
    - `app/(marketing)/sign-up/[[...sign-up]]/page.tsx`
 
-4. **Connect Clerk to Convex**
+4. [x] **Connect Clerk to Convex**
    - Use `ConvexProviderWithClerk`
    - Pass Clerk user ID to Convex functions
    - Update Convex functions to require authentication
 
-5. **Update Tasks API**
+5. [x] **Update Tasks API**
    - Replace `DEMO_USER_ID` with Clerk user ID via `useAuth()`
    - All queries filter by authenticated user
 
-6. **UI Updates**
+6. [x] **UI Updates**
    - Show user avatar in TopNav
-   - Add sign out button
+   - Add sign out button (via Clerk's UserButton)
    - Gate `(app)` content for signed-in users only
 
+#### Key Implementation Details
+
+- **Provider structure:** ClerkProvider and ConvexProvider are now in the (app) layout only, keeping marketing pages statically renderable.
+- **Dynamic prop:** ClerkProvider uses `dynamic` prop to avoid build-time key requirements.
+- **Skip queries:** When userId is not yet available, queries skip execution using Convex's `"skip"` argument.
+- **JWT Template:** Must create a `convex` JWT template in Clerk Dashboard (do NOT rename it).
+- **Auth config:** `convex/auth.config.ts` configures the Clerk issuer domain for token validation.
+
+#### Setup Steps (for new environments)
+
+1. Create a Clerk application at [clerk.com](https://clerk.com)
+2. In Clerk Dashboard → JWT Templates → New Template → Select "Convex"
+3. Copy the Issuer URL (Frontend API URL)
+4. Set environment variables:
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+   - `CLERK_SECRET_KEY`
+   - `CLERK_JWT_ISSUER_DOMAIN` (the Issuer URL from step 3)
+5. Run `npx convex dev` to sync auth config to Convex backend
+
 #### Testing
-- Can sign up and sign in
-- Each user sees only their own tasks
-- Signing out redirects to landing page
-- Cannot access `/tasks` without authentication
+- [x] Can sign up and sign in
+- [x] Each user sees only their own tasks
+- [x] Signing out redirects to landing page
+- [x] Cannot access `/tasks` without authentication
 
 ---
 
@@ -862,15 +881,14 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-We are currently at **Phase 3: Clerk Authentication**.
+We are currently at **Phase 5: Search, Tags, Filters (remaining)**.
 
-Phases 0–2 are complete. Phases 4 (Scheduling & Weekly View) and large parts of Phase 5 (Search, Tags, Filters) have also been implemented. Next step: add Clerk, scope Convex data to authenticated users, and replace the demo user ID.
+Phases 0–4 are complete. Large parts of Phase 5 (Search, Tags, Filters) have also been implemented during earlier phases.
 
 ### Remaining Phases
 
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
-| 3 | Clerk Authentication | **Current** | 1–3 hours |
 | 5 | Search/Filter (remaining) | Partial | 2–4 hours |
 | 6 | Markdown Editor | Todo | 1–3 hours |
 | 7 | Billing (Stripe) | Todo | 1–2 days |

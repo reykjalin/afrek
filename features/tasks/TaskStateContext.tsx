@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { useAuth } from "@clerk/nextjs";
 import type { Task, TaskStatus, UpdateTaskInput } from "./types";
 import {
   useTasksQuery,
@@ -8,7 +9,6 @@ import {
   useUpdateTask,
   useDeleteTask,
   useToggleDone,
-  DEMO_USER_ID,
 } from "./api";
 import type { Id } from "@/convex/_generated/dataModel";
 
@@ -34,10 +34,11 @@ interface TaskStateContextType {
 const TaskStateContext = createContext<TaskStateContextType | undefined>(undefined);
 
 export function TaskStateProvider({ children }: { children: ReactNode }) {
+  const { userId } = useAuth();
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<TaskFilters>({});
 
-  const tasksData = useTasksQuery({
+  const tasksData = useTasksQuery(userId ?? undefined, {
     search: filters.search,
     tags: filters.tags,
     status: filters.status,
@@ -73,15 +74,16 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
 
   const addTask = useCallback(
     async (task: Omit<Task, "id">) => {
+      if (!userId) return;
       await createTaskMutation({
-        userId: DEMO_USER_ID,
+        userId,
         title: task.title,
         tags: task.tags,
         scheduledDate: task.scheduledDate,
         priority: task.priority,
       });
     },
-    [createTaskMutation]
+    [createTaskMutation, userId]
   );
 
   const updateTask = useCallback(
