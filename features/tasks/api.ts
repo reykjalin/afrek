@@ -1,31 +1,44 @@
-// Convex API wrappers for tasks
-// This file will wrap Convex queries and mutations once Convex is integrated (Phase 2)
+"use client";
 
-import type { Task, CreateTaskInput, UpdateTaskInput, TaskFilters } from "./types";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+import type { TaskStatus, TaskPriority } from "./types";
 
-// Placeholder exports - will be implemented in Phase 2
-export function useTasksQuery(filters: TaskFilters): Task[] | undefined {
-  void filters; // Will be used when Convex is integrated
-  // Will use: useQuery(api.tasks.listTasks, { userId, ...filters })
-  return undefined;
+export const DEMO_USER_ID = "demo";
+
+// Query hook for listing tasks
+export function useTasksQuery(filters?: {
+  search?: string;
+  tags?: string[];
+  status?: TaskStatus;
+}) {
+  return useQuery(api.tasks.listTasks, {
+    userId: DEMO_USER_ID,
+    search: filters?.search,
+    tags: filters?.tags,
+    status: filters?.status,
+  });
 }
 
-export function useCreateTask(): (input: CreateTaskInput) => Promise<void> {
-  // Will use: useMutation(api.tasks.createTask)
-  return async () => {};
+// Query hook for single task
+export function useTaskQuery(id: Id<"tasks">) {
+  return useQuery(api.tasks.getTask, { id });
 }
 
-export function useUpdateTask(): (input: UpdateTaskInput) => Promise<void> {
-  // Will use: useMutation(api.tasks.updateTask)
-  return async () => {};
+// Mutation hooks
+export function useCreateTask() {
+  return useMutation(api.tasks.createTask);
 }
 
-export function useDeleteTask(): (id: string) => Promise<void> {
-  // Will use: useMutation(api.tasks.deleteTask)
-  return async () => {};
+export function useUpdateTask() {
+  return useMutation(api.tasks.updateTask);
 }
 
-export function useToggleDone(): (id: string) => Promise<void> {
-  // Will use: useMutation(api.tasks.toggleDone)
-  return async () => {};
+export function useToggleDone() {
+  return useMutation(api.tasks.toggleDone);
+}
+
+export function useDeleteTask() {
+  return useMutation(api.tasks.deleteTask);
 }

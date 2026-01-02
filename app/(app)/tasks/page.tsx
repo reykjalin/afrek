@@ -19,7 +19,7 @@ const today = getTodayString();
 
 export default function TasksPage() {
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
-  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
+  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone, setFilters } = useTaskState();
   const { setLeftContent } = useTopNavActions();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -27,23 +27,19 @@ export default function TasksPage() {
   const [showNewTask, setShowNewTask] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Sync filters from TaskFilterContext to TaskStateContext for server-side filtering
+  useEffect(() => {
+    setFilters({
+      search: search || undefined,
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
+    });
+  }, [search, selectedTags, setFilters]);
+
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
     tasks.forEach((task) => task.tags.forEach((tag) => tagSet.add(tag)));
     return Array.from(tagSet).sort();
   }, [tasks]);
-
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      if (search && !task.title.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
-      if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
-        return false;
-      }
-      return true;
-    });
-  }, [tasks, search, selectedTags]);
 
   const hasActiveFilters = !!search || selectedTags.length > 0;
 
@@ -166,7 +162,7 @@ export default function TasksPage() {
 
   const handleSchedule = (id: string, date: string | null) => {
     updateTask(id, {
-      scheduledDate: date ?? undefined,
+      scheduledDate: date,
       status: date ? "scheduled" : "backlog",
     });
   };
@@ -177,7 +173,7 @@ export default function TasksPage() {
     updateTask(id, { priority });
   };
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTaskTitle.trim()) return;
 
     const tags = newTaskTags
@@ -185,8 +181,7 @@ export default function TasksPage() {
       .map((tag) => tag.trim())
       .filter(Boolean);
 
-    const newTask = {
-      id: crypto.randomUUID(),
+    await addTask({
       title: newTaskTitle.trim(),
       notesMarkdown: "",
       tags,
@@ -196,9 +191,8 @@ export default function TasksPage() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
       userId: "demo",
-    };
+    });
 
-    addTask(newTask);
     setNewTaskTitle("");
     setNewTaskTags("");
     setShowNewTask(false);
@@ -209,7 +203,7 @@ export default function TasksPage() {
       <div className="mx-auto w-full max-w-4xl">
         {/* Weekly view */}
         <WeeklyView
-        tasks={filteredTasks}
+        tasks={tasks}
         weekStart={weekStart}
         onWeekChange={setWeekStart}
         onToggleDone={handleToggleDone}
