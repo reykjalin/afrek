@@ -44,6 +44,8 @@ As an AI agent, you are responsible for:
    - `users.ts` - User management
    - `subscriptions.ts` - Billing/subscription
 2. Always require `userId` parameter for user-scoped data
+   - **Current state (pre-Phase 3):** We use a demo user constant `DEMO_USER_ID = "demo"` in `features/tasks/api.ts`
+   - **After Phase 3:** Replace with Clerk user IDs using `useAuth()` as shown in the examples below
 3. Update `convex/schema.ts` if adding new tables
 
 ## Conventions
@@ -118,6 +120,31 @@ const tasks = useTasksQuery({ status: "scheduled" });
 
 ### Creating a Hook with Convex
 
+**Current implementation (Phase 2 - demo user):**
+
+```typescript
+// features/tasks/api.ts
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+export const DEMO_USER_ID = "demo";
+
+export function useTasksQuery(filters?: { search?: string; tags?: string[]; status?: TaskStatus }) {
+  return useQuery(api.tasks.listTasks, {
+    userId: DEMO_USER_ID,
+    search: filters?.search,
+    tags: filters?.tags,
+    status: filters?.status,
+  });
+}
+
+export function useCreateTask() {
+  return useMutation(api.tasks.createTask);
+}
+```
+
+**After Phase 3 (Clerk auth):**
+
 ```typescript
 // features/tasks/api.ts
 import { useQuery, useMutation } from "convex/react";
@@ -147,11 +174,43 @@ export function useCreateTask() {
 
 ```typescript
 // Always use lib/date.ts utilities
-import { getStartOfWeek, formatDateLabel } from "@/lib/date";
+import { getStartOfWeek, formatDateLabel, toISODateString, getTodayString } from "@/lib/date";
 
 // Dates stored as ISO strings: "2024-01-15"
-const today = new Date().toISOString().split("T")[0];
+const today = getTodayString(); // Preferred
+// Or: toISODateString(new Date())
 ```
+
+### Clearing Scheduled Dates
+
+To move a task to backlog, pass `scheduledDate: null` (not `undefined`):
+
+```typescript
+// ❌ undefined means "don't change this field"
+updateTask(id, { scheduledDate: undefined });
+
+// ✅ null means "clear this field"
+updateTask(id, { scheduledDate: null, status: "backlog" });
+```
+
+### Context Usage
+
+The app uses two main contexts for task state:
+
+```typescript
+// TaskStateContext - task data and CRUD operations
+import { useTaskState } from "@/features/tasks/TaskStateContext";
+const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
+
+// TaskFilterContext - search/tag filters with URL sync
+import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
+const { search, setSearch, selectedTags, handleTagToggle, clearFilters } = useTaskFilter();
+```
+
+The tasks page connects them:
+1. `TaskFilterContext` owns filter state and syncs to URL
+2. `TasksPage` reads filters and passes to `TaskStateContext.setFilters`
+3. `TaskStateContext` passes filters to Convex query
 
 ### Error Handling
 

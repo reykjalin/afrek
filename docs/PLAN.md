@@ -49,7 +49,7 @@ Each phase produces a working, testable product.
        settings/page.tsx     # User settings
    components/
      ui/                     # Shadcn/Base UI wrappers
-     layout/                 # AppShell, Sidebar, TopNav
+     layout/                 # AppShell, AppSidebar, TopNav
      tasks/                  # Task-related components
      editors/                # Markdown editor components
    features/
@@ -57,11 +57,16 @@ Each phase produces a working, testable product.
        hooks.ts              # useTasks, useTaskFilters
        api.ts                # Convex wrapper functions
        types.ts              # Task, Tag types
+       TaskStateContext.tsx  # Central task data + mutations
+       TaskFilterContext.tsx # Search/tag filters with URL sync
+     layout/                 # TopNav actions context (added during implementation)
+       TopNavActionsContext.tsx
      auth/
        hooks.ts
      billing/
        hooks.ts
    lib/
+     convexClient.tsx        # Convex provider wrapper (JSX, hence .tsx)
      date.ts                 # Monday-first week utilities
      markdown.ts             # Serialize/deserialize helpers
    convex/
@@ -93,56 +98,75 @@ Each phase produces a working, testable product.
 
 **Goal:** Build complete UI with mock data and useState, no backend.
 
+> **Implementation Note:** Convex integration was pulled forward into this phase, so the UI was built with real persistence from the start rather than mock data.
+
 #### Deliverables
 
 1. **App Shell** (`components/layout/`)
-   - `AppShell.tsx` - Main layout wrapper
-   - `Sidebar.tsx` - Navigation (Tasks, Settings), filters area
-   - `TopNav.tsx` - User avatar placeholder, "Upgrade" button
+   - [x] `AppShell.tsx` - Main layout wrapper
+   - [x] `AppSidebar.tsx` - Navigation (Tasks, Settings), filters area *(renamed from planned `Sidebar.tsx`)*
+   - [x] `TopNav.tsx` - User avatar placeholder, "Upgrade" button
 
 2. **Task Components** (`components/tasks/`)
-   - `TaskList.tsx` - Vertical list of tasks
-   - `TaskItem.tsx` - Single task with:
+   - [x] `TaskList.tsx` - Vertical list of tasks
+   - [x] `TaskItem.tsx` - Single task with:
      - Checkbox (toggle done)
-     - Title (editable)
-     - Tags (chip display)
-     - Due date or "Backlog" label
+     - Title (editable inline)
+     - Tags (chip display, clickable for filtering)
+     - Priority dropdown (Highest → Lowest)
+     - Due date picker via calendar popover
      - Expand/collapse caret
-   - `TaskItemExpanded.tsx` - Expanded view with:
+   - [x] `TaskItemExpanded.tsx` - Expanded view with:
      - Textarea for notes (WYSIWYG later)
      - Quick actions: "Today", "Tomorrow", "This Week", "Backlog", "Delete"
-   - `WeeklyView.tsx` - 7-day grid, Monday first
-   - `BacklogView.tsx` - List of unscheduled tasks
-   - `TaskFilters.tsx` - Search input, tag chips, status dropdown
+   - [x] `WeeklyView.tsx` - 7-day grid, Monday first
+   - [x] `TaskFilters.tsx` - Search input, tag chips (in modal dialog)
+   
+   > **Note:** Backlog is implemented as a separate page (`/backlog`) rather than a `BacklogView` component. See Phase 4.
 
-3. **Tasks Page** (`app/(app)/tasks/page.tsx`)
-   - Local state with mock tasks
-   - Tab toggle: "Week" | "Backlog"
-   - Search and filter controls
+3. **Pages** (`app/(app)/`)
+   - [x] `tasks/page.tsx` - Weekly view with task management
+     - Task state via `TaskStateContext` backed by Convex *(originally planned as local useState)*
+     - Search and filter controls (via modal, keyboard shortcut `/`)
+     - New task creation (via modal, keyboard shortcut `N`)
+   - [x] `backlog/page.tsx` - Dedicated backlog page for unscheduled tasks
+   - [x] `completed/page.tsx` - Completed tasks view with week-based grouping
+   
+   > **Note:** Instead of a tab toggle on the tasks page, backlog and completed are separate pages accessible via sidebar navigation.
 
 4. **Types** (`features/tasks/types.ts`)
    ```typescript
    export type TaskStatus = "backlog" | "scheduled" | "done";
-   
+   export type TaskPriority = "Lowest" | "Low" | "Normal" | "Medium" | "High" | "Highest";
+
    export interface Task {
      id: string;
      title: string;
      notesMarkdown: string;
      tags: string[];
      status: TaskStatus;
-     scheduledDate?: string; // ISO date string
+     priority: TaskPriority;
+     scheduledDate?: string; // ISO date string (YYYY-MM-DD)
+     completedAt?: number;   // timestamp when marked done
      createdAt: number;
      updatedAt: number;
+     userId: string;
    }
    ```
 
+5. **Bonus: Keyboard Shortcuts** *(not in original plan)*
+   - [x] `N` - Open new task dialog
+   - [x] `/` - Open search/filter dialog
+   - [x] `Escape` - Close dialogs
+
 #### Testing
-- Can add, edit, delete tasks (in memory)
-- Can expand tasks and edit notes
-- Weekly view displays tasks by day
-- Backlog view shows unscheduled tasks
-- Search filters tasks by title
-- Tag chips filter by tag
+- [x] Can add, edit, delete tasks (persisted via Convex)
+- [x] Can expand tasks and edit notes
+- [x] Weekly view displays tasks by day
+- [x] Backlog page shows unscheduled tasks (`/backlog`)
+- [x] Completed page shows done tasks (`/completed`)
+- [x] Search filters tasks by title
+- [x] Tag chips filter by tag
 
 ---
 
@@ -156,8 +180,8 @@ Each phase produces a working, testable product.
 1. [x] **Set up Convex**
    - Install: `bun add convex`
    - Run: `npx convex dev`
-   - Create `lib/convexClient.tsx`
-   - Wrap app with `ConvexProvider`
+   - Create `lib/convexClient.tsx` *(JSX provider wrapper, hence .tsx not .ts)*
+   - Wrap app with `ConvexProvider` via `ConvexClientProvider`
 
 2. [x] **Database Schema** (`convex/schema.ts`)
    - Tasks table with all fields (including priority, completedAt)
@@ -187,7 +211,18 @@ Each phase produces a working, testable product.
 6. [x] **Server-side filtering**
    - Full-text search on title using Convex search index
    - Tag filtering via server query
-   - Cache previous results while loading to prevent UI flicker
+   - Cache previous results while loading to prevent UI flicker (via `TaskStateContext` holding last task list)
+
+7. [x] **Context Architecture** *(emerged during implementation)*
+   - `TaskStateContext` - Central task data, CRUD operations, expansion state
+   - `TaskFilterContext` - Search/tag filters with URL query param persistence
+   - `TopNavActionsContext` - Allows pages to inject actions into TopNav
+
+#### Key Implementation Details
+
+- **Clearing scheduledDate:** `UpdateTaskInput.scheduledDate` uses `string | null` type. Passing `null` clears the date (moves to backlog); `undefined` means "don't change".
+- **Status automation:** When `scheduledDate` is set, status becomes `"scheduled"`. When cleared, becomes `"backlog"`. When toggled done, becomes `"done"` with `completedAt` timestamp.
+- **URL persistence:** Filters are stored in URL query params (`?q=search&tags=tag1,tag2`) for shareability and refresh persistence.
 
 #### Testing
 - [x] Tasks persist across page refreshes
@@ -224,7 +259,7 @@ Each phase produces a working, testable product.
    - Update Convex functions to require authentication
 
 5. **Update Tasks API**
-   - Get `userId` from Clerk instead of demo constant
+   - Replace `DEMO_USER_ID` with Clerk user ID via `useAuth()`
    - All queries filter by authenticated user
 
 6. **UI Updates**
@@ -240,84 +275,108 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 4: Scheduling & Weekly View
+### Phase 4: Scheduling & Weekly View ✅ Completed
 **Time estimate:** 1–3 hours
 
 **Goal:** Build robust scheduling UX with Monday-first weekly view.
 
+> **Note:** Core scheduling and weekly navigation were implemented during Phases 1-2. Backlog is implemented as a dedicated page.
+
 #### Deliverables
 
-1. **Date Utilities** (`lib/date.ts`)
-   ```typescript
-   export function getStartOfWeek(date: Date): Date; // Returns Monday
-   export function getWeekDays(startMonday: Date): { label: string; date: string }[];
-   export function formatDateLabel(date: string): string; // "Mon 23"
-   export function isToday(date: string): boolean;
-   export function isSameWeek(date1: string, date2: string): boolean;
-   ```
+1. [x] **Date Utilities** (`lib/date.ts`)
+   - `getStartOfWeek(date)` - Returns Monday of the week
+   - `getWeekDays(startMonday)` - Returns array of 7 days with labels
+   - `toISODateString(date)` - Formats as YYYY-MM-DD in local time
+   - `parseISODate(dateString)` - Parses without timezone issues
+   - `isToday(dateString)` - Checks if date is today
+   - `isSameWeek(date1, date2)` - Monday-based week comparison
+   - `getWeekNumber(date)` - ISO week number (1-53)
+   - `formatWeekRange(startMonday)` - e.g., "Jan 20 - Jan 26"
+   - `getTodayString()`, `getTomorrowString()` - Quick date helpers
 
-2. **Enhanced Weekly View**
-   - Week navigation (previous/next week)
-   - Current week indicator
-   - Day headers: "Mon 23", "Tue 24", etc.
-   - Today highlighted
-   - Drop zone for drag-and-drop (stretch goal)
+2. [x] **Weekly View** (`components/tasks/WeeklyView.tsx`)
+   - Monday–Sunday grid layout
+   - Week navigation (previous/next buttons)
+   - "Go to current week" button when viewing other weeks
+   - Week number display with date range tooltip
+   - Today highlighted visually
+   - Tasks grouped by `scheduledDate`
 
-3. **Scheduling UX**
-   - Quick schedule buttons on backlog items: "Today", "Tomorrow", "Pick date"
-   - Date picker in expanded task view
-   - "Move to Backlog" action for scheduled tasks
-   - Creating new task defaults to "Today" with easy backlog toggle
+3. [x] **Task Scheduling**
+   - Calendar popover on each task for date selection
+   - Quick actions in expanded view: Today, Tomorrow, This Week, Backlog
+   - Status automatically updates based on scheduling
 
-4. **Backend Updates**
-   - `listTasks` accepts `weekStart` parameter
-   - Query returns tasks for 7-day window efficiently
+4. [x] **Backlog Page** (`app/(app)/backlog/page.tsx`)
+   - Dedicated page for unscheduled tasks (status = "backlog")
+   - Same task interactions as weekly view
+   - Accessible via sidebar navigation
+
+5. [x] **Completed Page** (`app/(app)/completed/page.tsx`)
+   - View of done tasks grouped by completion week
+   - Week navigation to see historical completions
 
 #### Testing
-- Weekly view shows Mon–Sun correctly
-- Navigation between weeks works
-- Quick scheduling buttons work
-- Tasks move between backlog and scheduled views
-- Today is visually highlighted
+- [x] Week starts on Monday
+- [x] Can navigate between weeks
+- [x] Tasks appear on correct days
+- [x] Can schedule/reschedule tasks via date picker
+- [x] Backlog tasks visible on `/backlog` page
+- [x] Completed tasks visible on `/completed` page
 
 ---
 
-### Phase 5: Search, Tags & Filters
-**Time estimate:** 1–3 hours
+### Phase 5: Search, Tags, Filters & Sort ⏳ Partially Completed
+**Time estimate:** 2–4 hours (remaining work)
 
-**Goal:** Full organization capabilities.
+**Goal:** Comprehensive search, filtering, and organization capabilities.
 
-#### Deliverables
+#### Completed
 
 1. **Search**
-   - Search input in TaskFilters
-   - Searches title and notes content
-   - Debounced input (300ms)
+   - [x] Search input in TaskFilters (modal dialog)
+   - [x] Searches task title via Convex full-text search index
+   - [x] Keyboard shortcut `/` opens search dialog
+   - [x] Search term persisted in URL (`?q=...`)
 
 2. **Tags**
-   - Tag input on TaskItem (comma-separated or chip selector)
-   - Auto-suggest from existing user tags
-   - Multi-select tag filter
-   - Tags displayed as colored chips
+   - [x] Tag input on task creation (comma-separated)
+   - [x] Tags displayed as colored chips on TaskItem
+   - [x] Clicking a tag chip toggles it in the filter
+   - [x] Multi-select tag filtering
+   - [x] Auto-suggest from existing user tags (computed from task list)
+   - [x] Tags persisted in URL (`?tags=tag1,tag2`)
 
-3. **Status Filter**
-   - Dropdown: All | Backlog | Scheduled | Done
-   - Show/hide completed tasks toggle
+3. **Backend Updates**
+   - [x] `listTasks` handles `search`, `tags`, and `status` filter parameters
+   - [x] Full-text search via Convex search index on `title`
+
+#### Remaining
+
+1. **Search Enhancements**
+   - [ ] Include `notesMarkdown` in search results (title + notes)
+   - [ ] Debounce search input (300ms) to reduce query churn
+
+2. **Status Filter**
+   - [ ] Dropdown: All | Backlog | Scheduled | Done
+   - [ ] Show/hide completed tasks toggle
+
+3. **Backlog View**
+   - [x] Visible list of tasks with no `scheduledDate` (implemented as `/backlog` page)
 
 4. **Sort**
-   - Options: Created date | Scheduled date | Alphabetical
-   - Ascending/descending toggle
-
-5. **Backend Updates**
-   - `listTasks` handles all filter parameters
-   - Text search on title and notesMarkdown (simple includes for MVP)
+   - [ ] Options: Created date | Scheduled date | Alphabetical | Priority
+   - [ ] Ascending/descending toggle
 
 #### Testing
-- Search filters in real-time
-- Tags can be added/removed from tasks
-- Tag filter shows only matching tasks
-- Status filter works correctly
-- Sort order changes task display
+- [x] Search filters in real-time
+- [x] Tags can be added/removed from tasks
+- [x] Tag filter shows only matching tasks
+- [x] Backlog tasks accessible via `/backlog` page
+- [x] Completed tasks accessible via `/completed` page
+- [ ] Status filter works correctly
+- [ ] Sort order changes task display
 
 ---
 
@@ -443,6 +502,254 @@ Each phase produces a working, testable product.
 
 ---
 
+### Phase 8: Telemetry (PostHog)
+**Time estimate:** 1–2 hours
+
+**Goal:** Add privacy-respecting analytics to understand user behavior and improve the product.
+
+#### Deliverables
+
+1. **Install PostHog**
+   - `bun add posthog-js`
+   - Configure environment variables
+   - Create `lib/posthog.ts` provider wrapper
+
+2. **Integration**
+   - Initialize PostHog in app layout
+   - Identify users after Clerk auth (use Clerk user ID)
+   - Respect Do Not Track browser setting
+
+3. **Key Events to Track**
+   - Task created, completed, deleted
+   - Scheduling actions (scheduled, moved to backlog)
+   - Feature usage (search, filters, markdown editor)
+   - Page views (tasks, backlog, completed, settings)
+   - Subscription events (upgrade, cancel)
+
+4. **Privacy Considerations**
+   - Never log task content (titles, notes)
+   - Only track aggregate behavior patterns
+   - Provide opt-out in settings (stretch goal)
+
+#### Testing
+- Events appear in PostHog dashboard
+- User identification works correctly
+- No PII or task content in event payloads
+
+---
+
+### Phase 9: Data Export
+**Time estimate:** 2–4 hours
+
+**Goal:** Allow users to export their data in standard formats.
+
+#### Deliverables
+
+1. **Export Formats**
+   - CSV export (tasks with all metadata)
+   - todo.txt format (http://todotxt.org/) for interoperability
+
+2. **Export UI** (`app/(app)/settings/page.tsx`)
+   - "Export Data" section in settings
+   - Format selector (CSV, todo.txt)
+   - Download button that triggers client-side export
+
+3. **Export Logic** (`features/tasks/export.ts`)
+   ```typescript
+   export function exportToCSV(tasks: Task[]): string;
+   export function exportToTodoTxt(tasks: Task[]): string;
+   export function downloadFile(content: string, filename: string, mimeType: string): void;
+   ```
+
+4. **todo.txt Format Mapping**
+   - `x` prefix for completed tasks
+   - `(A)` priority mapping (Highest→A, High→B, etc.)
+   - `due:YYYY-MM-DD` for scheduled date
+   - `+tag` for each tag
+   - `created:YYYY-MM-DD` for creation date
+
+#### Testing
+- CSV opens correctly in Excel/Google Sheets
+- todo.txt imports into other todo.txt apps
+- All task data preserved in exports
+
+---
+
+### Phase 10: Client-Side Encryption
+**Time estimate:** 1–2 days
+
+**Goal:** Enable end-to-end encryption so sensitive data is never readable on the server.
+
+#### Deliverables
+
+1. **Install Encryption Library**
+   - `bun add libsodium-wrappers` (or `tweetnacl` as lighter alternative)
+   - Create `lib/crypto.ts` wrapper
+
+2. **Key Management**
+   - Derive encryption key from user password (or separate passphrase)
+   - Use Argon2id for key derivation (via libsodium)
+   - Store encrypted key backup (optional, for recovery)
+   - **Important:** Key never leaves the browser unencrypted
+
+3. **Encrypted Fields**
+   - `title` - encrypted
+   - `notesMarkdown` - encrypted
+   - `tags` - encrypted (prevents tag-based analysis)
+   - Metadata (dates, status, priority) - unencrypted (for queries)
+
+4. **Schema Updates** (`convex/schema.ts`)
+   ```typescript
+   tasks: defineTable({
+     // Encrypted fields stored as base64 strings
+     encryptedTitle: v.optional(v.string()),
+     encryptedNotes: v.optional(v.string()),
+     encryptedTags: v.optional(v.string()),
+     // Keep unencrypted for queries
+     title: v.optional(v.string()), // Empty when encrypted
+     // ... rest unchanged
+   })
+   ```
+
+5. **Encryption Toggle**
+   - Setting in user preferences to enable/disable
+   - Migration flow: encrypt existing tasks on enable
+   - Warning: losing passphrase = losing data
+
+6. **UI Indicators**
+   - Lock icon when encryption is enabled
+   - Clear messaging about encryption status
+   - Passphrase entry on login (if enabled)
+
+#### Security Considerations
+- Use authenticated encryption (XChaCha20-Poly1305)
+- Unique nonce per encryption operation
+- Zero-knowledge: server never sees plaintext
+- Search disabled for encrypted content (or use deterministic encryption for search, with trade-offs)
+
+#### Testing
+- Data unreadable in Convex dashboard when encrypted
+- Decryption works correctly after page refresh
+- Wrong passphrase shows clear error
+- Encryption/decryption performance acceptable
+
+---
+
+### Phase 11: Admin Area
+**Time estimate:** 1–2 days
+
+**Goal:** Minimal admin interface for account and application management.
+
+#### Design Principles
+- **Minimal data exposure:** Show only what's needed for support
+- **Audit logging:** Track all admin actions
+- **Privacy-first:** No ability to read user task content
+
+#### Deliverables
+
+1. **Admin Role**
+   - Add `role` field to user data: `"user" | "admin"`
+   - Check role in middleware and Convex functions
+   - Admin accounts managed via environment variable or Clerk metadata
+
+2. **Admin Routes** (`app/(admin)/`)
+   - Protected by admin role check
+   - Separate layout from main app
+
+3. **Admin Dashboard** (`app/(admin)/dashboard/page.tsx`)
+   - Total users (active, churned)
+   - Subscription breakdown (free, monthly, yearly)
+   - Tasks created (aggregate, no content)
+   - Error rates / health metrics
+
+4. **User Management** (`app/(admin)/users/page.tsx`)
+   - Search users by email (partial match)
+   - Display: email, signup date, plan, task count
+   - **Never display:** task titles, notes, tags
+   - Actions:
+     - Grant free access / extend trial
+     - Apply discount to subscription
+     - Delete account and all data
+     - Trigger full data export (sends to user's email)
+
+5. **Convex Functions** (`convex/admin.ts`)
+   - `listUsers({ search?, limit, offset })`
+   - `getUserStats({ userId })` - aggregate stats only
+   - `grantFreeAccess({ userId, until })`
+   - `applyDiscount({ userId, percent, months })`
+   - `deleteUser({ userId })` - cascades to all user data
+   - `triggerExport({ userId })` - queues export job
+
+6. **Audit Log** (`convex/schema.ts`)
+   ```typescript
+   adminAuditLog: defineTable({
+     adminUserId: v.string(),
+     action: v.string(),
+     targetUserId: v.optional(v.string()),
+     details: v.string(), // JSON
+     timestamp: v.number(),
+   }).index("by_admin", ["adminUserId"])
+     .index("by_target", ["targetUserId"])
+   ```
+
+#### Testing
+- Non-admins cannot access admin routes
+- All admin actions logged
+- User deletion removes all associated data
+- Cannot see user task content from admin
+
+---
+
+### Phase 12: Launch Prep
+**Time estimate:** 1–2 days
+
+**Goal:** Polish public-facing pages and legal compliance for launch.
+
+#### Deliverables
+
+1. **Landing Page** (`app/(marketing)/page.tsx`)
+   - Clear value proposition
+   - Feature highlights with visuals
+   - Pricing summary with link to full pricing page
+   - Call-to-action: Sign up
+   - Social proof (testimonials, if available)
+
+2. **Privacy Policy** (`app/(marketing)/privacy/page.tsx`)
+   - What data we collect
+   - How we use it (PostHog analytics)
+   - Client-side encryption option
+   - Data retention policy
+   - GDPR/CCPA compliance
+   - Contact information
+
+3. **Terms of Service** (`app/(marketing)/terms/page.tsx`)
+   - Acceptable use
+   - Payment terms
+   - Liability limitations
+   - Account termination
+
+4. **Footer Links**
+   - Add Privacy Policy and Terms links to all pages
+   - Social links (if applicable)
+
+5. **SEO & Meta**
+   - Open Graph tags for social sharing
+   - Proper meta descriptions
+   - Favicon and app icons
+
+6. **Final Polish**
+   - Mobile responsiveness check
+   - Accessibility audit (keyboard navigation, screen readers)
+   - Performance check (Core Web Vitals)
+
+#### Testing
+- Landing page converts (A/B test with PostHog, stretch goal)
+- Legal pages reviewed (consider legal counsel)
+- All links work
+- Mobile experience is good
+
+---
+
 ## File Structure Reference
 
 ```
@@ -450,14 +757,22 @@ afrek/
 ├── app/
 │   ├── (marketing)/
 │   │   ├── layout.tsx
-│   │   ├── page.tsx
+│   │   ├── page.tsx              # Landing page
 │   │   ├── pricing/page.tsx
+│   │   ├── privacy/page.tsx      # Privacy policy (Phase 12)
+│   │   ├── terms/page.tsx        # Terms of service (Phase 12)
 │   │   ├── sign-in/[[...sign-in]]/page.tsx
 │   │   └── sign-up/[[...sign-up]]/page.tsx
 │   ├── (app)/
 │   │   ├── layout.tsx
-│   │   ├── tasks/page.tsx
-│   │   └── settings/page.tsx
+│   │   ├── tasks/page.tsx        # Weekly view
+│   │   ├── backlog/page.tsx      # Unscheduled tasks
+│   │   ├── completed/page.tsx    # Done tasks
+│   │   └── settings/page.tsx     # User settings + data export
+│   ├── (admin)/                   # Admin area (Phase 11)
+│   │   ├── layout.tsx
+│   │   ├── dashboard/page.tsx
+│   │   └── users/page.tsx
 │   ├── api/
 │   │   └── webhooks/stripe/route.ts
 │   ├── globals.css
@@ -466,16 +781,14 @@ afrek/
 │   ├── ui/                    # Shadcn components
 │   ├── layout/
 │   │   ├── AppShell.tsx
-│   │   ├── Sidebar.tsx
+│   │   ├── AppSidebar.tsx
 │   │   └── TopNav.tsx
 │   ├── tasks/
 │   │   ├── TaskList.tsx
 │   │   ├── TaskItem.tsx
 │   │   ├── TaskItemExpanded.tsx
 │   │   ├── WeeklyView.tsx
-│   │   ├── BacklogView.tsx
-│   │   ├── TaskFilters.tsx
-│   │   └── CreateTaskButton.tsx
+│   │   └── TaskFilters.tsx
 │   └── editors/
 │       ├── MarkdownEditor.tsx
 │       └── MarkdownPreview.tsx
@@ -483,7 +796,14 @@ afrek/
 │   ├── tasks/
 │   │   ├── hooks.ts
 │   │   ├── api.ts
-│   │   └── types.ts
+│   │   ├── types.ts
+│   │   ├── export.ts             # Data export (Phase 9)
+│   │   ├── TaskStateContext.tsx
+│   │   ├── TaskFilterContext.tsx
+│   │   └── index.ts
+│   ├── layout/
+│   │   ├── TopNavActionsContext.tsx
+│   │   └── TopNavContext.tsx
 │   ├── auth/
 │   │   └── hooks.ts
 │   └── billing/
@@ -491,13 +811,17 @@ afrek/
 │       └── types.ts
 ├── lib/
 │   ├── utils.ts
+│   ├── convexClient.tsx
+│   ├── crypto.ts                 # Encryption (Phase 10)
+│   ├── posthog.ts                # Telemetry (Phase 8)
 │   ├── date.ts
 │   └── markdown.ts
 ├── convex/
 │   ├── schema.ts
 │   ├── tasks.ts
 │   ├── users.ts
-│   └── subscriptions.ts
+│   ├── subscriptions.ts
+│   └── admin.ts                  # Admin functions (Phase 11)
 ├── docs/
 │   ├── PLAN.md
 │   ├── ARCHITECTURE.md
@@ -538,4 +862,30 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-Start with **Phase 0** to establish the folder structure and conventions, then proceed sequentially through each phase. Each phase builds on the previous one and results in a testable product.
+We are currently at **Phase 3: Clerk Authentication**.
+
+Phases 0–2 are complete. Phases 4 (Scheduling & Weekly View) and large parts of Phase 5 (Search, Tags, Filters) have also been implemented. Next step: add Clerk, scope Convex data to authenticated users, and replace the demo user ID.
+
+### Remaining Phases
+
+| Phase | Name | Status | Time Estimate |
+|-------|------|--------|---------------|
+| 3 | Clerk Authentication | **Current** | 1–3 hours |
+| 5 | Search/Filter (remaining) | Partial | 2–4 hours |
+| 6 | Markdown Editor | Todo | 1–3 hours |
+| 7 | Billing (Stripe) | Todo | 1–2 days |
+| 8 | Telemetry (PostHog) | Todo | 1–2 hours |
+| 9 | Data Export | Todo | 2–4 hours |
+| 10 | Client-Side Encryption | Todo | 1–2 days |
+| 11 | Admin Area | Todo | 1–2 days |
+| 12 | Launch Prep | Todo | 1–2 days |
+
+### Critical Path to Launch
+1. **Phase 3** - Auth (required for multi-user)
+2. **Phase 7** - Billing (required for revenue)
+3. **Phase 12** - Launch prep (legal, landing page)
+
+### Nice-to-Have Before Launch
+- Phase 6 (Markdown) - improves UX significantly
+- Phase 8 (Telemetry) - helps understand usage
+- Phase 10 (Encryption) - differentiator for privacy-conscious users

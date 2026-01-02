@@ -83,4 +83,150 @@ This document records significant architectural decisions made during developmen
 
 ---
 
+### Task State via Context + Convex — 2025-01
+
+**Phase:** 2
+
+**Context:** We needed a way to access tasks, filters, and Convex mutations from multiple components (Tasks page, TaskItem, WeeklyView) without wiring Convex everywhere.
+
+**Decision:** Introduce `TaskStateContext` for task data + CRUD operations and `TaskFilterContext` for search/tag filters (with URL persistence). Components consume these contexts instead of calling Convex directly.
+
+**Rationale:**
+- Centralizes Convex access in one layer
+- Keeps components focused on UI concerns
+- Enables URL-persisted filters without leaking router details into every component
+- Caching previous results in state prevents UI flicker during loading
+
+**Trade-offs:**
+- Slightly more indirection for simple components
+- Two filter models (`TaskFilters` type vs `TaskFilterContext` state) must be kept conceptually aligned
+
+---
+
+### Scheduling Model (scheduledDate + status + completedAt) — 2025-01
+
+**Phase:** 2 / 4
+
+**Context:** We needed to support backlog tasks, scheduled tasks, and completed tasks with clear semantics and simple UI.
+
+**Decision:** Model scheduling with:
+- `scheduledDate?: string` (ISO `YYYY-MM-DD`)
+- `status: "backlog" | "scheduled" | "done"`
+- `completedAt?: number` (timestamp)
+
+`UpdateTaskInput` uses `scheduledDate: string | null` so the client can explicitly clear dates; the server maps `null` to `undefined`.
+
+**Rationale:**
+- Simple to reason about:
+  - No date → backlog
+  - Date + not done → scheduled
+  - Done → completed with `completedAt` timestamp
+- Clearing scheduling is explicit and type-safe
+
+**Trade-offs:**
+- Some duplication between `status` and presence/absence of `scheduledDate`
+
+---
+
+### Backlog and Completed as Separate Pages — 2025-01
+
+**Phase:** 1 / 4
+
+**Context:** The original plan called for a "Week | Backlog" tab toggle on the tasks page, or a `BacklogView` component. We needed to decide how to surface unscheduled tasks and completed tasks.
+
+**Decision:** Implement backlog and completed as separate pages (`/backlog`, `/completed`) accessible via sidebar navigation, rather than tabs or inline views.
+
+**Rationale:**
+- Cleaner URL structure - each view has its own shareable URL
+- Simpler component logic - each page focuses on one concern
+- Consistent with sidebar navigation pattern already in place
+- Completed page can have its own week-based navigation for historical viewing
+
+**Trade-offs:**
+- Extra navigation step to switch between views
+- Some code duplication between pages (task list rendering, filter handling)
+
+---
+
+### TopNav Actions via Layout Feature Context — 2025-01
+
+**Phase:** 1 / 2
+
+**Context:** We wanted the Tasks page to add actions (e.g., New Task, Search buttons) into the global TopNav, which is defined in the app layout.
+
+**Decision:** Add `features/layout/TopNavActionsContext` so pages can set top-nav left and right content, and `TopNav` renders that content.
+
+**Rationale:**
+- Avoids prop-drilling from layout to every page
+- Keeps layout generic while allowing rich page-specific actions
+- Easy to extend for auth/billing actions in future phases
+
+**Trade-offs:**
+- Implicit dependency between pages and layout (context must be present)
+- Slightly harder to follow than explicit props for new contributors
+
+---
+
+### URL-Persisted Filters — 2025-01
+
+**Phase:** 2 / 5
+
+**Context:** We wanted search and tag filters to persist across reloads and be shareable via URL without complicating components.
+
+**Decision:** `TaskFilterContext` reads/writes filters from/to `q` and `tags` query params using Next.js `useSearchParams` and `router.replace`.
+
+**Rationale:**
+- Bookmarkable/shareable filter state
+- Keeps URL handling in one place, not spread across components
+- Filters survive page refresh
+
+**Trade-offs:**
+- Slight coupling to URL structure
+- Should add debounce for search to avoid excessive `router.replace` calls
+
+---
+
+### Priority Field Added to Task Model — 2025-01
+
+**Phase:** 1 / 2
+
+**Context:** The original plan had a simple task model without priority. During implementation, we decided tasks should have priority levels for better organization.
+
+**Decision:** Add `priority` field with values: `"Lowest" | "Low" | "Normal" | "Medium" | "High" | "Highest"`. Default to `"Normal"`.
+
+**Rationale:**
+- Common feature in task management apps
+- Enables future sorting by priority
+- Simple enum is easy to implement and display
+
+**Trade-offs:**
+- Adds UI complexity (priority dropdown on each task)
+- Need to decide whether/how to sort by priority
+
+---
+
+### Keyboard Shortcuts as First-Class UX — 2025-01
+
+**Phase:** 1
+
+**Context:** While building the task UI, we wanted to support power users who prefer keyboard navigation.
+
+**Decision:** Add global keyboard shortcuts:
+- `N` - Open new task dialog
+- `/` - Open search/filter dialog
+- `Escape` - Close dialogs
+
+Implemented via `useEffect` with `window.addEventListener('keydown', ...)` in the tasks page.
+
+**Rationale:**
+- Common pattern in productivity apps (Gmail, Notion, Linear)
+- Low implementation cost, high UX value
+- Disabled when user is typing in an input
+
+**Trade-offs:**
+- Global listener could conflict with future features (e.g., markdown editor)
+- May need to scope shortcuts or use a hotkey library as app grows
+
+---
+
 *Add new decisions above this line*
