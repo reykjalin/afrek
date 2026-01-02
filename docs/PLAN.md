@@ -19,7 +19,7 @@ A task management application with expandable notes, markdown support, and a wee
 | Auth & Billing | Clerk |
 | Database | Convex |
 | Icons | Lucide React |
-| Markdown Editor | @uiw/react-md-editor (upgradable to Tiptap) |
+| Markdown Editor | Plate (platejs.org) |
 
 ---
 
@@ -377,16 +377,8 @@ Each phase produces a working, testable product.
    - [ ] Include `notesMarkdown` in search results (title + notes)
    - [ ] Debounce search input (300ms) to reduce query churn
 
-2. **Status Filter**
-   - [ ] Dropdown: All | Backlog | Scheduled | Done
-   - [ ] Show/hide completed tasks toggle
-
-3. **Backlog View**
+2. **Backlog View**
    - [x] Visible list of tasks with no `scheduledDate` (implemented as `/backlog` page)
-
-4. **Sort**
-   - [ ] Options: Created date | Scheduled date | Alphabetical | Priority
-   - [ ] Ascending/descending toggle
 
 #### Testing
 - [x] Search filters in real-time
@@ -394,70 +386,50 @@ Each phase produces a working, testable product.
 - [x] Tag filter shows only matching tasks
 - [x] Backlog tasks accessible via `/backlog` page
 - [x] Completed tasks accessible via `/completed` page
-- [ ] Status filter works correctly
-- [ ] Sort order changes task display
 
 ---
 
-### Phase 6: WYSIWYG Markdown Editor
-**Time estimate:** 1–3 hours
+### Phase 6: WYSIWYG Markdown Editor (Plate)
+**Time estimate:** 2–4 hours
 
-**Goal:** Upgrade notes from textarea to rich markdown editor.
+**Goal:** Upgrade notes from textarea to rich WYSIWYG editor using Plate (platejs.org).
+
+#### Why Plate?
+- Built on Slate.js, highly customizable
+- First-class TypeScript support
+- Plugin architecture for features (markdown, lists, etc.)
+- Active development and good documentation
+- Integrates well with Tailwind and shadcn/ui
 
 #### Deliverables
 
-1. **Install Editor**
-   - `bun add @uiw/react-md-editor`
+1. **Install Plate**
+   - `bun add @udecode/plate`
+   - Install additional plugins as needed (lists, code, etc.)
 
-2. **Editor Component** (`components/editors/MarkdownEditor.tsx`)
-   ```typescript
-   "use client";
-   
-   import dynamic from "next/dynamic";
-   
-   const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { 
-     ssr: false,
-     loading: () => <div className="h-48 bg-muted animate-pulse rounded" />
-   });
-   
-   interface Props {
-     value: string;
-     onChange: (value: string) => void;
-     placeholder?: string;
-   }
-   
-   export function MarkdownEditor({ value, onChange, placeholder }: Props) {
-     return (
-       <div data-color-mode="light">
-         <MDEditor
-           value={value}
-           onChange={(v) => onChange(v ?? "")}
-           height={200}
-           preview="edit"
-           textareaProps={{ placeholder }}
-         />
-       </div>
-     );
-   }
-   ```
+2. **Editor Component** (`components/editors/PlateEditor.tsx`)
+   - Configure Plate with plugins: paragraph, headings, bold, italic, lists, code, links
+   - Placeholder text support
 
-3. **Markdown Preview** (`components/editors/MarkdownPreview.tsx`)
-   - For displaying notes in collapsed/read mode
+3. **Schema Update**
+   - Change `notesMarkdown: string` to `notesJson: string` (serialized Slate JSON)
+   - Store Plate's native JSON format directly in database
 
 4. **Integration**
-   - Replace textarea in TaskItemExpanded with MarkdownEditor
+   - Replace textarea in TaskItemExpanded with PlateEditor
    - Debounce saves (500ms) to avoid excessive API calls
-   - Show preview in collapsed task view
+   - Parse/stringify JSON for database storage
 
 5. **Styling**
-   - Match editor theme to app theme
+   - Match editor theme to app theme using Tailwind
+   - Toolbar with common formatting options (optional, can use keyboard shortcuts)
    - Ensure proper dark mode support (stretch goal)
 
 #### Testing
-- Rich text editing works (bold, italic, lists, code)
-- Markdown renders correctly in preview
-- Changes persist to database
-- No SSR errors
+- Rich text editing works (bold, italic, lists, code, links)
+- Keyboard shortcuts work (Cmd+B for bold, etc.)
+- Changes persist to database as JSON
+- No SSR errors (use dynamic import if needed)
 
 ---
 
