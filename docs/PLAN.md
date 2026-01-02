@@ -146,68 +146,55 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 2: Convex Database Integration
+### Phase 2: Convex Database Integration ✅ Completed
 **Time estimate:** 1–2 days
 
 **Goal:** Replace local state with Convex persistence using a demo user.
 
 #### Deliverables
 
-1. **Set up Convex**
+1. [x] **Set up Convex**
    - Install: `bun add convex`
    - Run: `npx convex dev`
-   - Create `lib/convexClient.ts`
+   - Create `lib/convexClient.tsx`
    - Wrap app with `ConvexProvider`
 
-2. **Database Schema** (`convex/schema.ts`)
-   ```typescript
-   import { defineSchema, defineTable } from "convex/server";
-   import { v } from "convex/values";
+2. [x] **Database Schema** (`convex/schema.ts`)
+   - Tasks table with all fields (including priority, completedAt)
+   - Indexes: by_user, by_user_scheduled, by_user_status
+   - Search index on title for full-text search
 
-   export default defineSchema({
-     tasks: defineTable({
-       title: v.string(),
-       notesMarkdown: v.string(),
-       tags: v.array(v.string()),
-       status: v.union(
-         v.literal("backlog"),
-         v.literal("scheduled"),
-         v.literal("done")
-       ),
-       scheduledDate: v.optional(v.string()),
-       createdAt: v.number(),
-       updatedAt: v.number(),
-       userId: v.string(),
-     })
-       .index("by_user", ["userId"])
-       .index("by_user_scheduled", ["userId", "scheduledDate"])
-       .index("by_user_status", ["userId", "status"]),
-   });
-   ```
-
-3. **Convex Functions** (`convex/tasks.ts`)
+3. [x] **Convex Functions** (`convex/tasks.ts`)
    - Queries:
-     - `listTasks({ userId, view?, weekStart?, search?, tags?, status? })`
+     - `listTasks({ userId, search?, tags?, status? })` - with full-text search
      - `getTask({ id })`
    - Mutations:
-     - `createTask({ userId, title, tags?, scheduledDate? })`
-     - `updateTask({ id, title?, notesMarkdown?, tags?, status?, scheduledDate? })`
+     - `createTask({ userId, title, tags?, scheduledDate?, priority? })`
+     - `updateTask({ id, title?, notesMarkdown?, tags?, status?, priority?, scheduledDate? })`
      - `toggleDone({ id })`
      - `deleteTask({ id })`
 
-4. **API Wrappers** (`features/tasks/api.ts`)
-   - `useTasksQuery(filters)` - wraps useQuery
+4. [x] **API Wrappers** (`features/tasks/api.ts`)
+   - `useTasksQuery(filters)` - wraps useQuery with server-side filtering
    - `useCreateTask()` - wraps useMutation
    - `useUpdateTask()` - wraps useMutation
    - `useDeleteTask()` - wraps useMutation
+   - `useToggleDone()` - wraps useMutation
 
-5. **Use demo user for now**
+5. [x] **Use demo user for now**
    - Constant `DEMO_USER_ID = "demo"` until Clerk integration
 
+6. [x] **Server-side filtering**
+   - Full-text search on title using Convex search index
+   - Tag filtering via server query
+   - Cache previous results while loading to prevent UI flicker
+
 #### Testing
-- Tasks persist across page refreshes
-- CRUD operations work via Convex dashboard
-- Multiple browser tabs stay in sync (real-time updates)
+- [x] Tasks persist across page refreshes
+- [x] CRUD operations work via Convex dashboard
+- [x] Multiple browser tabs stay in sync (real-time updates)
+- [x] Search filters tasks using full-text search
+- [x] Tag filtering works server-side
 
 ---
 
