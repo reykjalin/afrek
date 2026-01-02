@@ -19,21 +19,13 @@ const today = getTodayString();
 
 export default function TasksPage() {
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
-  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone, setFilters } = useTaskState();
+  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskTags, setNewTaskTags] = useState("");
   const [showNewTask, setShowNewTask] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-
-  // Sync filters from TaskFilterContext to TaskStateContext for server-side filtering
-  useEffect(() => {
-    setFilters({
-      search: search || undefined,
-      tags: selectedTags.length > 0 ? selectedTags : undefined,
-    });
-  }, [search, selectedTags, setFilters]);
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();

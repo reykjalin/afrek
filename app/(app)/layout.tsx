@@ -14,15 +14,15 @@ export default function AppLayout({
 }) {
   return (
     <ConvexClientProvider>
-      <TaskStateProvider>
-        <Suspense fallback={null}>
-          <TaskFilterProvider>
+      <Suspense fallback={null}>
+        <TaskFilterProvider>
+          <TaskStateProvider>
             <TopNavActionsProvider>
               <AppShell>{children}</AppShell>
             </TopNavActionsProvider>
-          </TaskFilterProvider>
-        </Suspense>
-      </TaskStateProvider>
+          </TaskStateProvider>
+        </TaskFilterProvider>
+      </Suspense>
     </ConvexClientProvider>
   );
 }

@@ -14,12 +14,29 @@ export const listTasks = query({
     let tasks;
 
     if (args.search && args.search.trim()) {
-      tasks = await ctx.db
-        .query("tasks")
-        .withSearchIndex("search_title", (q) =>
-          q.search("title", args.search!).eq("userId", args.userId)
-        )
-        .collect();
+      const [titleResults, notesResults] = await Promise.all([
+        ctx.db
+          .query("tasks")
+          .withSearchIndex("search_title", (q) =>
+            q.search("title", args.search!).eq("userId", args.userId)
+          )
+          .collect(),
+        ctx.db
+          .query("tasks")
+          .withSearchIndex("search_notes", (q) =>
+            q.search("notesMarkdown", args.search!).eq("userId", args.userId)
+          )
+          .collect(),
+      ]);
+
+      const seenIds = new Set<string>();
+      tasks = [];
+      for (const task of [...titleResults, ...notesResults]) {
+        if (!seenIds.has(task._id)) {
+          seenIds.add(task._id);
+          tasks.push(task);
+        }
+      }
     } else {
       tasks = await ctx.db
         .query("tasks")

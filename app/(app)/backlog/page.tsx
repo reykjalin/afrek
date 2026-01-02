@@ -30,19 +30,10 @@ export default function BacklogPage() {
     return Array.from(tagSet).sort();
   }, [tasks]);
 
-  const backlogTasks = useMemo(() => {
-    return tasks
-      .filter((task) => task.status === "backlog")
-      .filter((task) => {
-        if (search && !task.title.toLowerCase().includes(search.toLowerCase())) {
-          return false;
-        }
-        if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
-          return false;
-        }
-        return true;
-      });
-  }, [tasks, search, selectedTags]);
+  const backlogTasks = useMemo(
+    () => tasks.filter((task) => task.status === "backlog"),
+    [tasks],
+  );
 
   const hasActiveFilters = !!search || selectedTags.length > 0;
 

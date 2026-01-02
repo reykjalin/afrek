@@ -31,5 +31,9 @@ export default defineSchema({
     .searchIndex("search_title", {
       searchField: "title",
       filterFields: ["userId"],
+    })
+    .searchIndex("search_notes", {
+      searchField: "notesMarkdown",
+      filterFields: ["userId"],
     }),
 });

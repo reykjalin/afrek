@@ -36,22 +36,12 @@ export default function CompletedPage() {
   }, [tasks]);
 
   const tasksForSelectedWeek = useMemo(() => {
-    return completedTasks
-      .filter((task) => {
-        const completedDate = new Date(task.completedAt);
-        const taskWeekStart = getStartOfWeek(completedDate);
-        return taskWeekStart.toDateString() === weekStart.toDateString();
-      })
-      .filter((task) => {
-        if (search && !task.title.toLowerCase().includes(search.toLowerCase())) {
-          return false;
-        }
-        if (selectedTags.length > 0 && !selectedTags.some((tag) => task.tags.includes(tag))) {
-          return false;
-        }
-        return true;
-      });
-  }, [completedTasks, weekStart, search, selectedTags]);
+    return completedTasks.filter((task) => {
+      const completedDate = new Date(task.completedAt);
+      const taskWeekStart = getStartOfWeek(completedDate);
+      return taskWeekStart.toDateString() === weekStart.toDateString();
+    });
+  }, [completedTasks, weekStart]);
 
   const hasActiveFilters = !!search || selectedTags.length > 0;
 

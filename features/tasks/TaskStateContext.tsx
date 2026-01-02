@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, useMemo, ReactNode, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
-import type { Task, TaskStatus, UpdateTaskInput } from "./types";
+import type { Task, UpdateTaskInput } from "./types";
 import {
   useTasksQuery,
   useCreateTask,
@@ -10,19 +10,12 @@ import {
   useDeleteTask,
   useToggleDone,
 } from "./api";
+import { useTaskFilter } from "./TaskFilterContext";
 import type { Id } from "@/convex/_generated/dataModel";
-
-interface TaskFilters {
-  search?: string;
-  tags?: string[];
-  status?: TaskStatus;
-}
 
 interface TaskStateContextType {
   tasks: Task[];
   isLoading: boolean;
-  filters: TaskFilters;
-  setFilters: (filters: TaskFilters) => void;
   addTask: (task: Omit<Task, "id">) => Promise<void>;
   updateTask: (id: string, updates: Omit<UpdateTaskInput, "id">) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -35,8 +28,8 @@ const TaskStateContext = createContext<TaskStateContextType | undefined>(undefin
 
 export function TaskStateProvider({ children }: { children: ReactNode }) {
   const { userId } = useAuth();
+  const { filters } = useTaskFilter();
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
-  const [filters, setFilters] = useState<TaskFilters>({});
 
   const tasksData = useTasksQuery(userId ?? undefined, {
     search: filters.search,
@@ -48,26 +41,21 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
   const deleteTaskMutation = useDeleteTask();
   const toggleDoneMutation = useToggleDone();
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-
-  useEffect(() => {
-    if (tasksData) {
-      setTasks(
-        tasksData.map((t) => ({
-          id: t._id,
-          title: t.title,
-          notesMarkdown: t.notesMarkdown,
-          tags: t.tags,
-          status: t.status,
-          priority: t.priority,
-          scheduledDate: t.scheduledDate,
-          completedAt: t.completedAt,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
-          userId: t.userId,
-        }))
-      );
-    }
+  const tasks = useMemo<Task[]>(() => {
+    if (!tasksData) return [];
+    return tasksData.map((t) => ({
+      id: t._id,
+      title: t.title,
+      notesMarkdown: t.notesMarkdown,
+      tags: t.tags,
+      status: t.status,
+      priority: t.priority,
+      scheduledDate: t.scheduledDate,
+      completedAt: t.completedAt,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+      userId: t.userId,
+    }));
   }, [tasksData]);
 
   const isLoading = tasksData === undefined;
@@ -132,8 +120,6 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
       value={{
         tasks,
         isLoading,
-        filters,
-        setFilters,
         addTask,
         updateTask,
         deleteTask,

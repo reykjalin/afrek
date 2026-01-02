@@ -346,18 +346,20 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 5: Search, Tags, Filters & Sort ⏳ Partially Completed
-**Time estimate:** 2–4 hours (remaining work)
+### Phase 5: Search, Tags, Filters & Sort ✅ Completed
+**Time estimate:** 2–4 hours
 
 **Goal:** Comprehensive search, filtering, and organization capabilities.
 
-#### Completed
+#### Deliverables
 
 1. **Search**
    - [x] Search input in TaskFilters (modal dialog)
    - [x] Searches task title via Convex full-text search index
    - [x] Keyboard shortcut `/` opens search dialog
    - [x] Search term persisted in URL (`?q=...`)
+   - [x] Include `notesMarkdown` in search results (title + notes)
+   - [x] Debounce search input (300ms) to reduce query churn
 
 2. **Tags**
    - [x] Tag input on task creation (comma-separated)
@@ -369,15 +371,9 @@ Each phase produces a working, testable product.
 
 3. **Backend Updates**
    - [x] `listTasks` handles `search`, `tags`, and `status` filter parameters
-   - [x] Full-text search via Convex search index on `title`
+   - [x] Full-text search via Convex search indexes on `title` and `notesMarkdown`
 
-#### Remaining
-
-1. **Search Enhancements**
-   - [ ] Include `notesMarkdown` in search results (title + notes)
-   - [ ] Debounce search input (300ms) to reduce query churn
-
-2. **Backlog View**
+4. **Backlog View**
    - [x] Visible list of tasks with no `scheduledDate` (implemented as `/backlog` page)
 
 #### Testing
@@ -853,15 +849,14 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-We are currently at **Phase 5: Search, Tags, Filters (remaining)**.
+We are currently at **Phase 6: WYSIWYG Markdown Editor**.
 
-Phases 0–4 are complete. Large parts of Phase 5 (Search, Tags, Filters) have also been implemented during earlier phases.
+Phases 0–5 are complete.
 
 ### Remaining Phases
 
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
-| 5 | Search/Filter (remaining) | Partial | 2–4 hours |
 | 6 | Markdown Editor | Todo | 1–3 hours |
 | 7 | Billing (Stripe) | Todo | 1–2 days |
 | 8 | Telemetry (PostHog) | Todo | 1–2 hours |

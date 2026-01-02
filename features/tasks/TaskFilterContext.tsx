@@ -7,26 +7,42 @@ import {
   ReactNode,
   useEffect,
   useCallback,
+  useMemo,
+  useRef,
+  startTransition,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
+import type { TaskStatus } from "./types";
+
+export interface TaskFilters {
+  search?: string;
+  tags?: string[];
+  status?: TaskStatus;
+}
 
 interface TaskFilterContextType {
   search: string;
+  debouncedSearch: string;
   setSearch: (search: string) => void;
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
   handleTagToggle: (tag: string) => void;
   clearFilters: () => void;
+  filters: TaskFilters;
 }
 
 const TaskFilterContext = createContext<TaskFilterContextType | undefined>(
   undefined,
 );
 
+const DEBOUNCE_DELAY = 300;
+
 export function TaskFilterProvider({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const isLocalUpdateRef = useRef(false);
 
   const [search, setSearchState] = useState(() => searchParams.get("q") ?? "");
   const [selectedTags, setSelectedTagsState] = useState<string[]>(() => {
@@ -34,8 +50,19 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     return tags ? tags.split(",").filter(Boolean) : [];
   });
 
+  const debouncedSearch = useDebouncedValue(search, DEBOUNCE_DELAY);
+
+  const filters = useMemo<TaskFilters>(
+    () => ({
+      search: debouncedSearch || undefined,
+      tags: selectedTags.length > 0 ? selectedTags : undefined,
+    }),
+    [debouncedSearch, selectedTags],
+  );
+
   const updateUrl = useCallback(
     (newSearch: string, newTags: string[]) => {
+      isLocalUpdateRef.current = true;
       const params = new URLSearchParams();
       if (newSearch) params.set("q", newSearch);
       if (newTags.length > 0) params.set("tags", newTags.join(","));
@@ -47,20 +74,16 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     [router, pathname],
   );
 
-  const setSearch = useCallback(
-    (newSearch: string) => {
-      setSearchState(newSearch);
-      updateUrl(newSearch, selectedTags);
-    },
-    [updateUrl, selectedTags],
-  );
+  const setSearch = useCallback((newSearch: string) => {
+    setSearchState(newSearch);
+  }, []);
 
   const setSelectedTags = useCallback(
     (tags: string[]) => {
       setSelectedTagsState(tags);
-      updateUrl(search, tags);
+      updateUrl(debouncedSearch, tags);
     },
-    [updateUrl, search],
+    [updateUrl, debouncedSearch],
   );
 
   const handleTagToggle = useCallback(
@@ -79,24 +102,39 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     updateUrl("", []);
   }, [updateUrl]);
 
+  // Sync URL to state when debouncedSearch changes
   useEffect(() => {
+    updateUrl(debouncedSearch, selectedTags);
+  }, [debouncedSearch, selectedTags, updateUrl]);
+
+  // Sync state from URL when navigating (back/forward, direct URL entry)
+  useEffect(() => {
+    if (isLocalUpdateRef.current) {
+      isLocalUpdateRef.current = false;
+      return;
+    }
+
     const urlSearch = searchParams.get("q") ?? "";
     const urlTags = searchParams.get("tags");
     const urlTagsArray = urlTags ? urlTags.split(",").filter(Boolean) : [];
 
-    setSearchState(urlSearch);
-    setSelectedTagsState(urlTagsArray);
+    startTransition(() => {
+      setSearchState(urlSearch);
+      setSelectedTagsState(urlTagsArray);
+    });
   }, [searchParams]);
 
   return (
     <TaskFilterContext.Provider
       value={{
         search,
+        debouncedSearch,
         setSearch,
         selectedTags,
         setSelectedTags,
         handleTagToggle,
         clearFilters,
+        filters,
       }}
     >
       {children}
