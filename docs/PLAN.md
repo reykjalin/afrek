@@ -525,44 +525,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 9: Data Export
-**Time estimate:** 2–4 hours
-
-**Goal:** Allow users to export their data in standard formats.
-
-#### Deliverables
-
-1. **Export Formats**
-   - CSV export (tasks with all metadata)
-   - todo.txt format (http://todotxt.org/) for interoperability
-
-2. **Export UI** (`app/(app)/settings/page.tsx`)
-   - "Export Data" section in settings
-   - Format selector (CSV, todo.txt)
-   - Download button that triggers client-side export
-
-3. **Export Logic** (`features/tasks/export.ts`)
-   ```typescript
-   export function exportToCSV(tasks: Task[]): string;
-   export function exportToTodoTxt(tasks: Task[]): string;
-   export function downloadFile(content: string, filename: string, mimeType: string): void;
-   ```
-
-4. **todo.txt Format Mapping**
-   - `x` prefix for completed tasks
-   - `(A)` priority mapping (Highest→A, High→B, etc.)
-   - `due:YYYY-MM-DD` for scheduled date
-   - `+tag` for each tag
-   - `created:YYYY-MM-DD` for creation date
-
-#### Testing
-- CSV opens correctly in Excel/Google Sheets
-- todo.txt imports into other todo.txt apps
-- All task data preserved in exports
-
----
-
-### Phase 10: Client-Side Encryption
+### Phase 9: Client-Side Encryption
 **Time estimate:** 1–2 days
 
 **Goal:** Enable end-to-end encryption so sensitive data is never readable on the server.
@@ -622,7 +585,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 11: Admin Area
+### Phase 10: Admin Area
 **Time estimate:** 1–2 days
 
 **Goal:** Minimal admin interface for account and application management.
@@ -687,7 +650,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 12: Launch Prep
+### Phase 11: Launch Prep
 **Time estimate:** 1–2 days
 
 **Goal:** Polish public-facing pages and legal compliance for launch.
@@ -734,6 +697,43 @@ Each phase produces a working, testable product.
 - Legal pages reviewed (consider legal counsel)
 - All links work
 - Mobile experience is good
+
+---
+
+### Phase 12: Data Export (Post-Launch)
+**Time estimate:** 2–4 hours
+
+**Goal:** Allow users to export their data in standard formats.
+
+#### Deliverables
+
+1. **Export Formats**
+   - CSV export (tasks with all metadata)
+   - todo.txt format (http://todotxt.org/) for interoperability
+
+2. **Export UI** (`app/(app)/settings/page.tsx`)
+   - "Export Data" section in settings
+   - Format selector (CSV, todo.txt)
+   - Download button that triggers client-side export
+
+3. **Export Logic** (`features/tasks/export.ts`)
+   ```typescript
+   export function exportToCSV(tasks: Task[]): string;
+   export function exportToTodoTxt(tasks: Task[]): string;
+   export function downloadFile(content: string, filename: string, mimeType: string): void;
+   ```
+
+4. **todo.txt Format Mapping**
+   - `x` prefix for completed tasks
+   - `(A)` priority mapping (Highest→A, High→B, etc.)
+   - `due:YYYY-MM-DD` for scheduled date
+   - `+tag` for each tag
+   - `created:YYYY-MM-DD` for creation date
+
+#### Testing
+- CSV opens correctly in Excel/Google Sheets
+- todo.txt imports into other todo.txt apps
+- All task data preserved in exports
 
 ---
 
@@ -860,17 +860,22 @@ Phases 0–5 are complete.
 | 6 | Markdown Editor | Todo | 1–3 hours |
 | 7 | Billing (Stripe) | Todo | 1–2 days |
 | 8 | Telemetry (PostHog) | Todo | 1–2 hours |
-| 9 | Data Export | Todo | 2–4 hours |
-| 10 | Client-Side Encryption | Todo | 1–2 days |
-| 11 | Admin Area | Todo | 1–2 days |
-| 12 | Launch Prep | Todo | 1–2 days |
+| 9 | Client-Side Encryption | Todo | 1–2 days |
+| 10 | Admin Area | Todo | 1–2 days |
+| 11 | Launch Prep | Todo | 1–2 days |
+
+### Post-Launch Phases
+
+| Phase | Name | Status | Time Estimate |
+|-------|------|--------|---------------|
+| 12 | Data Export | Todo | 2–4 hours |
 
 ### Critical Path to Launch
-1. **Phase 3** - Auth (required for multi-user)
+1. **Phase 3** - Auth (required for multi-user) ✅
 2. **Phase 7** - Billing (required for revenue)
-3. **Phase 12** - Launch prep (legal, landing page)
+3. **Phase 11** - Launch prep (legal, landing page)
 
 ### Nice-to-Have Before Launch
 - Phase 6 (Markdown) - improves UX significantly
 - Phase 8 (Telemetry) - helps understand usage
-- Phase 10 (Encryption) - differentiator for privacy-conscious users
+- Phase 9 (Encryption) - differentiator for privacy-conscious users
