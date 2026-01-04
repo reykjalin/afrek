@@ -385,7 +385,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 6: WYSIWYG Markdown Editor (Plate)
+### Phase 6: WYSIWYG Markdown Editor (Plate) ✅ Completed
 **Time estimate:** 2–4 hours
 
 **Goal:** Upgrade notes from textarea to rich WYSIWYG editor using Plate (platejs.org).
@@ -399,93 +399,104 @@ Each phase produces a working, testable product.
 
 #### Deliverables
 
-1. **Install Plate**
+1. [x] **Install Plate**
    - `bun add @udecode/plate`
    - Install additional plugins as needed (lists, code, etc.)
 
-2. **Editor Component** (`components/editors/PlateEditor.tsx`)
+2. [x] **Editor Component** (`components/editors/PlateEditor.tsx`)
    - Configure Plate with plugins: paragraph, headings, bold, italic, lists, code, links
    - Placeholder text support
 
-3. **Schema Update**
+3. [x] **Schema Update**
    - Change `notesMarkdown: string` to `notesJson: string` (serialized Slate JSON)
    - Store Plate's native JSON format directly in database
 
-4. **Integration**
+4. [x] **Integration**
    - Replace textarea in TaskItemExpanded with PlateEditor
    - Debounce saves (500ms) to avoid excessive API calls
    - Parse/stringify JSON for database storage
 
-5. **Styling**
+5. [x] **Styling**
    - Match editor theme to app theme using Tailwind
    - Toolbar with common formatting options (optional, can use keyboard shortcuts)
    - Ensure proper dark mode support (stretch goal)
 
 #### Testing
-- Rich text editing works (bold, italic, lists, code, links)
-- Keyboard shortcuts work (Cmd+B for bold, etc.)
-- Changes persist to database as JSON
-- No SSR errors (use dynamic import if needed)
+- [x] Rich text editing works (bold, italic, lists, code, links)
+- [x] Keyboard shortcuts work (Cmd+B for bold, etc.)
+- [x] Changes persist to database as JSON
+- [x] No SSR errors (use dynamic import if needed)
 
 ---
 
-### Phase 7: Subscription & Billing
+### Phase 7: Subscription & Billing (Clerk)
 **Time estimate:** 1–2 days
 
-**Goal:** Implement freemium model with Clerk billing.
+**Goal:** Implement subscription model with 30-day free trial using Clerk's built-in billing.
+
+#### Subscription Model
+- **30-day free trial** from account creation
+- **After trial expires:** Read-only mode (no new tasks, no completing, no editing)
+- **Subscribed users:** Full access
+- **Data export:** Always available, even with expired trial (see Phase 12)
+
+#### Why Clerk Billing?
+- Native integration with existing Clerk auth
+- No need to manage Stripe webhooks or customer IDs manually
+- Subscription status available directly from Clerk user object
+- Built-in checkout and customer portal flows
+- Simplified architecture: no `convex/subscriptions.ts` needed
 
 #### Deliverables
 
-1. **Stripe Setup**
-   - Create Stripe products:
-     - "Afrek Pro Monthly" - $3/month
-     - "Afrek Pro Yearly" - $30/year
-   - Configure webhook endpoint
+1. **Clerk Billing Setup**
+   - Enable Clerk Billing in dashboard
+   - Create plans in Clerk:
+     - "Monthly" - $3/month
+     - "Yearly" - $30/year
+   - Configure Stripe connection through Clerk
 
-2. **Convex Schema Update**
-   ```typescript
-   subscriptions: defineTable({
-     userId: v.string(),
-     stripeCustomerId: v.string(),
-     status: v.string(), // "active" | "past_due" | "canceled"
-     priceId: v.string(),
-     currentPeriodEnd: v.number(),
-   }).index("by_user", ["userId"]),
-   ```
+2. **Subscription Hooks** (`features/billing/hooks.ts`)
+   - `useSubscription()` - reads subscription status from Clerk user metadata
+   - `useCanEdit()` - returns true if trial active OR subscribed
+   - `useTrialStatus()` - returns trial days remaining, expired status
+   - `useBillingPortal()` - opens Clerk's billing portal
 
-3. **Convex Functions** (`convex/subscriptions.ts`)
-   - `getSubscription({ userId })`
-   - `upsertSubscription({ ... })` - called by webhook
+3. **Trial Tracking**
+   - Store `trialStartedAt` timestamp on user creation (Clerk metadata or Convex)
+   - Calculate trial expiration: 30 days from account creation
+   - Check trial/subscription status in all mutation functions
 
-4. **Webhook Handler**
-   - Handle `checkout.session.completed`
-   - Handle `customer.subscription.updated`
-   - Handle `customer.subscription.deleted`
+4. **Read-Only Mode**
+   - When trial expired and no subscription:
+     - Disable task creation
+     - Disable task completion/uncomplete
+     - Disable task editing (title, notes, dates, tags, priority)
+     - Disable task deletion
+     - Allow viewing all existing tasks
+     - Show banner prompting subscription
 
-5. **Free Tier Limits**
-   - 50 tasks maximum for free users
-   - Check limit in `createTask` mutation
-   - Return clear error when limit reached
+5. **Pricing Page** (`app/(marketing)/pricing/page.tsx`)
+   - Show both plans with pricing
+   - "Start Free Trial" for new users
+   - "Subscribe" buttons use Clerk's checkout component
 
-6. **Pricing Page** (`app/(marketing)/pricing/page.tsx`)
-   - Show both plans with feature comparison
-   - "Get Started" buttons link to checkout
+6. **Subscribe Flow**
+   - "Subscribe" button in TopNav when trial expired
+   - Subscription banner in app when trial expiring soon or expired
+   - Clerk handles checkout and success/cancel redirects
 
-7. **Upgrade Flow**
-   - "Upgrade" button in TopNav for free users
-   - Upgrade modal when hitting limits
-   - Success/cancel redirect handling
-
-8. **Billing Management**
-   - Link to Stripe Customer Portal for subscription management
-   - Show current plan status in Settings
+7. **Billing Management**
+   - Use Clerk's `<UserButton />` with billing portal integration
+   - Show subscription status and trial days remaining in Settings
 
 #### Testing
-- Can complete checkout flow
-- Subscription status reflected in app
-- Free users hit 50-task limit
-- Paid users have unlimited tasks
-- Subscription cancellation works
+- New users get 30-day free trial with full access
+- After 30 days, app becomes read-only
+- Can complete checkout flow via Clerk
+- Subscription restores full access immediately
+- Subscription management via Clerk portal works
+- Read-only users can still view all their tasks
 
 ---
 
@@ -530,28 +541,55 @@ Each phase produces a working, testable product.
 
 **Goal:** Enable end-to-end encryption so sensitive data is never readable on the server.
 
+#### Why SubtleCrypto?
+- Built into all modern browsers (Web Crypto API)
+- No external dependencies needed
+- Hardware-accelerated where available
+- Well-audited, standardized implementation
+
 #### Deliverables
 
-1. **Install Encryption Library**
-   - `bun add libsodium-wrappers` (or `tweetnacl` as lighter alternative)
-   - Create `lib/crypto.ts` wrapper
+1. **Crypto Utilities** (`lib/crypto.ts`)
+   - Use browser's `SubtleCrypto` API (https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto)
+   - All encryption/decryption happens client-side only
+   - No crypto libraries to install
 
-2. **Key Management**
-   - Derive encryption key from user password (or separate passphrase)
-   - Use Argon2id for key derivation (via libsodium)
-   - Store encrypted key backup (optional, for recovery)
-   - **Important:** Key never leaves the browser unencrypted
+2. **Key Derivation Options**
+   Users can choose one of two methods to derive their encryption key:
+   
+   **Option A: Passphrase (fallback)**
+   - Derive encryption key from user passphrase using PBKDF2 (`crypto.subtle.deriveKey`)
+   - Generate random salt per user, store in Convex (salt is not secret)
+   - PBKDF2 iterations: minimum 100,000
+   
+   **Option B: Passkey with PRF extension (preferred)**
+   - Use WebAuthn PRF (Pseudo-Random Function) extension to derive encryption key
+   - Key derived directly from passkey during authentication
+   - No passphrase to remember - encryption tied to passkey
+   - Requires browser + authenticator support for PRF extension
+   - Supported: Chrome/Edge (hardware keys like YubiKey), expanding to platform authenticators
+   - Reference: https://developers.yubico.com/WebAuthn/Concepts/PRF_Extension/
 
-3. **Encrypted Fields**
+3. **Key Storage**
+   - Store derived key in memory only (re-derive on page load/login)
+   - **Important:** Key and passphrase never leave the browser
+
+4. **Encryption Implementation**
+   - Use AES-GCM for authenticated encryption (`crypto.subtle.encrypt`)
+   - Generate random IV (12 bytes) per encryption operation
+   - Store IV alongside ciphertext (prepend or separate field)
+   - Encode ciphertext as base64 for database storage
+
+5. **Encrypted Fields**
    - `title` - encrypted
-   - `notesMarkdown` - encrypted
+   - `notesJson` - encrypted
    - `tags` - encrypted (prevents tag-based analysis)
    - Metadata (dates, status, priority) - unencrypted (for queries)
 
-4. **Schema Updates** (`convex/schema.ts`)
+6. **Schema Updates** (`convex/schema.ts`)
    ```typescript
    tasks: defineTable({
-     // Encrypted fields stored as base64 strings
+     // Encrypted fields stored as base64 strings (IV + ciphertext)
      encryptedTitle: v.optional(v.string()),
      encryptedNotes: v.optional(v.string()),
      encryptedTags: v.optional(v.string()),
@@ -561,27 +599,32 @@ Each phase produces a working, testable product.
    })
    ```
 
-5. **Encryption Toggle**
+7. **Encryption Toggle**
    - Setting in user preferences to enable/disable
    - Migration flow: encrypt existing tasks on enable
-   - Warning: losing passphrase = losing data
+   - Warning: losing passphrase/passkey = losing data
 
-6. **UI Indicators**
+8. **UI Indicators**
    - Lock icon when encryption is enabled
    - Clear messaging about encryption status
-   - Passphrase entry on login (if enabled)
+   - Key derivation method selector (passkey vs passphrase)
+   - Passphrase entry on login (if using passphrase method)
 
 #### Security Considerations
-- Use authenticated encryption (XChaCha20-Poly1305)
-- Unique nonce per encryption operation
+- AES-GCM provides authenticated encryption (integrity + confidentiality)
+- Unique IV per encryption operation (never reuse)
 - Zero-knowledge: server never sees plaintext
-- Search disabled for encrypted content (or use deterministic encryption for search, with trade-offs)
+- Search disabled for encrypted content (trade-off for privacy)
+- PBKDF2 iterations: minimum 100,000 for passphrase derivation
+- PRF extension provides hardware-backed key derivation when using passkeys
 
 #### Testing
 - Data unreadable in Convex dashboard when encrypted
 - Decryption works correctly after page refresh
 - Wrong passphrase shows clear error
+- Passkey PRF derivation works (where supported)
 - Encryption/decryption performance acceptable
+- Works in all major browsers (Chrome, Firefox, Safari, Edge)
 
 ---
 
@@ -849,16 +892,15 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-We are currently at **Phase 6: WYSIWYG Markdown Editor**.
+We are currently at **Phase 7: Subscription & Billing (Clerk)**.
 
-Phases 0–5 are complete.
+Phases 0–6 are complete.
 
 ### Remaining Phases
 
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
-| 6 | Markdown Editor | Todo | 1–3 hours |
-| 7 | Billing (Stripe) | Todo | 1–2 days |
+| 7 | Billing (Clerk) | Todo | 1–2 days |
 | 8 | Telemetry (PostHog) | Todo | 1–2 hours |
 | 9 | Client-Side Encryption | Todo | 1–2 days |
 | 10 | Admin Area | Todo | 1–2 days |
@@ -876,6 +918,5 @@ Phases 0–5 are complete.
 3. **Phase 11** - Launch prep (legal, landing page)
 
 ### Nice-to-Have Before Launch
-- Phase 6 (Markdown) - improves UX significantly
 - Phase 8 (Telemetry) - helps understand usage
 - Phase 9 (Encryption) - differentiator for privacy-conscious users
