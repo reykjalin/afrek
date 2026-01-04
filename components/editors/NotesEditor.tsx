@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
-import { BasicNodesKit } from "@/components/editor/plugins/basic-nodes-kit";
+import { NotesEditorKit } from "@/components/editor/plugins/notes-editor-kit";
 import { Editor, EditorContainer } from "@/components/ui/editor";
 
 interface NotesEditorProps {
@@ -28,7 +28,7 @@ export function NotesEditor({
   readOnly = false,
 }: NotesEditorProps) {
   const editor = usePlateEditor({
-    plugins: BasicNodesKit,
+    plugins: NotesEditorKit,
     value: value.length > 0 ? value : emptyValue,
   });
 
