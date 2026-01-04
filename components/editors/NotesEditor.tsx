@@ -44,7 +44,7 @@ export function NotesEditor({
       <EditorContainer variant="default" className="min-h-24 rounded-md border">
         <Editor
           variant="none"
-          className="px-3 py-2 text-sm"
+          className="px-8 py-3 text-sm"
           placeholder={placeholder}
         />
       </EditorContainer>

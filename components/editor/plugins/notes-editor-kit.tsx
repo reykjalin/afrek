@@ -1,5 +1,7 @@
 'use client';
 
+import { TrailingBlockPlugin } from '@platejs/utils';
+
 import { BasicNodesKit } from '@/components/editor/plugins/basic-nodes-kit';
 import { AutoformatKit } from '@/components/editor/plugins/autoformat-kit';
 import { BlockSelectionKit } from '@/components/editor/plugins/block-selection-kit';
@@ -32,4 +34,5 @@ export const NotesEditorKit = [
   ...SlashKit,
   ...TocKit,
   ...ToggleKit,
+  TrailingBlockPlugin,
 ];
