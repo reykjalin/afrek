@@ -13,6 +13,7 @@ import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { getStartOfWeek, getTodayString } from "@/lib/date";
+import { isEditableElement } from "@/lib/keyboard";
 import type { TaskPriority } from "@/features/tasks/types";
 
 const today = getTodayString();
@@ -117,13 +118,23 @@ export default function TasksPage() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip shortcuts when typing in editable elements (inputs, textareas, rich text editors)
+      if (isEditableElement(e.target)) {
+        // Still allow Escape to close modals
+        if (e.key === "Escape") {
+          setShowNewTask(false);
+          setShowFilters(false);
+        }
+        return;
+      }
+
       // N key for new task
-      if (e.key === "n" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
+      if (e.key === "n" && !showNewTask && !showFilters) {
         e.preventDefault();
         setShowNewTask(true);
       }
       // / key for search/filters
-      if (e.key === "/" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
+      if (e.key === "/" && !showNewTask && !showFilters) {
         e.preventDefault();
         setShowFilters(true);
       }
@@ -144,8 +155,8 @@ export default function TasksPage() {
     updateTask(id, { title });
   };
 
-  const handleUpdateNotes = (id: string, notesMarkdown: string) => {
-    updateTask(id, { notesMarkdown });
+  const handleUpdateNotes = (id: string, notesJson: string) => {
+    updateTask(id, { notesJson });
   };
 
   const handleUpdateTags = (id: string, tags: string[]) => {
@@ -175,7 +186,7 @@ export default function TasksPage() {
 
     await addTask({
       title: newTaskTitle.trim(),
-      notesMarkdown: "",
+      notesJson: "",
       tags,
       status: "scheduled" as const,
       priority: "Normal" as const,

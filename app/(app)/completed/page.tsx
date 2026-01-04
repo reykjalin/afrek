@@ -12,6 +12,7 @@ import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { getStartOfWeek, getWeekNumber, formatWeekRange } from "@/lib/date";
+import { isEditableElement } from "@/lib/keyboard";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 export default function CompletedPage() {
@@ -92,7 +93,15 @@ export default function CompletedPage() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "/" && !showFilters && !(e.target instanceof HTMLInputElement)) {
+      // Skip shortcuts when typing in editable elements
+      if (isEditableElement(e.target)) {
+        if (e.key === "Escape") {
+          setShowFilters(false);
+        }
+        return;
+      }
+
+      if (e.key === "/" && !showFilters) {
         e.preventDefault();
         setShowFilters(true);
       }
@@ -123,8 +132,8 @@ export default function CompletedPage() {
     updateTask(id, { title });
   };
 
-  const handleUpdateNotes = (id: string, notesMarkdown: string) => {
-    updateTask(id, { notesMarkdown });
+  const handleUpdateNotes = (id: string, notesJson: string) => {
+    updateTask(id, { notesJson });
   };
 
   const handleUpdateTags = (id: string, tags: string[]) => {

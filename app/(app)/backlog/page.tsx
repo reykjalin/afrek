@@ -13,6 +13,7 @@ import { TaskFilters } from "@/components/tasks";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { isEditableElement } from "@/lib/keyboard";
 import type { TaskPriority } from "@/features/tasks/types";
 
 export default function BacklogPage() {
@@ -103,11 +104,20 @@ export default function BacklogPage() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "n" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
+      // Skip shortcuts when typing in editable elements
+      if (isEditableElement(e.target)) {
+        if (e.key === "Escape") {
+          setShowNewTask(false);
+          setShowFilters(false);
+        }
+        return;
+      }
+
+      if (e.key === "n" && !showNewTask && !showFilters) {
         e.preventDefault();
         setShowNewTask(true);
       }
-      if (e.key === "/" && !showNewTask && !showFilters && !(e.target instanceof HTMLInputElement)) {
+      if (e.key === "/" && !showNewTask && !showFilters) {
         e.preventDefault();
         setShowFilters(true);
       }
@@ -127,8 +137,8 @@ export default function BacklogPage() {
     updateTask(id, { title });
   };
 
-  const handleUpdateNotes = (id: string, notesMarkdown: string) => {
-    updateTask(id, { notesMarkdown });
+  const handleUpdateNotes = (id: string, notesJson: string) => {
+    updateTask(id, { notesJson });
   };
 
   const handleUpdateTags = (id: string, tags: string[]) => {
@@ -159,7 +169,7 @@ export default function BacklogPage() {
     const newTask = {
       id: crypto.randomUUID(),
       title: newTaskTitle.trim(),
-      notesMarkdown: "",
+      notesJson: "",
       tags,
       status: "backlog" as const,
       priority: "Normal" as const,

@@ -242,7 +242,6 @@ export function TaskItem({
           onUpdateTags={onUpdateTags}
           onSchedule={onSchedule}
           onDelete={onDelete}
-          onToggleExpand={toggleExpanded}
         />
       </CollapsibleContent>
     </Collapsible>

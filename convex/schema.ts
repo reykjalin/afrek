@@ -4,7 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   tasks: defineTable({
     title: v.string(),
-    notesMarkdown: v.string(),
+    notesJson: v.string(),
     tags: v.array(v.string()),
     status: v.union(
       v.literal("backlog"),
@@ -33,7 +33,7 @@ export default defineSchema({
       filterFields: ["userId"],
     })
     .searchIndex("search_notes", {
-      searchField: "notesMarkdown",
+      searchField: "notesJson",
       filterFields: ["userId"],
     }),
 });

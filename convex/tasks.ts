@@ -24,7 +24,7 @@ export const listTasks = query({
         ctx.db
           .query("tasks")
           .withSearchIndex("search_notes", (q) =>
-            q.search("notesMarkdown", args.search!).eq("userId", args.userId)
+            q.search("notesJson", args.search!).eq("userId", args.userId)
           )
           .collect(),
       ]);
@@ -91,7 +91,7 @@ export const createTask = mutation({
       scheduledDate: args.scheduledDate,
       priority: args.priority ?? "Normal",
       status: args.scheduledDate ? "scheduled" : "backlog",
-      notesMarkdown: "",
+      notesJson: "",
       createdAt: now,
       updatedAt: now,
     });
@@ -102,7 +102,7 @@ export const updateTask = mutation({
   args: {
     id: v.id("tasks"),
     title: v.optional(v.string()),
-    notesMarkdown: v.optional(v.string()),
+    notesJson: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
       v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done"))
@@ -126,8 +126,8 @@ export const updateTask = mutation({
     const updates: Record<string, unknown> = { updatedAt: Date.now() };
 
     if (args.title !== undefined) updates.title = args.title;
-    if (args.notesMarkdown !== undefined)
-      updates.notesMarkdown = args.notesMarkdown;
+    if (args.notesJson !== undefined)
+      updates.notesJson = args.notesJson;
     if (args.tags !== undefined) updates.tags = args.tags;
     if (args.priority !== undefined) updates.priority = args.priority;
 

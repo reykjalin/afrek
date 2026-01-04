@@ -46,7 +46,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
     return tasksData.map((t) => ({
       id: t._id,
       title: t.title,
-      notesMarkdown: t.notesMarkdown,
+      notesJson: t.notesJson,
       tags: t.tags,
       status: t.status,
       priority: t.priority,
@@ -79,7 +79,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
       await updateTaskMutation({
         id: id as Id<"tasks">,
         title: updates.title,
-        notesMarkdown: updates.notesMarkdown,
+        notesJson: updates.notesJson,
         tags: updates.tags,
         status: updates.status,
         priority: updates.priority,

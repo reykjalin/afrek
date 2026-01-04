@@ -4,7 +4,7 @@ export type TaskPriority = "Lowest" | "Low" | "Normal" | "Medium" | "High" | "Hi
 export interface Task {
   id: string;
   title: string;
-  notesMarkdown: string;
+  notesJson: string;
   tags: string[];
   status: TaskStatus;
   priority: TaskPriority;
@@ -25,7 +25,7 @@ export interface CreateTaskInput {
 export interface UpdateTaskInput {
   id: string;
   title?: string;
-  notesMarkdown?: string;
+  notesJson?: string;
   tags?: string[];
   status?: TaskStatus;
   priority?: TaskPriority;
