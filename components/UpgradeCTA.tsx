@@ -18,6 +18,7 @@ export function UpgradeCTA() {
         </div>
         <Button
           render={<Link href="/pricing" />}
+          nativeButton={false}
           size="sm"
           className="shrink-0"
         >
