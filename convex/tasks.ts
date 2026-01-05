@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireActiveSubscription } from "./users";
 
 export const listTasks = query({
   args: {
@@ -7,7 +8,7 @@ export const listTasks = query({
     search: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
-      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done"))
+      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done")),
     ),
   },
   handler: async (ctx, args) => {
@@ -18,13 +19,13 @@ export const listTasks = query({
         ctx.db
           .query("tasks")
           .withSearchIndex("search_title", (q) =>
-            q.search("title", args.search!).eq("userId", args.userId)
+            q.search("title", args.search!).eq("userId", args.userId),
           )
           .collect(),
         ctx.db
           .query("tasks")
           .withSearchIndex("search_notes", (q) =>
-            q.search("notesJson", args.search!).eq("userId", args.userId)
+            q.search("notesJson", args.search!).eq("userId", args.userId),
           )
           .collect(),
       ]);
@@ -50,7 +51,7 @@ export const listTasks = query({
 
     if (args.tags && args.tags.length > 0) {
       tasks = tasks.filter((t) =>
-        args.tags!.some((tag) => t.tags.includes(tag))
+        args.tags!.some((tag) => t.tags.includes(tag)),
       );
     }
 
@@ -78,11 +79,12 @@ export const createTask = mutation({
         v.literal("Normal"),
         v.literal("Medium"),
         v.literal("High"),
-        v.literal("Highest")
-      )
+        v.literal("Highest"),
+      ),
     ),
   },
   handler: async (ctx, args) => {
+    await requireActiveSubscription(ctx);
     const now = Date.now();
     return await ctx.db.insert("tasks", {
       userId: args.userId,
@@ -105,7 +107,7 @@ export const updateTask = mutation({
     notesJson: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
-      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done"))
+      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done")),
     ),
     priority: v.optional(
       v.union(
@@ -114,20 +116,20 @@ export const updateTask = mutation({
         v.literal("Normal"),
         v.literal("Medium"),
         v.literal("High"),
-        v.literal("Highest")
-      )
+        v.literal("Highest"),
+      ),
     ),
     scheduledDate: v.optional(v.union(v.string(), v.null())),
   },
   handler: async (ctx, args) => {
+    await requireActiveSubscription(ctx);
     const existing = await ctx.db.get(args.id);
     if (!existing) throw new Error("Task not found");
 
     const updates: Record<string, unknown> = { updatedAt: Date.now() };
 
     if (args.title !== undefined) updates.title = args.title;
-    if (args.notesJson !== undefined)
-      updates.notesJson = args.notesJson;
+    if (args.notesJson !== undefined) updates.notesJson = args.notesJson;
     if (args.tags !== undefined) updates.tags = args.tags;
     if (args.priority !== undefined) updates.priority = args.priority;
 
@@ -152,6 +154,7 @@ export const updateTask = mutation({
 export const toggleDone = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
+    await requireActiveSubscription(ctx);
     const task = await ctx.db.get(args.id);
     if (!task) throw new Error("Task not found");
 
@@ -174,6 +177,7 @@ export const toggleDone = mutation({
 export const deleteTask = mutation({
   args: { id: v.id("tasks") },
   handler: async (ctx, args) => {
+    await requireActiveSubscription(ctx);
     await ctx.db.delete(args.id);
   },
 });

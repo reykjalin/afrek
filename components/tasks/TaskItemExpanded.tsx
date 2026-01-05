@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { NotesEditor } from "@/components/editors/NotesEditor";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
+import { useTaskAccess } from "@/features/billing";
 
 interface TaskItemExpandedProps {
   task: Task;
@@ -44,6 +45,7 @@ export function TaskItemExpanded({
   onSchedule,
   onDelete,
 }: TaskItemExpandedProps) {
+  const { readOnly } = useTaskAccess();
   const [tags, setTags] = useState(task.tags.join(", "));
   const [notesValue, setNotesValue] = useState<Value>(() =>
     parseNotesJson(task.notesJson)
@@ -52,6 +54,8 @@ export function TaskItemExpanded({
 
   const handleNotesChange = useCallback(
     (value: Value) => {
+      if (readOnly) return;
+      
       setNotesValue(value);
 
       if (debounceRef.current) {
@@ -63,7 +67,7 @@ export function TaskItemExpanded({
         onUpdateNotes(task.id, json);
       }, 500);
     },
-    [onUpdateNotes, task.id]
+    [onUpdateNotes, task.id, readOnly]
   );
 
   useEffect(() => {
@@ -126,6 +130,7 @@ export function TaskItemExpanded({
           value={notesValue}
           onChange={handleNotesChange}
           placeholder="Add notes..."
+          readOnly={readOnly}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -136,6 +141,7 @@ export function TaskItemExpanded({
           onChange={(e) => setTags(e.target.value)}
           onBlur={handleTagsBlur}
           placeholder="Tags (comma-separated)..."
+          disabled={readOnly}
         />
       </div>
 
@@ -147,6 +153,7 @@ export function TaskItemExpanded({
           variant="outline"
           size="xs"
           onClick={() => onSchedule(task.id, getNextDayDate())}
+          disabled={readOnly}
         >
           <ArrowRight className="h-3 w-3" />
           Next day
@@ -155,6 +162,7 @@ export function TaskItemExpanded({
           variant="outline"
           size="xs"
           onClick={() => onSchedule(task.id, getNextWeekMondayDate())}
+          disabled={readOnly}
         >
           <Calendar className="h-3 w-3" />
           Next week
@@ -163,6 +171,7 @@ export function TaskItemExpanded({
           variant="outline"
           size="xs"
           onClick={() => onSchedule(task.id, null)}
+          disabled={readOnly}
         >
           <Inbox className="h-3 w-3" />
           Backlog
@@ -174,6 +183,7 @@ export function TaskItemExpanded({
           variant="destructive"
           size="xs"
           onClick={() => onDelete(task.id)}
+          disabled={readOnly}
         >
           <Trash2 className="h-3 w-3" />
           Delete

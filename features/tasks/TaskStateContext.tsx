@@ -1,7 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState, useMemo, ReactNode, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  ReactNode,
+  useCallback,
+} from "react";
 import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 import type { Task, UpdateTaskInput } from "./types";
 import {
   useTasksQuery,
@@ -17,19 +25,26 @@ interface TaskStateContextType {
   tasks: Task[];
   isLoading: boolean;
   addTask: (task: Omit<Task, "id">) => Promise<void>;
-  updateTask: (id: string, updates: Omit<UpdateTaskInput, "id">) => Promise<void>;
+  updateTask: (
+    id: string,
+    updates: Omit<UpdateTaskInput, "id">,
+  ) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   toggleTaskDone: (id: string) => Promise<void>;
   expandedTaskIds: Set<string>;
   toggleTaskExpanded: (id: string) => void;
 }
 
-const TaskStateContext = createContext<TaskStateContextType | undefined>(undefined);
+const TaskStateContext = createContext<TaskStateContextType | undefined>(
+  undefined,
+);
 
 export function TaskStateProvider({ children }: { children: ReactNode }) {
   const { userId } = useAuth();
   const { filters } = useTaskFilter();
-  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const tasksData = useTasksQuery(userId ?? undefined, {
     search: filters.search,
@@ -60,47 +75,85 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
 
   const isLoading = tasksData === undefined;
 
+  const handleMutationError = (error: unknown, action: string) => {
+    const message = error instanceof Error ? error.message : String(error);
+    
+    if (message.includes("Unauthenticated") || message.includes("User not found")) {
+      toast.error("Please sign in to manage tasks", {
+        description: "Your session may have expired. Try refreshing the page.",
+      });
+    } else if (message.includes("Subscription required") || message.includes("subscription")) {
+      toast.error("Subscription required", {
+        description: "Upgrade your plan to manage tasks.",
+        action: {
+          label: "View Plans",
+          onClick: () => window.location.href = "/pricing",
+        },
+      });
+    } else {
+      toast.error(`Failed to ${action}`, {
+        description: message,
+      });
+    }
+  };
+
   const addTask = useCallback(
     async (task: Omit<Task, "id">) => {
       if (!userId) return;
-      await createTaskMutation({
-        userId,
-        title: task.title,
-        tags: task.tags,
-        scheduledDate: task.scheduledDate,
-        priority: task.priority,
-      });
+      try {
+        await createTaskMutation({
+          userId,
+          title: task.title,
+          tags: task.tags,
+          scheduledDate: task.scheduledDate,
+          priority: task.priority,
+        });
+      } catch (error) {
+        handleMutationError(error, "create task");
+      }
     },
-    [createTaskMutation, userId]
+    [createTaskMutation, userId],
   );
 
   const updateTask = useCallback(
     async (id: string, updates: Omit<UpdateTaskInput, "id">) => {
-      await updateTaskMutation({
-        id: id as Id<"tasks">,
-        title: updates.title,
-        notesJson: updates.notesJson,
-        tags: updates.tags,
-        status: updates.status,
-        priority: updates.priority,
-        scheduledDate: updates.scheduledDate,
-      });
+      try {
+        await updateTaskMutation({
+          id: id as Id<"tasks">,
+          title: updates.title,
+          notesJson: updates.notesJson,
+          tags: updates.tags,
+          status: updates.status,
+          priority: updates.priority,
+          scheduledDate: updates.scheduledDate,
+        });
+      } catch (error) {
+        handleMutationError(error, "update task");
+      }
     },
-    [updateTaskMutation]
+    [updateTaskMutation],
   );
 
   const deleteTask = useCallback(
     async (id: string) => {
-      await deleteTaskMutation({ id: id as Id<"tasks"> });
+      try {
+        await deleteTaskMutation({ id: id as Id<"tasks"> });
+      } catch (error) {
+        handleMutationError(error, "delete task");
+      }
     },
-    [deleteTaskMutation]
+    [deleteTaskMutation],
   );
 
   const toggleTaskDone = useCallback(
     async (id: string) => {
-      await toggleDoneMutation({ id: id as Id<"tasks"> });
+      try {
+        await toggleDoneMutation({ id: id as Id<"tasks"> });
+      } catch (error) {
+        handleMutationError(error, "update task");
+      }
     },
-    [toggleDoneMutation]
+    [toggleDoneMutation],
   );
 
   const toggleTaskExpanded = useCallback((id: string) => {

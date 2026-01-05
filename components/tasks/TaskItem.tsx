@@ -23,6 +23,7 @@ import {
 import { TaskItemExpanded } from "./TaskItemExpanded";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
+import { useTaskAccess } from "@/features/billing";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
@@ -52,6 +53,7 @@ export function TaskItem({
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { handleTagToggle, selectedTags } = useTaskFilter();
   const { expandedTaskIds, toggleTaskExpanded } = useTaskState();
+  const { readOnly } = useTaskAccess();
   const isExpanded = expandedTaskIds.has(task.id);
 
   const isDone = task.status === "done";
@@ -112,13 +114,16 @@ export function TaskItem({
         <button
           onClick={(e) => {
             e.stopPropagation();
+            if (readOnly) return;
             onToggleDone(task.id);
           }}
+          disabled={readOnly}
           className={cn(
             "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
             isDone
               ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground/30 hover:border-primary"
+              : "border-muted-foreground/30 hover:border-primary",
+            readOnly && "opacity-60 cursor-default"
           )}
         >
           {isDone && <Check className="h-3 w-3" />}
@@ -144,11 +149,12 @@ export function TaskItem({
           <span
             onClick={(e) => {
               e.stopPropagation();
-              setIsEditingTitle(true);
+              if (!readOnly) setIsEditingTitle(true);
             }}
             className={cn(
-              "cursor-text break-words",
-              isDone && "line-through"
+              "break-words",
+              isDone && "line-through",
+              readOnly ? "cursor-default" : "cursor-text"
             )}
           >
             {task.title}
@@ -175,8 +181,15 @@ export function TaskItem({
 
         <DropdownMenu>
           <DropdownMenuTrigger
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (readOnly) e.preventDefault();
+            }}
+            disabled={readOnly}
+            className={cn(
+              "flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer",
+              readOnly && "opacity-60 cursor-default"
+            )}
           >
             {task.priority}
           </DropdownMenuTrigger>
@@ -202,10 +215,19 @@ export function TaskItem({
             {formatCompletedDate(task.completedAt)}
           </div>
         ) : (
-          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+          <Popover open={isDatePickerOpen} onOpenChange={(open) => {
+            if (!readOnly) setIsDatePickerOpen(open);
+          }}>
             <PopoverTrigger
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (readOnly) e.preventDefault();
+              }}
+              disabled={readOnly}
+              className={cn(
+                "flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer whitespace-nowrap",
+                readOnly && "opacity-60 cursor-default"
+              )}
             >
               <Calendar className="h-4 w-4" />
               {task.scheduledDate

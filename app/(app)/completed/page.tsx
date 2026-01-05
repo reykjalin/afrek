@@ -8,17 +8,20 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { Kbd } from "@/components/ui/kbd";
 import { TaskList } from "@/components/tasks/TaskList";
 import { TaskFilters } from "@/components/tasks";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { getStartOfWeek, getWeekNumber, formatWeekRange } from "@/lib/date";
 import { isEditableElement } from "@/lib/keyboard";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
-export default function CompletedPage() {
+function CompletedPageContent() {
   const { tasks, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { setLeftContent } = useTopNavActions();
+  const { readOnly } = useTaskAccess();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [showFilters, setShowFilters] = useState(false);
 
@@ -157,6 +160,7 @@ export default function CompletedPage() {
     <div className="flex flex-col gap-6 p-6 h-full">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex flex-col gap-4">
+          {readOnly && <UpgradeCTA />}
           <div className="flex items-center justify-center gap-1">
             <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
               <ChevronLeft className="h-4 w-4" />
@@ -211,5 +215,13 @@ export default function CompletedPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function CompletedPage() {
+  return (
+    <TaskAccessProvider>
+      <CompletedPageContent />
+    </TaskAccessProvider>
   );
 }

@@ -2,6 +2,33 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  users: defineTable({
+    externalId: v.string(), // Clerk user ID
+    // Subscription fields
+    plan: v.optional(
+      v.object({
+        id: v.optional(v.string()), // Clerk plan ID.
+        key: v.optional(v.string()),
+        status: v.union(v.literal("active"), v.literal("none")),
+        subscription: v.optional(
+          v.object({
+            id: v.string(), // Clerk subscription ID.
+            itemId: v.string(), // Clerk subscription item ID
+          }),
+        ),
+        trial: v.optional(
+          v.object({
+            status: v.union(
+              v.literal("active"),
+              v.literal("ending_soon"),
+              v.literal("none"),
+            ),
+          }),
+        ),
+      }),
+    ),
+  }).index("byExternalId", ["externalId"]),
+
   tasks: defineTable({
     title: v.string(),
     notesJson: v.string(),
@@ -9,7 +36,7 @@ export default defineSchema({
     status: v.union(
       v.literal("backlog"),
       v.literal("scheduled"),
-      v.literal("done")
+      v.literal("done"),
     ),
     priority: v.union(
       v.literal("Lowest"),
@@ -17,7 +44,7 @@ export default defineSchema({
       v.literal("Normal"),
       v.literal("Medium"),
       v.literal("High"),
-      v.literal("Highest")
+      v.literal("Highest"),
     ),
     scheduledDate: v.optional(v.string()),
     completedAt: v.optional(v.number()),

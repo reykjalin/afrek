@@ -9,19 +9,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/ui/kbd";
 import { TaskFilters, WeeklyView } from "@/components/tasks";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { getStartOfWeek, getTodayString } from "@/lib/date";
 import { isEditableElement } from "@/lib/keyboard";
 import type { TaskPriority } from "@/features/tasks/types";
 
 const today = getTodayString();
 
-export default function TasksPage() {
+function TasksPageContent() {
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
+  const { readOnly } = useTaskAccess();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskTags, setNewTaskTags] = useState("");
@@ -49,25 +52,27 @@ export default function TasksPage() {
   useEffect(() => {
     setLeftContent(
       <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowNewTask(true)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            }
-          />
-          <TooltipContent>
-            <div className="flex items-center gap-2">
-              <span>Create Task</span>
-              <Kbd>N</Kbd>
-            </div>
-          </TooltipContent>
-        </Tooltip>
+        {!readOnly && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowNewTask(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <div className="flex items-center gap-2">
+                <span>Create Task</span>
+                <Kbd>N</Kbd>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Tooltip>
           <TooltipTrigger
             render={
@@ -113,7 +118,7 @@ export default function TasksPage() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart, readOnly]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -128,8 +133,8 @@ export default function TasksPage() {
         return;
       }
 
-      // N key for new task
-      if (e.key === "n" && !showNewTask && !showFilters) {
+      // N key for new task (only when not readOnly)
+      if (e.key === "n" && !readOnly && !showNewTask && !showFilters) {
         e.preventDefault();
         setShowNewTask(true);
       }
@@ -147,7 +152,7 @@ export default function TasksPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showNewTask, showFilters]);
+  }, [showNewTask, showFilters, readOnly]);
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
@@ -203,7 +208,8 @@ export default function TasksPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
+        {readOnly && <UpgradeCTA />}
         {/* Weekly view */}
         <WeeklyView
         tasks={tasks}
@@ -289,5 +295,13 @@ export default function TasksPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <TaskAccessProvider>
+      <TasksPageContent />
+    </TaskAccessProvider>
   );
 }

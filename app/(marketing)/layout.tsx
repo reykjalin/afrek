@@ -1,7 +1,9 @@
+import { ClerkProvider } from "@clerk/nextjs";
+
 export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <ClerkProvider dynamic>{children}</ClerkProvider>;
 }
