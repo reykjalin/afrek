@@ -51,6 +51,24 @@ export function TaskItemExpanded({
     parseNotesJson(task.notesJson)
   );
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevTagsRef = useRef<string>(task.tags.join(", "));
+  const prevNotesRef = useRef<string>(task.notesJson);
+
+  // Sync local state when task data changes (e.g., after decryption unlock)
+  useEffect(() => {
+    const tagsStr = task.tags.join(", ");
+    if (tagsStr !== prevTagsRef.current) {
+      prevTagsRef.current = tagsStr;
+      setTags(tagsStr);
+    }
+  }, [task.tags]);
+
+  useEffect(() => {
+    if (task.notesJson !== prevNotesRef.current) {
+      prevNotesRef.current = task.notesJson;
+      setNotesValue(parseNotesJson(task.notesJson));
+    }
+  }, [task.notesJson]);
 
   const handleNotesChange = useCallback(
     (value: Value) => {

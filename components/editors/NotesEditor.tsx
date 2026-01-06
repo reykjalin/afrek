@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
@@ -31,6 +31,16 @@ export function NotesEditor({
     plugins: NotesEditorKit,
     value: value.length > 0 ? value : emptyValue,
   });
+
+  const prevValueRef = useRef<string>(JSON.stringify(value));
+
+  useEffect(() => {
+    const valueStr = JSON.stringify(value);
+    if (valueStr !== prevValueRef.current) {
+      prevValueRef.current = valueStr;
+      editor.tf.setValue(value.length > 0 ? value : emptyValue);
+    }
+  }, [value, editor]);
 
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {
