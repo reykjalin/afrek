@@ -66,9 +66,9 @@ This project uses **shadcn with Base UI** (not Radix UI). Key difference:
 
 ## Current Phase
 
-**Phase 9: Admin Area**
+**Phase 10: Telemetry (PostHog)**
 
-Phases 0–8 are complete.
+Phases 0–9 are complete.
 
 ### What's Done
 - ✅ Phase 0: Folder structure, conventions, docs
@@ -80,10 +80,10 @@ Phases 0–8 are complete.
 - ✅ Phase 6: Markdown WYSIWYG editor (Plate)
 - ✅ Phase 7: Subscription & Billing (Clerk)
 - ✅ Phase 8: Client-Side Encryption (WebAuthn PRF, AES-GCM)
+- ✅ Phase 9: Admin Area (Clerk RBAC)
 
 ### What's Remaining
-- Phase 9: Admin Area (current focus)
-- Phase 10: Telemetry (PostHog)
+- Phase 10: Telemetry (PostHog) (current focus)
 - Phase 11: Launch Prep
 
 ## Key Patterns

@@ -911,19 +911,17 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-We are currently at **Phase 8: Client-Side Encryption**.
-
-Phases 0–7 are complete.
+Phases 0–9 are complete.
 
 ### Remaining Phases
 
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
 | 7 | Billing (Clerk) | ✅ Complete | 1–2 days |
-| 8 | Client-Side Encryption | Todo | 1–2 days |
-| 9 | Admin Area | Todo | 1–2 days |
-| 10 | Launch Prep | Todo | 1–2 days |
-| 11 | Telemetry (PostHog) | Todo | 1–2 hours |
+| 8 | Client-Side Encryption | ✅ Complete | 1–2 days |
+| 9 | Admin Area | ✅ Complete | 1–2 days |
+| 10 | Telemetry (PostHog) | Todo | 1–2 hours |
+| 11 | Launch Prep | Todo | 1–2 days |
 
 ### Post-Launch Phases
 
@@ -937,5 +935,4 @@ Phases 0–7 are complete.
 3. **Phase 11** - Launch prep (legal, landing page)
 
 ### Nice-to-Have Before Launch
-- Phase 8 (Telemetry) - helps understand usage
-- Phase 9 (Encryption) - differentiator for privacy-conscious users
+- Phase 10 (Telemetry) - helps understand usage
