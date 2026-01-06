@@ -4,6 +4,7 @@ import {
   query,
   QueryCtx,
   MutationCtx,
+  internalQuery,
 } from "./_generated/server";
 import type { UserJSON } from "@clerk/backend";
 import { v, Validator } from "convex/values";
@@ -222,5 +223,13 @@ export const clearEncryption = mutation({
     await ctx.db.patch(user._id, {
       encryption: undefined,
     });
+  },
+});
+
+// Get user by external ID (for admin functions)
+export const getByExternalId = internalQuery({
+  args: { externalId: v.string() },
+  handler: async (ctx, { externalId }) => {
+    return await userByExternalId(ctx, externalId);
   },
 });

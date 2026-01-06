@@ -599,18 +599,46 @@ Each phase produces a working, testable product.
 
 #### Design Principles
 - **Minimal data exposure:** Show only what's needed for support
-- **Audit logging:** Track all admin actions
 - **Privacy-first:** No ability to read user task content
+- **Audit logging:** Deferred to a later phase using a dedicated logging service
 
 #### Deliverables
 
-1. **Admin Role**
-   - Add `role` field to user data: `"user" | "admin"`
-   - Check role in middleware and Convex functions
-   - Admin accounts managed via environment variable or Clerk metadata
+1. **Clerk RBAC Setup** (using [Clerk's basic RBAC pattern](https://clerk.com/docs/guides/secure/basic-rbac))
+   - **Configure session token** in Clerk Dashboard → Sessions → Customize session token:
+     ```json
+     { "metadata": "{{user.public_metadata}}" }
+     ```
+   - **Create TypeScript definitions** (`types/globals.d.ts`):
+     ```typescript
+     export type Roles = "admin" | "user";
+     
+     declare global {
+       interface CustomJwtSessionClaims {
+         metadata: {
+           role?: Roles;
+         };
+       }
+     }
+     ```
+   - **Create role helper** (`lib/roles.ts`):
+     ```typescript
+     import { auth } from "@clerk/nextjs/server";
+     import { Roles } from "@/types/globals";
+     
+     export async function checkRole(role: Roles): Promise<boolean> {
+       const { sessionClaims } = await auth();
+       return sessionClaims?.metadata?.role === role;
+     }
+     ```
+   - **Set admin role** via Clerk Dashboard → Users → [user] → Public metadata:
+     ```json
+     { "role": "admin" }
+     ```
 
 2. **Admin Routes** (`app/(admin)/`)
-   - Protected by admin role check
+   - Protected via middleware using `checkRole("admin")`
+   - Redirect non-admins to home page
    - Separate layout from main app
 
 3. **Admin Dashboard** (`app/(admin)/dashboard/page.tsx`)
@@ -620,7 +648,7 @@ Each phase produces a working, testable product.
    - Error rates / health metrics
 
 4. **User Management** (`app/(admin)/users/page.tsx`)
-   - Search users by email (partial match)
+   - Search users by email using Clerk Backend SDK
    - Display: email, signup date, plan, task count
    - **Never display:** task titles, notes, tags
    - Actions:
@@ -628,30 +656,21 @@ Each phase produces a working, testable product.
      - Apply discount to subscription
      - Delete account and all data
      - Trigger full data export (sends to user's email)
+   - **Server actions** (`app/(admin)/_actions.ts`) to update user roles via `clerkClient.users.updateUser()`
 
-5. **Convex Functions** (`convex/admin.ts`)
-   - `listUsers({ search?, limit, offset })`
-   - `getUserStats({ userId })` - aggregate stats only
-   - `grantFreeAccess({ userId, until })`
-   - `applyDiscount({ userId, percent, months })`
-   - `deleteUser({ userId })` - cascades to all user data
-   - `triggerExport({ userId })` - queues export job
-
-6. **Audit Log** (`convex/schema.ts`)
-   ```typescript
-   adminAuditLog: defineTable({
-     adminUserId: v.string(),
-     action: v.string(),
-     targetUserId: v.optional(v.string()),
-     details: v.string(), // JSON
-     timestamp: v.number(),
-   }).index("by_admin", ["adminUserId"])
-     .index("by_target", ["targetUserId"])
-   ```
+5. **Convex Functions**
+   - `convex/admin.ts` - queries and internal mutations (Convex runtime)
+     - `getDashboardStats` - aggregate stats only
+     - `deleteUserData` - internal mutation to cascade delete user data
+   - `convex/adminActions.ts` - actions using Clerk SDK (Node.js runtime)
+     - `searchUsers` - search via Clerk Backend SDK
+     - `setUserRole` - update user publicMetadata
+     - `deleteUserAndData` - delete user from Convex and Clerk
 
 #### Testing
-- Non-admins cannot access admin routes
-- All admin actions logged
+- Non-admins cannot access admin routes (middleware redirect)
+- `checkRole()` returns correct boolean for each role
+- Convex functions verify admin role before executing
 - User deletion removes all associated data
 - Cannot see user task content from admin
 

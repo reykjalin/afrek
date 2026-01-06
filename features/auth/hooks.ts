@@ -1,10 +1,16 @@
-// Auth hooks - will wrap Clerk hooks once integrated (Phase 3)
+import { useUser } from "@clerk/nextjs";
 
 export function useCurrentUser() {
-  // Will use: useUser() from @clerk/nextjs
+  const { user, isLoaded, isSignedIn } = useUser();
   return {
-    userId: undefined as string | undefined,
-    isLoaded: true,
-    isSignedIn: false,
+    userId: user?.id,
+    isLoaded,
+    isSignedIn: isSignedIn ?? false,
   };
+}
+
+export function useIsAdmin(): boolean {
+  const { user, isLoaded } = useUser();
+  if (!isLoaded || !user) return false;
+  return user.publicMetadata?.role === "admin";
 }
