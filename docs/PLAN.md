@@ -920,8 +920,8 @@ Phases 0–9 are complete.
 | 7 | Billing (Clerk) | ✅ Complete | 1–2 days |
 | 8 | Client-Side Encryption | ✅ Complete | 1–2 days |
 | 9 | Admin Area | ✅ Complete | 1–2 days |
-| 10 | Telemetry (PostHog) | Todo | 1–2 hours |
-| 11 | Launch Prep | Todo | 1–2 days |
+| 10 | Launch Prep | Todo | 1–2 days |
+| 11 | Telemetry (PostHog) | Todo | 1–2 hours |
 
 ### Post-Launch Phases
 
@@ -932,7 +932,7 @@ Phases 0–9 are complete.
 ### Critical Path to Launch
 1. **Phase 3** - Auth (required for multi-user) ✅
 2. **Phase 7** - Billing (required for revenue) ✅
-3. **Phase 11** - Launch prep (legal, landing page)
+3. **Phase 10** - Launch prep (legal, landing page)
 
 ### Nice-to-Have Before Launch
-- Phase 10 (Telemetry) - helps understand usage
+- Phase 11 (Telemetry) - helps understand usage
