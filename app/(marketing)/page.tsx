@@ -145,6 +145,14 @@ export default function LandingPage() {
             View pricing
           </Link>
         </div>
+        <a
+          href="https://github.com/reykjalin/afrek"
+          target="_blank"
+          rel="noreferrer"
+          className="animate-fade-in text-sm text-muted-foreground opacity-0 underline transition-colors [animation-delay:350ms] hover:text-foreground"
+        >
+          View source on GitHub
+        </a>
 
         {/* Extended trial pill */}
         <div className="animate-fade-in inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-1.5 text-sm text-emerald-700 opacity-0 transition-colors [animation-delay:450ms] hover:bg-emerald-500/20 dark:text-emerald-300">

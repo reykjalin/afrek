@@ -213,8 +213,15 @@ export default function EncryptionHelpPage() {
           alongside the ciphertext to allow future algorithm upgrades.
         </p>
         <p>
-          The implementation will be open-sourced, so you can audit the code
-          yourself.
+          The implementation is open source, so you can{" "}
+          <a
+            href="https://github.com/reykjalin/afrek"
+            target="_blank"
+            rel="noreferrer"
+          >
+            audit the code yourself on GitHub
+          </a>
+          .
         </p>
       </Prose>
     </div>

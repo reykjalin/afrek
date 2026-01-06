@@ -5,6 +5,7 @@ const footerLinks = [
   { href: "/terms", label: "Terms" },
   { href: "/help", label: "Help" },
   { href: "/help/encryption", label: "Security" },
+  { href: "https://github.com/reykjalin/afrek", label: "GitHub", external: true },
 ];
 
 export function MarketingFooter() {
@@ -17,15 +18,27 @@ export function MarketingFooter() {
           © {currentYear} Afrek. All rights reserved.
         </p>
         <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-          {footerLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {footerLinks.map((link) =>
+            link.external ? (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </nav>
       </div>
     </footer>

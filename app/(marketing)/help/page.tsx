@@ -115,6 +115,18 @@ export default function HelpPage() {
           Everything you need to get started with Afrek and make weekly planning
           stick.
         </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Afrek is open source —{" "}
+          <a
+            href="https://github.com/reykjalin/afrek"
+            target="_blank"
+            rel="noreferrer"
+            className="underline hover:text-foreground"
+          >
+            view the code on GitHub
+          </a>
+          .
+        </p>
       </div>
 
       {/* Quick Start */}

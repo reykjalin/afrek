@@ -170,6 +170,20 @@ export default function PrivacyPage() {
           major changes, we may also notify you via email.
         </p>
 
+        <h2>Open source</h2>
+        <p>
+          Afrek is open source. You can review how we handle your data by
+          viewing the{" "}
+          <a
+            href="https://github.com/reykjalin/afrek"
+            target="_blank"
+            rel="noreferrer"
+          >
+            source code on GitHub
+          </a>
+          .
+        </p>
+
         <h2>Contact</h2>
         <p>
           If you have questions about this privacy policy or your data, please

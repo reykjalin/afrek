@@ -8,7 +8,9 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16">
-      <h1 className="mb-2 text-3xl font-bold tracking-tight">Terms of Service</h1>
+      <h1 className="mb-2 text-3xl font-bold tracking-tight">
+        Terms of Service
+      </h1>
       <p className="mb-8 text-sm text-muted-foreground">
         Last updated: January 2025
       </p>
@@ -62,10 +64,12 @@ export default function TermsPage() {
         <p>You agree not to:</p>
         <ul>
           <li>Use Afrek for any illegal or unauthorized purpose</li>
-          <li>Attempt to gain unauthorized access to our systems or other users&apos; accounts</li>
+          <li>
+            Attempt to gain unauthorized access to our systems or other
+            users&apos; accounts
+          </li>
           <li>Use Afrek to store or transmit malware or malicious content</li>
           <li>Interfere with or disrupt the service or servers</li>
-          <li>Reverse engineer, decompile, or attempt to extract the source code</li>
           <li>Use the service to harass, abuse, or harm others</li>
         </ul>
 
@@ -101,9 +105,9 @@ export default function TermsPage() {
 
         <h2>Disclaimers</h2>
         <p>
-          Afrek is provided &quot;as is&quot; and &quot;as available&quot; without warranties
-          of any kind, either express or implied. We do not warrant that the
-          service will be uninterrupted, secure, or error-free.
+          Afrek is provided &quot;as is&quot; and &quot;as available&quot;
+          without warranties of any kind, either express or implied. We do not
+          warrant that the service will be uninterrupted, secure, or error-free.
         </p>
 
         <h2>Limitation of liability</h2>
@@ -139,6 +143,19 @@ export default function TermsPage() {
           significant changes by updating the date at the top of this page. Your
           continued use of Afrek after changes constitutes acceptance of the new
           terms.
+        </p>
+
+        <h2>Open source</h2>
+        <p>
+          Afrek&apos;s application code is open source and available on{" "}
+          <a
+            href="https://github.com/reykjalin/afrek"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+          . These Terms govern your use of the hosted Afrek service.
         </p>
 
         <h2>Contact</h2>
