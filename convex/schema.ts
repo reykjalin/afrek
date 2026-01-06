@@ -27,12 +27,23 @@ export default defineSchema({
         ),
       }),
     ),
+    // Encryption settings (passkey-based)
+    encryption: v.optional(
+      v.object({
+        credentialId: v.string(), // base64url passkey credential ID
+        keyCheck: v.string(), // encrypted blob to verify key is correct
+        createdAt: v.number(),
+      }),
+    ),
   }).index("byExternalId", ["externalId"]),
 
   tasks: defineTable({
     title: v.string(),
     notesJson: v.string(),
     tags: v.array(v.string()),
+    // Encrypted payload containing title, notesJson, tags when encryption is enabled
+    // When set, title/notesJson/tags contain placeholders
+    encryptedPayload: v.optional(v.string()),
     status: v.union(
       v.literal("backlog"),
       v.literal("scheduled"),

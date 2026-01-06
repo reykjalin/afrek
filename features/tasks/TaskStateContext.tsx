@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useMemo,
+  useEffect,
   ReactNode,
   useCallback,
 } from "react";
@@ -19,11 +20,19 @@ import {
   useToggleDone,
 } from "./api";
 import { useTaskFilter } from "./TaskFilterContext";
+import { useEncryption } from "@/features/crypto";
+import {
+  encryptJson,
+  decryptJson,
+  type EncryptedBlob,
+  type EncryptedTaskPayload,
+} from "@/lib/crypto";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface TaskStateContextType {
   tasks: Task[];
   isLoading: boolean;
+  readOnly: boolean;
   addTask: (task: Omit<Task, "id">) => Promise<void>;
   updateTask: (
     id: string,
@@ -42,13 +51,17 @@ const TaskStateContext = createContext<TaskStateContextType | undefined>(
 export function TaskStateProvider({ children }: { children: ReactNode }) {
   const { userId } = useAuth();
   const { filters } = useTaskFilter();
+  const { enabled: encryptionEnabled, key, locked: encryptionLocked } = useEncryption();
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(
     new Set(),
   );
+  const [decryptedCache, setDecryptedCache] = useState<
+    Map<string, EncryptedTaskPayload>
+  >(new Map());
 
   const tasksData = useTasksQuery(userId ?? undefined, {
-    search: filters.search,
-    tags: filters.tags,
+    search: encryptionEnabled ? undefined : filters.search,
+    tags: encryptionEnabled ? undefined : filters.tags,
     status: filters.status,
   });
   const createTaskMutation = useCreateTask();
@@ -56,24 +69,73 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
   const deleteTaskMutation = useDeleteTask();
   const toggleDoneMutation = useToggleDone();
 
+  useEffect(() => {
+    if (!tasksData || !key) return;
+
+    const decryptTasks = async () => {
+      const newCache = new Map<string, EncryptedTaskPayload>();
+      for (const task of tasksData) {
+        if (task.encryptedPayload) {
+          try {
+            const blob: EncryptedBlob = JSON.parse(task.encryptedPayload);
+            const decrypted = await decryptJson<EncryptedTaskPayload>(key, blob);
+            newCache.set(task._id, decrypted);
+          } catch (e) {
+            console.error("Failed to decrypt task:", task._id, e);
+          }
+        }
+      }
+      setDecryptedCache(newCache);
+    };
+
+    decryptTasks();
+  }, [tasksData, key]);
+
   const tasks = useMemo<Task[]>(() => {
     if (!tasksData) return [];
-    return tasksData.map((t) => ({
-      id: t._id,
-      title: t.title,
-      notesJson: t.notesJson,
-      tags: t.tags,
-      status: t.status,
-      priority: t.priority,
-      scheduledDate: t.scheduledDate,
-      completedAt: t.completedAt,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt,
-      userId: t.userId,
-    }));
-  }, [tasksData]);
+
+    let result = tasksData.map((t) => {
+      const decrypted = decryptedCache.get(t._id);
+      const isLocked = !!t.encryptedPayload && !decrypted;
+
+      return {
+        id: t._id,
+        title: decrypted?.title ?? (isLocked ? "[Locked]" : t.title),
+        notesJson: decrypted?.notesJson ?? (isLocked ? "" : t.notesJson),
+        tags: decrypted?.tags ?? (isLocked ? [] : t.tags),
+        status: t.status,
+        priority: t.priority,
+        scheduledDate: t.scheduledDate,
+        completedAt: t.completedAt,
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        userId: t.userId,
+        isLocked,
+      };
+    });
+
+    if (encryptionEnabled && !encryptionLocked) {
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        result = result.filter(
+          (t) =>
+            t.title.toLowerCase().includes(q) ||
+            t.notesJson.toLowerCase().includes(q) ||
+            t.tags.some((tag) => tag.toLowerCase().includes(q))
+        );
+      }
+      if (filters.tags && filters.tags.length > 0) {
+        result = result.filter((t) =>
+          t.tags.some((tag) => filters.tags!.includes(tag))
+        );
+      }
+    }
+
+    return result;
+  }, [tasksData, decryptedCache, encryptionEnabled, encryptionLocked, filters]);
 
   const isLoading = tasksData === undefined;
+  const readOnly = encryptionEnabled && encryptionLocked;
 
   const handleMutationError = (error: unknown, action: string) => {
     const message = error instanceof Error ? error.message : String(error);
@@ -100,60 +162,135 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
   const addTask = useCallback(
     async (task: Omit<Task, "id">) => {
       if (!userId) return;
-      try {
-        await createTaskMutation({
-          userId,
-          title: task.title,
-          tags: task.tags,
-          scheduledDate: task.scheduledDate,
-          priority: task.priority,
+      if (readOnly) {
+        toast.error("Cannot create tasks", {
+          description: "Unlock encryption to create tasks.",
         });
+        return;
+      }
+      if (encryptionEnabled && !key) {
+        toast.error("Cannot create tasks", {
+          description: "Encryption key not available.",
+        });
+        return;
+      }
+      try {
+        if (encryptionEnabled && key) {
+          const payload: EncryptedTaskPayload = {
+            title: task.title,
+            notesJson: task.notesJson ?? "",
+            tags: task.tags,
+          };
+          const blob = await encryptJson(key, payload);
+          await createTaskMutation({
+            userId,
+            title: "[encrypted]",
+            tags: [],
+            scheduledDate: task.scheduledDate,
+            priority: task.priority,
+            encryptedPayload: JSON.stringify(blob),
+          });
+        } else {
+          await createTaskMutation({
+            userId,
+            title: task.title,
+            tags: task.tags,
+            scheduledDate: task.scheduledDate,
+            priority: task.priority,
+          });
+        }
       } catch (error) {
         handleMutationError(error, "create task");
       }
     },
-    [createTaskMutation, userId],
+    [createTaskMutation, userId, encryptionEnabled, key, readOnly],
   );
 
   const updateTask = useCallback(
     async (id: string, updates: Omit<UpdateTaskInput, "id">) => {
-      try {
-        await updateTaskMutation({
-          id: id as Id<"tasks">,
-          title: updates.title,
-          notesJson: updates.notesJson,
-          tags: updates.tags,
-          status: updates.status,
-          priority: updates.priority,
-          scheduledDate: updates.scheduledDate,
+      if (readOnly) {
+        toast.error("Cannot update tasks", {
+          description: "Unlock encryption to update tasks.",
         });
+        return;
+      }
+      if (encryptionEnabled && !key) {
+        toast.error("Cannot update tasks", {
+          description: "Encryption key not available.",
+        });
+        return;
+      }
+      try {
+        const existingTask = tasks.find((t) => t.id === id);
+        if (!existingTask) return;
+
+        if (encryptionEnabled && key) {
+          const payload: EncryptedTaskPayload = {
+            title: updates.title ?? existingTask.title,
+            notesJson: updates.notesJson ?? existingTask.notesJson,
+            tags: updates.tags ?? existingTask.tags,
+          };
+          const blob = await encryptJson(key, payload);
+          await updateTaskMutation({
+            id: id as Id<"tasks">,
+            title: "[encrypted]",
+            notesJson: "",
+            tags: [],
+            status: updates.status,
+            priority: updates.priority,
+            scheduledDate: updates.scheduledDate,
+            encryptedPayload: JSON.stringify(blob),
+          });
+        } else {
+          await updateTaskMutation({
+            id: id as Id<"tasks">,
+            title: updates.title,
+            notesJson: updates.notesJson,
+            tags: updates.tags,
+            status: updates.status,
+            priority: updates.priority,
+            scheduledDate: updates.scheduledDate,
+          });
+        }
       } catch (error) {
         handleMutationError(error, "update task");
       }
     },
-    [updateTaskMutation],
+    [updateTaskMutation, encryptionEnabled, key, tasks, readOnly],
   );
 
   const deleteTask = useCallback(
     async (id: string) => {
+      if (readOnly) {
+        toast.error("Cannot delete tasks", {
+          description: "Unlock encryption to delete tasks.",
+        });
+        return;
+      }
       try {
         await deleteTaskMutation({ id: id as Id<"tasks"> });
       } catch (error) {
         handleMutationError(error, "delete task");
       }
     },
-    [deleteTaskMutation],
+    [deleteTaskMutation, readOnly],
   );
 
   const toggleTaskDone = useCallback(
     async (id: string) => {
+      if (readOnly) {
+        toast.error("Cannot update tasks", {
+          description: "Unlock encryption to update tasks.",
+        });
+        return;
+      }
       try {
         await toggleDoneMutation({ id: id as Id<"tasks"> });
       } catch (error) {
         handleMutationError(error, "update task");
       }
     },
-    [toggleDoneMutation],
+    [toggleDoneMutation, readOnly],
   );
 
   const toggleTaskExpanded = useCallback((id: string) => {
@@ -173,6 +310,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
       value={{
         tasks,
         isLoading,
+        readOnly,
         addTask,
         updateTask,
         deleteTask,

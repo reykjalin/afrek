@@ -1,5 +1,6 @@
 import {
   internalMutation,
+  mutation,
   query,
   QueryCtx,
   MutationCtx,
@@ -194,3 +195,32 @@ async function userByExternalId(
     .withIndex("byExternalId", (q) => q.eq("externalId", externalId))
     .unique();
 }
+
+// Set encryption settings for the current user
+export const setEncryption = mutation({
+  args: {
+    credentialId: v.string(),
+    keyCheck: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    await ctx.db.patch(user._id, {
+      encryption: {
+        credentialId: args.credentialId,
+        keyCheck: args.keyCheck,
+        createdAt: Date.now(),
+      },
+    });
+  },
+});
+
+// Clear encryption settings for the current user
+export const clearEncryption = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    await ctx.db.patch(user._id, {
+      encryption: undefined,
+    });
+  },
+});

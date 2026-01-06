@@ -13,6 +13,7 @@ export interface Task {
   createdAt: number;
   updatedAt: number;
   userId: string;
+  isLocked?: boolean; // true when task is encrypted but key is not available
 }
 
 export interface CreateTaskInput {

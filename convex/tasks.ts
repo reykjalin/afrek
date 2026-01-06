@@ -82,6 +82,7 @@ export const createTask = mutation({
         v.literal("Highest"),
       ),
     ),
+    encryptedPayload: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireActiveSubscription(ctx);
@@ -94,6 +95,7 @@ export const createTask = mutation({
       priority: args.priority ?? "Normal",
       status: args.scheduledDate ? "scheduled" : "backlog",
       notesJson: "",
+      encryptedPayload: args.encryptedPayload,
       createdAt: now,
       updatedAt: now,
     });
@@ -120,6 +122,7 @@ export const updateTask = mutation({
       ),
     ),
     scheduledDate: v.optional(v.union(v.string(), v.null())),
+    encryptedPayload: v.optional(v.union(v.string(), v.null())),
   },
   handler: async (ctx, args) => {
     await requireActiveSubscription(ctx);
@@ -132,6 +135,10 @@ export const updateTask = mutation({
     if (args.notesJson !== undefined) updates.notesJson = args.notesJson;
     if (args.tags !== undefined) updates.tags = args.tags;
     if (args.priority !== undefined) updates.priority = args.priority;
+    if (args.encryptedPayload !== undefined) {
+      updates.encryptedPayload =
+        args.encryptedPayload === null ? undefined : args.encryptedPayload;
+    }
 
     if (args.scheduledDate !== undefined) {
       updates.scheduledDate =
