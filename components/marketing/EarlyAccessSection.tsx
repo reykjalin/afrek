@@ -15,6 +15,7 @@ const worksWell = [
 
 const inProgress = [
   "Recurring tasks",
+  "Easy to find overdue tasks",
   "Data export",
   "Some onboarding and UX flows",
   "Visual polish and small interaction details",
