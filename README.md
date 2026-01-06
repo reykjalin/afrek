@@ -203,13 +203,12 @@ npx convex deploy     # Deploy Convex to production
 
 ## Project Status
 
-**Actively developed** — Phases 0–9 complete. See [docs/PLAN.md](docs/PLAN.md) for the full roadmap.
+**Actively developed** — Phases 0–10 complete. See [docs/PLAN.md](docs/PLAN.md) for the full roadmap.
 
 ### Coming Soon
 
 - PostHog telemetry (opt-out)
 - Data export (CSV, todo.txt)
-- Landing page polish
 
 ---
 
