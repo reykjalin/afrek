@@ -131,3 +131,117 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Traveling light border effect - base */
+  .traveling-light,
+  .traveling-light-button,
+  .traveling-light-card {
+    --angle: 0deg;
+    position: relative;
+    z-index: 0;
+  }
+
+  .traveling-light {
+    background: var(--background);
+  }
+
+  .traveling-light::before,
+  .traveling-light-button::before,
+  .traveling-light-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--angle),
+      transparent 0%,
+      transparent 25%,
+      oklch(0.75 0.15 280) 30%,
+      oklch(0.65 0.2 320) 35%,
+      oklch(0.75 0.15 280) 40%,
+      transparent 45%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Persona pills - medium speed */
+  .traveling-light:hover::before {
+    opacity: 1;
+    animation: travel-light 1.5s linear infinite;
+  }
+
+  /* CTA buttons - slower, softer */
+  .traveling-light-button::before {
+    filter: blur(1px);
+    padding: 2px;
+    inset: -1px;
+  }
+
+  .traveling-light-button:hover::before,
+  .traveling-light-button:focus-visible::before {
+    opacity: 0.7;
+    animation: travel-light 2.4s linear infinite;
+  }
+
+  /* Cards - very slow, soft glow */
+  .traveling-light-card::before {
+    filter: blur(2px);
+    padding: 2px;
+    inset: -1px;
+  }
+
+  .traveling-light-card:hover::before {
+    opacity: 0.5;
+    animation: travel-light 4s linear infinite;
+  }
+
+  @property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes travel-light {
+    from {
+      --angle: 0deg;
+    }
+    to {
+      --angle: 360deg;
+    }
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .traveling-light::before,
+    .traveling-light-button::before,
+    .traveling-light-card::before {
+      animation: none !important;
+    }
+  }
+
+}
