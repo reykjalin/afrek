@@ -66,22 +66,25 @@ This project uses **shadcn with Base UI** (not Radix UI). Key difference:
 
 ## Current Phase
 
-**Phase 3: Clerk Authentication**
+**Phase 8: Client-Side Encryption**
 
-Phases 0–2 are complete. Core scheduling (Phase 4) and parts of search/filter (Phase 5) were implemented early. Next step: add Clerk auth, replace `DEMO_USER_ID` with real user IDs.
+Phases 0–7 are complete.
 
 ### What's Done
 - ✅ Phase 0: Folder structure, conventions, docs
 - ✅ Phase 1: App shell, task components, weekly view, keyboard shortcuts
 - ✅ Phase 2: Convex integration, real-time sync, server-side filtering
+- ✅ Phase 3: Clerk authentication
 - ✅ Phase 4: Date utilities, weekly navigation, scheduling UX, backlog page, completed page
-- ✅ Phase 5 (partial): Search, tags, URL-persisted filters, backlog/completed views
+- ✅ Phase 5: Search, tags, URL-persisted filters, backlog/completed views
+- ✅ Phase 6: Markdown WYSIWYG editor (Plate)
+- ✅ Phase 7: Subscription & Billing (Clerk)
 
 ### What's Remaining
-- Phase 3: Clerk auth (current focus)
-- Phase 5: Status filter UI, sort options, search debounce, notes search
-- Phase 6: Markdown WYSIWYG editor
-- Phase 7: Stripe billing
+- Phase 8: Client-Side Encryption (current focus)
+- Phase 9: Admin Area
+- Phase 10: Telemetry (PostHog)
+- Phase 11: Launch Prep
 
 ## Key Patterns
 

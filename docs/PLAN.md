@@ -892,15 +892,15 @@ npx convex deploy     # Deploy Convex to production
 
 ## Next Steps
 
-We are currently at **Phase 7: Subscription & Billing (Clerk)**.
+We are currently at **Phase 8: Client-Side Encryption**.
 
-Phases 0–6 are complete.
+Phases 0–7 are complete.
 
 ### Remaining Phases
 
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
-| 7 | Billing (Clerk) | Todo | 1–2 days |
+| 7 | Billing (Clerk) | ✅ Complete | 1–2 days |
 | 8 | Client-Side Encryption | Todo | 1–2 days |
 | 9 | Admin Area | Todo | 1–2 days |
 | 10 | Telemetry (PostHog) | Todo | 1–2 hours |
@@ -914,7 +914,7 @@ Phases 0–6 are complete.
 
 ### Critical Path to Launch
 1. **Phase 3** - Auth (required for multi-user) ✅
-2. **Phase 7** - Billing (required for revenue)
+2. **Phase 7** - Billing (required for revenue) ✅
 3. **Phase 11** - Launch prep (legal, landing page)
 
 ### Nice-to-Have Before Launch
