@@ -66,9 +66,9 @@ This project uses **shadcn with Base UI** (not Radix UI). Key difference:
 
 ## Current Phase
 
-**Phase 8: Client-Side Encryption**
+**Phase 9: Admin Area**
 
-Phases 0–7 are complete.
+Phases 0–8 are complete.
 
 ### What's Done
 - ✅ Phase 0: Folder structure, conventions, docs
@@ -79,10 +79,10 @@ Phases 0–7 are complete.
 - ✅ Phase 5: Search, tags, URL-persisted filters, backlog/completed views
 - ✅ Phase 6: Markdown WYSIWYG editor (Plate)
 - ✅ Phase 7: Subscription & Billing (Clerk)
+- ✅ Phase 8: Client-Side Encryption (WebAuthn PRF, AES-GCM)
 
 ### What's Remaining
-- Phase 8: Client-Side Encryption (current focus)
-- Phase 9: Admin Area
+- Phase 9: Admin Area (current focus)
 - Phase 10: Telemetry (PostHog)
 - Phase 11: Launch Prep
 
