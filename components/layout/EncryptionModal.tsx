@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useEncryption } from "@/features/crypto";
 import {
   Dialog,
@@ -115,6 +116,15 @@ export function EncryptionModal({ open, onOpenChange }: EncryptionModalProps) {
                       You&apos;ll need your passkey to access tasks on new devices.
                     </li>
                   </ul>
+                  <p className="mt-2">
+                    <Link
+                      href="/encryption"
+                      className="text-primary underline underline-offset-4"
+                      target="_blank"
+                    >
+                      Learn more about encryption
+                    </Link>
+                  </p>
                 </div>
               </div>
             </div>
@@ -190,7 +200,14 @@ export function EncryptionModal({ open, onOpenChange }: EncryptionModalProps) {
           </DialogTitle>
           <DialogDescription>
             Your tasks are currently encrypted. Disabling encryption will decrypt
-            all your tasks and store them in plain text on our servers.
+            all your tasks and store them in plain text on our servers.{" "}
+            <Link
+              href="/encryption"
+              className="text-primary underline underline-offset-4"
+              target="_blank"
+            >
+              Learn more
+            </Link>
           </DialogDescription>
         </DialogHeader>
 
