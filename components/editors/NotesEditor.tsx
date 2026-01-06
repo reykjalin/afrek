@@ -33,17 +33,22 @@ export function NotesEditor({
   });
 
   const prevValueRef = useRef<string>(JSON.stringify(value));
+  const editorValueRef = useRef<string>(JSON.stringify(value));
 
   useEffect(() => {
     const valueStr = JSON.stringify(value);
-    if (valueStr !== prevValueRef.current) {
-      prevValueRef.current = valueStr;
+    // Only update editor if the external value changed AND it's different from
+    // what the editor currently has (avoids resetting on our own edits)
+    if (valueStr !== prevValueRef.current && valueStr !== editorValueRef.current) {
       editor.tf.setValue(value.length > 0 ? value : emptyValue);
+      editorValueRef.current = valueStr;
     }
+    prevValueRef.current = valueStr;
   }, [value, editor]);
 
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {
+      editorValueRef.current = JSON.stringify(value);
       onChange(value);
     },
     [onChange]
