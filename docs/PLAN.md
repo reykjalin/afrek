@@ -500,43 +500,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 8: Telemetry (PostHog)
-**Time estimate:** 1–2 hours
-
-**Goal:** Add privacy-respecting analytics to understand user behavior and improve the product.
-
-#### Deliverables
-
-1. **Install PostHog**
-   - `bun add posthog-js`
-   - Configure environment variables
-   - Create `lib/posthog.ts` provider wrapper
-
-2. **Integration**
-   - Initialize PostHog in app layout
-   - Identify users after Clerk auth (use Clerk user ID)
-   - Respect Do Not Track browser setting
-
-3. **Key Events to Track**
-   - Task created, completed, deleted
-   - Scheduling actions (scheduled, moved to backlog)
-   - Feature usage (search, filters, markdown editor)
-   - Page views (tasks, backlog, completed, settings)
-   - Subscription events (upgrade, cancel)
-
-4. **Privacy Considerations**
-   - Never log task content (titles, notes)
-   - Only track aggregate behavior patterns
-   - Provide opt-out in settings (stretch goal)
-
-#### Testing
-- Events appear in PostHog dashboard
-- User identification works correctly
-- No PII or task content in event payloads
-
----
-
-### Phase 9: Client-Side Encryption
+### Phase 8: Client-Side Encryption
 **Time estimate:** 1–2 days
 
 **Goal:** Enable end-to-end encryption so sensitive data is never readable on the server.
@@ -628,7 +592,7 @@ Each phase produces a working, testable product.
 
 ---
 
-### Phase 10: Admin Area
+### Phase 9: Admin Area
 **Time estimate:** 1–2 days
 
 **Goal:** Minimal admin interface for account and application management.
@@ -690,6 +654,42 @@ Each phase produces a working, testable product.
 - All admin actions logged
 - User deletion removes all associated data
 - Cannot see user task content from admin
+
+---
+
+### Phase 10: Telemetry (PostHog)
+**Time estimate:** 1–2 hours
+
+**Goal:** Add privacy-respecting analytics to understand user behavior and improve the product.
+
+#### Deliverables
+
+1. **Install PostHog**
+   - `bun add posthog-js`
+   - Configure environment variables
+   - Create `lib/posthog.ts` provider wrapper
+
+2. **Integration**
+   - Initialize PostHog in app layout
+   - Identify users after Clerk auth (use Clerk user ID)
+   - Respect Do Not Track browser setting
+
+3. **Key Events to Track**
+   - Task created, completed, deleted
+   - Scheduling actions (scheduled, moved to backlog)
+   - Feature usage (search, filters, markdown editor)
+   - Page views (tasks, backlog, completed, settings)
+   - Subscription events (upgrade, cancel)
+
+4. **Privacy Considerations**
+   - Never log task content (titles, notes)
+   - Only track aggregate behavior patterns
+   - Provide opt-out in settings (stretch goal)
+
+#### Testing
+- Events appear in PostHog dashboard
+- User identification works correctly
+- No PII or task content in event payloads
 
 ---
 
@@ -901,9 +901,9 @@ Phases 0–6 are complete.
 | Phase | Name | Status | Time Estimate |
 |-------|------|--------|---------------|
 | 7 | Billing (Clerk) | Todo | 1–2 days |
-| 8 | Telemetry (PostHog) | Todo | 1–2 hours |
-| 9 | Client-Side Encryption | Todo | 1–2 days |
-| 10 | Admin Area | Todo | 1–2 days |
+| 8 | Client-Side Encryption | Todo | 1–2 days |
+| 9 | Admin Area | Todo | 1–2 days |
+| 10 | Telemetry (PostHog) | Todo | 1–2 hours |
 | 11 | Launch Prep | Todo | 1–2 days |
 
 ### Post-Launch Phases
