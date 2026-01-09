@@ -17,12 +17,12 @@ export function UpgradeCTA() {
           </p>
         </div>
         <Button
-          render={<Link href="/pricing" />}
+          render={<Link href="/choose-plan" />}
           nativeButton={false}
           size="sm"
           className="shrink-0"
         >
-          View Plans
+          Renew
         </Button>
       </CardContent>
     </Card>

@@ -94,7 +94,7 @@ export function PricingCards() {
               </Button>
             ) : (
               <Link
-                href={`/sign-up?plan=${plan.id}`}
+                href="/sign-up?returnTo=/choose-plan"
                 className={cn(buttonVariants(), "w-full")}
               >
                 Get started
