@@ -1,154 +1,19 @@
 import {
-  internalMutation,
   mutation,
   query,
   QueryCtx,
   MutationCtx,
   internalQuery,
+  internalMutation,
 } from "./_generated/server";
-import type { UserJSON } from "@clerk/backend";
-import { v, Validator } from "convex/values";
+import { Doc } from "./_generated/dataModel";
+import { v } from "convex/values";
 
 // Query to get current user
 export const current = query({
   args: {},
   handler: async (ctx) => {
     return await getCurrentUser(ctx);
-  },
-});
-
-// Upsert user from Clerk webhook (user.created, user.updated)
-export const upsertFromClerk = internalMutation({
-  args: { data: v.any() as Validator<UserJSON> },
-  async handler(ctx, { data }) {
-    const userAttributes = {
-      externalId: data.id,
-    };
-
-    const user = await userByExternalId(ctx, data.id);
-    if (user === null) {
-      await ctx.db.insert("users", {
-        ...userAttributes,
-      });
-    } else {
-      await ctx.db.patch(user._id, userAttributes);
-    }
-  },
-});
-
-// Delete user from Clerk webhook (user.deleted)
-export const deleteFromClerk = internalMutation({
-  args: { clerkUserId: v.string() },
-  async handler(ctx, { clerkUserId }) {
-    const user = await userByExternalId(ctx, clerkUserId);
-
-    if (user !== null) {
-      await ctx.db.delete(user._id);
-    } else {
-      console.warn(
-        `Can't delete user, there is none for Clerk user ID: ${clerkUserId}`,
-      );
-    }
-  },
-});
-
-// Update subscription from Clerk billing webhook (subscriptionItem.active)
-export const activateSubscription = internalMutation({
-  args: {
-    clerkUserId: v.string(),
-    planId: v.string(),
-    planSlug: v.string(),
-    subscriptionId: v.string(),
-    subscriptionItemId: v.string(),
-    isTrial: v.boolean(),
-    trialEndsAt: v.optional(v.number()),
-  },
-  async handler(
-    ctx,
-    {
-      clerkUserId,
-      planId,
-      planSlug,
-      subscriptionId,
-      subscriptionItemId,
-      isTrial,
-    },
-  ) {
-    const user = await userByExternalId(ctx, clerkUserId);
-
-    const plan = {
-      id: planId,
-      key: planSlug,
-      subscription: {
-        id: subscriptionId,
-        itemId: subscriptionItemId,
-      },
-      status: "active" as const,
-      trial: { status: isTrial ? ("active" as const) : ("none" as const) },
-    };
-
-    if (user === null) {
-      await ctx.db.insert("users", {
-        externalId: clerkUserId,
-        plan,
-      });
-    } else {
-      await ctx.db.patch(user._id, {
-        plan,
-      });
-    }
-  },
-});
-
-// End subscription from Clerk billing webhook (subscriptionItem.ended)
-export const endSubscription = internalMutation({
-  args: { clerkUserId: v.string(), planSlug: v.string() },
-  async handler(ctx, { clerkUserId, planSlug }) {
-    const user = await userByExternalId(ctx, clerkUserId);
-
-    if (user === null) {
-      console.warn(
-        `Can't end subscription, no user for Clerk ID: ${clerkUserId}`,
-      );
-      return;
-    }
-
-    if (user.plan === undefined) {
-      console.warn(
-        `Can't end subscription, no plan active for Clerk ID: ${clerkUserId}`,
-      );
-      return;
-    }
-
-    if (user.plan.key !== planSlug) {
-      console.warn(
-        `Can't end subscription, plan ${planSlug} does not match currently active plan ${user.plan.key}`,
-      );
-      return;
-    }
-
-    await ctx.db.patch(user._id, {
-      plan: { status: "none", trial: { status: "none" } },
-    });
-  },
-});
-
-// Update trial ending notification from Clerk billing webhook (subscriptionItem.freeTrialEnding)
-export const updateTrialEnding = internalMutation({
-  args: { clerkUserId: v.string() },
-  async handler(ctx, { clerkUserId }) {
-    const user = await userByExternalId(ctx, clerkUserId);
-
-    if (user === null) {
-      console.warn(
-        `Can't update trial ending, no user for Clerk ID: ${clerkUserId}`,
-      );
-      return;
-    }
-
-    await ctx.db.patch(user._id, {
-      plan: { status: "active", trial: { status: "ending_soon" } },
-    });
   },
 });
 
@@ -186,8 +51,8 @@ export async function requireActiveSubscription(ctx: MutationCtx) {
   return user;
 }
 
-// Helper: Look up user by Clerk external ID
-async function userByExternalId(
+// Helper: Look up user by external ID
+export async function userByExternalId(
   ctx: QueryCtx | MutationCtx,
   externalId: string,
 ) {
@@ -231,5 +96,60 @@ export const getByExternalId = internalQuery({
   args: { externalId: v.string() },
   handler: async (ctx, { externalId }) => {
     return await userByExternalId(ctx, externalId);
+  },
+});
+
+// List all users (for admin)
+export const listAll = internalQuery({
+  args: {},
+  handler: async (ctx): Promise<Doc<"users">[]> => {
+    return await ctx.db.query("users").collect();
+  },
+});
+
+// Set user role (admin only, called from adminActions)
+export const setRole = internalMutation({
+  args: {
+    userId: v.id("users"),
+    role: v.union(v.literal("admin"), v.literal("user")),
+  },
+  handler: async (ctx, { userId, role }) => {
+    await ctx.db.patch(userId, { role });
+  },
+});
+
+// Delete user by ID (for admin)
+export const deleteUser = internalMutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    await ctx.db.delete(userId);
+  },
+});
+
+// Delete user and all their data by external ID
+export const deleteUserData = internalMutation({
+  args: {
+    externalId: v.string(),
+  },
+  handler: async (ctx, { externalId }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("byExternalId", (q) => q.eq("externalId", externalId))
+      .first();
+
+    if (!user) return;
+
+    // Delete all tasks
+    const tasks = await ctx.db
+      .query("tasks")
+      .withIndex("by_user", (q) => q.eq("userId", externalId))
+      .collect();
+
+    for (const task of tasks) {
+      await ctx.db.delete(task._id);
+    }
+
+    // Delete user record
+    await ctx.db.delete(user._id);
   },
 });

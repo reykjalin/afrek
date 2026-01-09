@@ -1,14 +1,16 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { Protect } from "@clerk/nextjs";
+import { useIsSubscribed } from "./hooks";
 
 type TaskAccessContextValue = {
   readOnly: boolean;
+  isLoading: boolean;
 };
 
 const TaskAccessContext = createContext<TaskAccessContextValue>({
   readOnly: true,
+  isLoading: true,
 });
 
 export function useTaskAccess() {
@@ -20,21 +22,12 @@ type Props = {
 };
 
 export function TaskAccessProvider({ children }: Props) {
+  const isSubscribed = useIsSubscribed();
+  const isLoading = isSubscribed === undefined;
+
   return (
-    <Protect
-      plan="premium"
-      // condition={(has) =>
-      //   has({ plan: "premium" }) || has({ plan: "free_user" })
-      // }
-      fallback={
-        <TaskAccessContext.Provider value={{ readOnly: true }}>
-          {children}
-        </TaskAccessContext.Provider>
-      }
-    >
-      <TaskAccessContext.Provider value={{ readOnly: false }}>
-        {children}
-      </TaskAccessContext.Provider>
-    </Protect>
+    <TaskAccessContext.Provider value={{ readOnly: !isSubscribed, isLoading }}>
+      {children}
+    </TaskAccessContext.Provider>
   );
 }

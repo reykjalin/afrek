@@ -47,7 +47,7 @@ docs/                 # Documentation
 - `features/tasks/TaskFilterContext.tsx` - Search/tag filters with URL sync
 - `features/tasks/api.ts` - Convex API wrappers
 - `features/layout/TopNavActionsContext.tsx` - Page-provided top nav actions
-- `lib/convexClient.tsx` - Convex client provider wrapper
+- `lib/convexClient.tsx` - Convex client provider with WorkOS AuthKit
 - `lib/date.ts` - Monday-first week date utilities
 
 ## Conventions
@@ -64,29 +64,25 @@ This project uses **shadcn with Base UI** (not Radix UI). Key difference:
 - Use `render` prop instead of `asChild` for component composition
 - Example: `<SidebarMenuButton render={<Link href="/tasks" />}>` instead of `<SidebarMenuButton asChild><Link>...</Link></SidebarMenuButton>`
 
-## Current Phase
+## Authentication & Billing
 
-**All phases complete!**
+- **Authentication:** WorkOS AuthKit
+- **Billing:** Dodo Payments
+- See `.env.example` for required environment variables
 
-Phases 0–10 are complete.
+### Auth Flow
+1. WorkOS middleware (`middleware.ts`) protects routes
+2. Auth routes at `/sign-in`, `/sign-up`, `/callback`, `/sign-out`
+3. `ConvexClientProvider` wraps app with `AuthKitProvider`
+4. Use `useConvexAuth()` for auth state, `useCurrentUser()` for user data
 
-### What's Done
-- ✅ Phase 0: Folder structure, conventions, docs
-- ✅ Phase 1: App shell, task components, weekly view, keyboard shortcuts
-- ✅ Phase 2: Convex integration, real-time sync, server-side filtering
-- ✅ Phase 3: Clerk authentication
-- ✅ Phase 4: Date utilities, weekly navigation, scheduling UX, backlog page, completed page
-- ✅ Phase 5: Search, tags, URL-persisted filters, backlog/completed views
-- ✅ Phase 6: Markdown WYSIWYG editor (Plate)
-- ✅ Phase 7: Subscription & Billing (Clerk)
-- ✅ Phase 8: Client-Side Encryption (WebAuthn PRF, AES-GCM)
-- ✅ Phase 9: Admin Area (Clerk RBAC)
-- ✅ Phase 10: Launch Prep
+### Billing Flow
+1. Pricing page shows plans with checkout buttons
+2. Authenticated users call `api.payments.createCheckout`
+3. Dodo webhooks update subscription status in Convex
+4. `useIsSubscribed()` hook checks subscription status
 
 ## Key Patterns
-
-### Demo User (Pre-Auth)
-Currently using `DEMO_USER_ID = "demo"` in `features/tasks/api.ts`. This will be replaced with Clerk user IDs in Phase 3.
 
 ### Clearing scheduledDate
 To move a task to backlog, pass `scheduledDate: null` (not `undefined`):

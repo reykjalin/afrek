@@ -2,15 +2,26 @@
 
 import { action, ActionCtx } from "./_generated/server";
 import { v } from "convex/values";
-import { clerkClient } from "@clerk/nextjs/server";
 import { internal } from "./_generated/api";
+
+type UserSearchResult = {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  createdAt: number;
+  role: string;
+};
 
 async function assertAdminAction(ctx: ActionCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new Error("Not authenticated");
 
-  const role = (identity as { metadata?: { role?: string } }).metadata?.role;
-  if (role !== "admin") {
+  const user = await ctx.runQuery(internal.users.getByExternalId, {
+    externalId: identity.subject,
+  });
+
+  if (!user || user.role !== "admin") {
     throw new Error("Admin access required");
   }
 
@@ -19,25 +30,32 @@ async function assertAdminAction(ctx: ActionCtx) {
 
 export const searchUsers = action({
   args: { searchQuery: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<UserSearchResult[]> => {
     await assertAdminAction(ctx);
 
-    const clerk = await clerkClient();
-    const clerkUsers = await clerk.users.getUserList({
-      query: args.searchQuery,
-      limit: 20,
-    });
+    const q = args.searchQuery.toLowerCase();
 
-    const userList = clerkUsers.data.map((u) => ({
-      id: u.id,
-      email: u.emailAddresses[0]?.emailAddress ?? "",
-      firstName: u.firstName,
-      lastName: u.lastName,
-      createdAt: u.createdAt,
-      role: (u.publicMetadata as { role?: string })?.role ?? "user",
+    const users = await ctx.runQuery(internal.users.listAll, {});
+
+    const filtered = users
+      .filter(
+        (u) =>
+          u.email?.toLowerCase().includes(q) ||
+          `${u.firstName ?? ""} ${u.lastName ?? ""}`
+            .toLowerCase()
+            .includes(q) ||
+          u.externalId.toLowerCase().includes(q)
+      )
+      .slice(0, 20);
+
+    return filtered.map((u) => ({
+      id: u.externalId,
+      email: u.email ?? "",
+      firstName: u.firstName ?? null,
+      lastName: u.lastName ?? null,
+      createdAt: u._creationTime,
+      role: u.role ?? "user",
     }));
-
-    return userList;
   },
 });
 
@@ -49,9 +67,15 @@ export const setUserRole = action({
   handler: async (ctx, { targetUserId, role }) => {
     await assertAdminAction(ctx);
 
-    const clerk = await clerkClient();
-    await clerk.users.updateUser(targetUserId, {
-      publicMetadata: { role },
+    const user = await ctx.runQuery(internal.users.getByExternalId, {
+      externalId: targetUserId,
+    });
+
+    if (!user) throw new Error("User not found");
+
+    await ctx.runMutation(internal.users.setRole, {
+      userId: user._id,
+      role,
     });
   },
 });
@@ -65,7 +89,12 @@ export const deleteUserAndData = action({
       externalId: targetUserId,
     });
 
-    const clerk = await clerkClient();
-    await clerk.users.deleteUser(targetUserId);
+    const user = await ctx.runQuery(internal.users.getByExternalId, {
+      externalId: targetUserId,
+    });
+
+    if (user) {
+      await ctx.runMutation(internal.users.deleteUser, { userId: user._id });
+    }
   },
 });

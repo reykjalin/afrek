@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         <h3>Account data</h3>
         <p>
           When you sign up, we collect your email address and name through our
-          authentication provider, Clerk. This information is used to identify
+          authentication provider, WorkOS. This information is used to identify
           your account and communicate with you about your subscription.
         </p>
 
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
         <h3>Subscription and billing data</h3>
         <p>
-          Payment processing is handled by Stripe through Clerk. We do not store
+          Payment processing is handled by Dodo Payments. We do not store
           your full credit card number. We receive information about your
           subscription status to provide you with the correct level of service.
         </p>
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
         <p>We use the following third-party services to operate Afrek:</p>
         <ul>
           <li>
-            <strong>Clerk</strong> — Authentication and billing
+            <strong>WorkOS</strong> — Authentication
           </li>
           <li>
             <strong>Convex</strong> — Database and real-time sync
@@ -114,7 +114,7 @@ export default function PrivacyPage() {
             <strong>PostHog</strong> — Analytics
           </li>
           <li>
-            <strong>Stripe</strong> — Payment processing (via Clerk)
+            <strong>Dodo Payments</strong> — Payment processing
           </li>
         </ul>
         <p>

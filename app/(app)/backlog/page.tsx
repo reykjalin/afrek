@@ -22,7 +22,7 @@ function BacklogPageContent() {
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { setLeftContent } = useTopNavActions();
-  const { readOnly } = useTaskAccess();
+  const { readOnly, isLoading: isAccessLoading } = useTaskAccess();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskTags, setNewTaskTags] = useState("");
   const [showNewTask, setShowNewTask] = useState(false);
@@ -194,7 +194,7 @@ function BacklogPageContent() {
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
       <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
-        {readOnly && <UpgradeCTA />}
+        {!isAccessLoading && readOnly && <UpgradeCTA />}
         <div className="flex items-center gap-2">
           <Inbox className="h-5 w-5" />
           <h1 className="text-xl font-semibold">Backlog</h1>

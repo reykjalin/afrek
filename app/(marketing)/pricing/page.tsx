@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { PricingTable } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
+import { PricingCards } from "@/components/marketing/PricingCards";
 
 export const metadata = {
   title: "Pricing - Afrek",
@@ -22,13 +22,12 @@ const features = [
 const faqs = [
   {
     question: "Is there a free trial?",
-    answer:
-      "We don't offer a free trial, but you can cancel anytime within your first billing period if Afrek isn't right for you.",
+    answer: "Yes, all plans include a 30-day free trial.",
   },
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept all major credit cards including Visa, Mastercard, and American Express through Stripe.",
+      "We accept all major credit cards including Visa, Mastercard, and American Express.",
   },
   {
     question: "What happens if I cancel?",
@@ -38,7 +37,7 @@ const faqs = [
   {
     question: "Can I switch between monthly and yearly?",
     answer:
-      "Yes, you can switch plans at any time from your account settings. If you switch to yearly, you'll get a discount equivalent to 2 months free.",
+      "Yes, you can switch plans at any time from your account settings. The yearly plan gives you a full year for the price of 10 months.",
   },
   {
     question: "Do I need to pay for encryption?",
@@ -72,14 +71,16 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Clerk Pricing Table */}
+      {/* Pricing Cards */}
       <div className="mb-12">
-        <PricingTable />
+        <PricingCards />
       </div>
 
       {/* FAQ */}
       <div className="mb-12">
-        <h2 className="mb-6 text-xl font-semibold">Frequently asked questions</h2>
+        <h2 className="mb-6 text-xl font-semibold">
+          Frequently asked questions
+        </h2>
         <div className="space-y-4">
           {faqs.map((faq) => (
             <div key={faq.question} className="border-b pb-4">

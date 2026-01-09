@@ -18,7 +18,7 @@ Plan your week with a Monday–Sunday grid, attach rich notes to each task, and 
 - **Fast filtering** — Tags, search, and keyboard shortcuts to find tasks instantly.
 - **Optional end-to-end encryption** — WebAuthn PRF + AES-GCM; the server never sees your plaintext notes.
 - **Real-time sync** — Changes sync across devices instantly via Convex.
-- **Self-hostable** — Run on your own infrastructure with Clerk + Convex in under 10 minutes.
+- **Self-hostable** — Run on your own infrastructure with WorkOS + Convex in under 10 minutes.
 
 ---
 
@@ -33,7 +33,7 @@ Plan your week with a Monday–Sunday grid, attach rich notes to each task, and 
 | **Completed view** | See what you've accomplished, grouped by week |
 | **Client-side encryption** | Optional AES-GCM encryption with WebAuthn PRF key derivation |
 | **Keyboard shortcuts** | `N` new task, `/` search, and more |
-| **Subscription billing** | Built-in Stripe integration via Clerk (optional for self-hosters) |
+| **Subscription billing** | Built-in payment integration via Dodo Payments (optional for self-hosters) |
 
 ---
 
@@ -51,7 +51,7 @@ bun run dev
 bunx convex dev
 ```
 
-See [Self-Hosting](#self-hosting) below to configure Clerk and Convex.
+See [Self-Hosting](#self-hosting) below to configure WorkOS and Convex.
 
 ---
 
@@ -59,13 +59,13 @@ See [Self-Hosting](#self-hosting) below to configure Clerk and Convex.
 
 Afrek requires two external services (both have generous free tiers):
 
-1. **[Clerk](https://clerk.com)** — Authentication, user management, billing UI
+1. **[WorkOS](https://workos.com)** — Authentication and user management
 2. **[Convex](https://convex.dev)** — Real-time database and backend functions
-3. **[Stripe](https://stripe.com)** — (Optional) Only needed for paid subscriptions
+3. **[Dodo Payments](https://dodopayments.com)** — (Optional) Only needed for paid subscriptions
 
 ### Setup
 
-1. **Create accounts** on Clerk and Convex (free tiers work fine for personal use)
+1. **Create accounts** on WorkOS and Convex (free tiers work fine for personal use)
 
 2. **Clone and configure:**
    ```bash
@@ -94,7 +94,7 @@ Afrek requires two external services (both have generous free tiers):
 A typical production setup:
 - **Next.js** → Vercel, Netlify, or your preferred host
 - **Convex** → `npx convex deploy`
-- **Clerk** → Configure redirect URLs for your domain
+- **WorkOS** → Configure redirect URLs for your domain
 
 ---
 
@@ -104,16 +104,17 @@ A typical production setup:
 
 | Variable | Description |
 |----------|-------------|
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk publishable key |
-| `CLERK_SECRET_KEY` | Clerk secret key |
+| `WORKOS_CLIENT_ID` | WorkOS client ID |
+| `WORKOS_API_KEY` | WorkOS API key |
+| `WORKOS_COOKIE_PASSWORD` | 32+ character password for session encryption |
 | `NEXT_PUBLIC_CONVEX_URL` | Your Convex deployment URL |
 
 ### Optional
 
 | Variable | Description |
 |----------|-------------|
-| `STRIPE_SECRET_KEY` | For subscription billing |
-| `STRIPE_WEBHOOK_SECRET` | For Stripe webhooks |
+| `DODO_PAYMENTS_API_KEY` | For subscription billing (set in Convex dashboard) |
+| `DODO_PAYMENTS_WEBHOOK_SECRET` | For Dodo Payments webhooks (set in Convex dashboard) |
 
 See [.env.example](.env.example) for the full list.
 
@@ -127,12 +128,13 @@ Afrek is built on modern managed services so you don't have to maintain your own
 |-------|------------|
 | Framework | Next.js 16, React 19 |
 | Styling | Tailwind 4, Shadcn/Base UI |
-| Auth & Billing | Clerk |
+| Auth | WorkOS AuthKit |
+| Billing | Dodo Payments |
 | Database | Convex |
 | Editor | Plate (platejs.org) |
 | Encryption | WebAuthn PRF + AES-GCM |
 
-### Why Clerk and Convex?
+### Why WorkOS and Convex?
 
 - No custom auth logic or password handling
 - Production-ready real-time sync across devices
@@ -148,7 +150,7 @@ Afrek depends on these hosted services today. If you need a stack that runs enti
 ## Data & Security
 
 - **Task data** is stored in your Convex project — you control access
-- **User data** (email, auth) is managed by your Clerk project
+- **User data** (email, auth) is managed by your WorkOS project
 - **With encryption enabled**, task content is encrypted in your browser before reaching Convex; only you hold the keys
 - **Telemetry** (if/when added) will be opt-out and documented
 
@@ -178,8 +180,8 @@ docs/                 # Documentation
 
 - [Bun](https://bun.sh/) (or Node.js 20+)
 - [Convex CLI](https://docs.convex.dev/getting-started)
-- Clerk account
-- Stripe account (optional, for billing)
+- WorkOS account
+- Dodo Payments account (optional, for billing)
 
 ### Commands
 

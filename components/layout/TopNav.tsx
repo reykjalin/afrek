@@ -1,8 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { UserButton } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const UserButton = dynamic(
+  () => import("./UserButton").then((mod) => mod.UserButton),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-8 w-8 rounded-full" />,
+  }
+);
 import { useEncryption } from "@/features/crypto";
 import { Button } from "@/components/ui/button";
 import { EncryptionModal } from "./EncryptionModal";
@@ -83,7 +92,7 @@ export function TopNav() {
             </TooltipTrigger>
             <TooltipContent>{getEncryptionTooltip()}</TooltipContent>
           </Tooltip>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       </div>
       <EncryptionModal

@@ -21,7 +21,7 @@ function CompletedPageContent() {
   const { tasks, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { setLeftContent } = useTopNavActions();
-  const { readOnly } = useTaskAccess();
+  const { readOnly, isLoading: isAccessLoading } = useTaskAccess();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [showFilters, setShowFilters] = useState(false);
 
@@ -160,7 +160,7 @@ function CompletedPageContent() {
     <div className="flex flex-col gap-6 p-6 h-full">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex flex-col gap-4">
-          {readOnly && <UpgradeCTA />}
+          {!isAccessLoading && readOnly && <UpgradeCTA />}
           <div className="flex items-center justify-center gap-1">
             <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
               <ChevronLeft className="h-4 w-4" />

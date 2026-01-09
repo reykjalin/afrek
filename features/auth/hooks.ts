@@ -1,16 +1,23 @@
-import { useUser } from "@clerk/nextjs";
+import { useConvexAuth, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export function useCurrentUser() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const user = useQuery(
+    api.users.current,
+    isAuthenticated ? {} : "skip"
+  );
+
   return {
-    userId: user?.id,
-    isLoaded,
-    isSignedIn: isSignedIn ?? false,
+    userId: user?.externalId,
+    isLoaded: !isLoading && (isAuthenticated ? user !== undefined : true),
+    isSignedIn: isAuthenticated,
+    user,
   };
 }
 
 export function useIsAdmin(): boolean {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded } = useCurrentUser();
   if (!isLoaded || !user) return false;
-  return user.publicMetadata?.role === "admin";
+  return user.role === "admin";
 }

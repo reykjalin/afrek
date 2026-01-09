@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { useConvexAuth } from "convex/react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
@@ -14,6 +14,7 @@ const navLinks = [
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, isLoading } = useConvexAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,28 +38,33 @@ export function MarketingHeader() {
 
         {/* Desktop auth buttons */}
         <div className="hidden items-center gap-2 md:flex">
-          <SignedOut>
-            <Link
-              href="/sign-in"
-              className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/sign-up"
-              className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-            >
-              Get started
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <Link
-              href="/tasks"
-              className={cn(buttonVariants({ variant: "default", size: "sm" }))}
-            >
-              Go to app
-            </Link>
-          </SignedIn>
+          {!isLoading && (
+            <>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/sign-in"
+                    className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className={cn(buttonVariants({ variant: "default", size: "sm" }))}
+                  >
+                    Get started
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/tasks"
+                  className={cn(buttonVariants({ variant: "default", size: "sm" }))}
+                >
+                  Go to app
+                </Link>
+              )}
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -92,31 +98,36 @@ export function MarketingHeader() {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t">
-              <SignedOut>
-                <Link
-                  href="/sign-in"
-                  className={cn(buttonVariants({ variant: "outline" }))}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className={cn(buttonVariants({ variant: "default" }))}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Get started
-                </Link>
-              </SignedOut>
-              <SignedIn>
-                <Link
-                  href="/tasks"
-                  className={cn(buttonVariants({ variant: "default" }))}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Go to app
-                </Link>
-              </SignedIn>
+              {!isLoading && (
+                <>
+                  {!isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/sign-in"
+                        className={cn(buttonVariants({ variant: "outline" }))}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Sign in
+                      </Link>
+                      <Link
+                        href="/sign-up"
+                        className={cn(buttonVariants({ variant: "default" }))}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Get started
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href="/tasks"
+                      className={cn(buttonVariants({ variant: "default" }))}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Go to app
+                    </Link>
+                  )}
+                </>
+              )}
             </div>
           </nav>
         </div>

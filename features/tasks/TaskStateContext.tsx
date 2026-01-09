@@ -9,7 +9,7 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useCurrentUser } from "@/features/auth/hooks";
 import { toast } from "sonner";
 import type { Task, UpdateTaskInput } from "./types";
 import {
@@ -49,7 +49,7 @@ const TaskStateContext = createContext<TaskStateContextType | undefined>(
 );
 
 export function TaskStateProvider({ children }: { children: ReactNode }) {
-  const { userId } = useAuth();
+  const { userId } = useCurrentUser();
   const { filters } = useTaskFilter();
   const { enabled: encryptionEnabled, key, locked: encryptionLocked } = useEncryption();
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(

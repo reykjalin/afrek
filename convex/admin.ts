@@ -1,12 +1,15 @@
 import { query, internalMutation, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
+import { userByExternalId } from "./users";
 
 async function assertAdminQuery(ctx: QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new Error("Not authenticated");
 
-  const role = (identity as { metadata?: { role?: string } }).metadata?.role;
-  if (role !== "admin") throw new Error("Admin access required");
+  const user = await userByExternalId(ctx, identity.subject);
+  if (!user || user.role !== "admin") {
+    throw new Error("Admin access required");
+  }
 
   return identity;
 }

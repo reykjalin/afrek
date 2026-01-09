@@ -3,17 +3,25 @@ import { v } from "convex/values";
 
 export default defineSchema({
   users: defineTable({
-    externalId: v.string(), // Clerk user ID
+    externalId: v.string(), // Auth provider user ID (e.g., WorkOS)
+    // User profile fields (synced from auth provider)
+    email: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    // Role for admin access
+    role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
+    // Dodo Payments customer ID
+    dodoCustomerId: v.optional(v.string()),
     // Subscription fields
     plan: v.optional(
       v.object({
-        id: v.optional(v.string()), // Clerk plan ID.
+        id: v.optional(v.string()), // Billing plan ID
         key: v.optional(v.string()),
         status: v.union(v.literal("active"), v.literal("none")),
         subscription: v.optional(
           v.object({
-            id: v.string(), // Clerk subscription ID.
-            itemId: v.string(), // Clerk subscription item ID
+            id: v.string(), // Subscription ID
+            itemId: v.string(), // Subscription item ID
           }),
         ),
         trial: v.optional(
@@ -35,7 +43,9 @@ export default defineSchema({
         createdAt: v.number(),
       }),
     ),
-  }).index("byExternalId", ["externalId"]),
+  })
+    .index("byExternalId", ["externalId"])
+    .index("byEmail", ["email"]),
 
   tasks: defineTable({
     title: v.string(),

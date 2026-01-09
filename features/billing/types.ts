@@ -22,14 +22,14 @@ export const PLANS: PricingPlan[] = [
     name: "Monthly",
     price: 3,
     interval: "month",
-    priceId: "", // Will be set from env
+    priceId: process.env.NEXT_PUBLIC_DODO_MONTHLY_PRODUCT_ID ?? "",
   },
   {
     id: "yearly",
     name: "Yearly",
     price: 30,
     interval: "year",
-    priceId: "", // Will be set from env
+    priceId: process.env.NEXT_PUBLIC_DODO_YEARLY_PRODUCT_ID ?? "",
   },
 ];
 

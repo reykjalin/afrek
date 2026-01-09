@@ -24,7 +24,7 @@ function TasksPageContent() {
   const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
   const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
   const { setLeftContent } = useTopNavActions();
-  const { readOnly } = useTaskAccess();
+  const { readOnly, isLoading: isAccessLoading } = useTaskAccess();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskTags, setNewTaskTags] = useState("");
@@ -209,7 +209,7 @@ function TasksPageContent() {
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
       <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
-        {readOnly && <UpgradeCTA />}
+        {!isAccessLoading && readOnly && <UpgradeCTA />}
         {/* Weekly view */}
         <WeeklyView
         tasks={tasks}

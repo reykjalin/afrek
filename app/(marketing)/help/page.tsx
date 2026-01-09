@@ -97,7 +97,7 @@ const faqs = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept all major credit cards through Stripe, including Visa, Mastercard, and American Express.",
+      "We accept all major credit cards including Visa, Mastercard, and American Express.",
   },
   {
     question: "Can I cancel my subscription?",

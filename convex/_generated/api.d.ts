@@ -8,9 +8,14 @@
  * @module
  */
 
+import type * as account from "../account.js";
 import type * as admin from "../admin.js";
 import type * as adminActions from "../adminActions.js";
+import type * as auth from "../auth.js";
+import type * as dodo from "../dodo.js";
 import type * as http from "../http.js";
+import type * as payments from "../payments.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 
@@ -21,9 +26,14 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  account: typeof account;
   admin: typeof admin;
   adminActions: typeof adminActions;
+  auth: typeof auth;
+  dodo: typeof dodo;
   http: typeof http;
+  payments: typeof payments;
+  subscriptions: typeof subscriptions;
   tasks: typeof tasks;
   users: typeof users;
 }>;
@@ -54,4 +64,115 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  workOSAuthKit: {
+    lib: {
+      enqueueWebhookEvent: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          apiKey: string;
+          event: string;
+          eventId: string;
+          eventTypes?: Array<string>;
+          logLevel?: "DEBUG";
+          onEventHandle?: string;
+          updatedAt?: string;
+        },
+        any
+      >;
+      getAuthUser: FunctionReference<
+        "query",
+        "internal",
+        { id: string },
+        {
+          createdAt: string;
+          email: string;
+          emailVerified: boolean;
+          externalId?: null | string;
+          firstName?: null | string;
+          id: string;
+          lastName?: null | string;
+          lastSignInAt?: null | string;
+          locale?: null | string;
+          metadata: Record<string, any>;
+          profilePictureUrl?: null | string;
+          updatedAt: string;
+        } | null
+      >;
+    };
+  };
+  dodopayments: {
+    lib: {
+      checkout: FunctionReference<
+        "action",
+        "internal",
+        {
+          apiKey: string;
+          environment: "test_mode" | "live_mode";
+          payload: {
+            allowed_payment_method_types?: Array<string>;
+            billing_address?: {
+              city?: string;
+              country: string;
+              state?: string;
+              street?: string;
+              zipcode?: string;
+            };
+            billing_currency?: string;
+            confirm?: boolean;
+            customer?:
+              | { email: string; name?: string; phone_number?: string }
+              | { customer_id: string };
+            customization?: {
+              force_language?: string;
+              show_on_demand_tag?: boolean;
+              show_order_details?: boolean;
+              theme?: string;
+            };
+            discount_code?: string;
+            feature_flags?: {
+              allow_currency_selection?: boolean;
+              allow_discount_code?: boolean;
+              allow_phone_number_collection?: boolean;
+              allow_tax_id?: boolean;
+              always_create_new_customer?: boolean;
+            };
+            force_3ds?: boolean;
+            metadata?: Record<string, string>;
+            product_cart: Array<{
+              addons?: Array<{ addon_id: string; quantity: number }>;
+              amount?: number;
+              product_id: string;
+              quantity: number;
+            }>;
+            return_url?: string;
+            show_saved_payment_methods?: boolean;
+            subscription_data?: {
+              on_demand?: {
+                adaptive_currency_fees_inclusive?: boolean;
+                mandate_only: boolean;
+                product_currency?: string;
+                product_description?: string;
+                product_price?: number;
+              };
+              trial_period_days?: number;
+            };
+          };
+        },
+        { checkout_url: string }
+      >;
+      customerPortal: FunctionReference<
+        "action",
+        "internal",
+        {
+          apiKey: string;
+          dodoCustomerId: string;
+          environment: "test_mode" | "live_mode";
+          send_email?: boolean;
+        },
+        { portal_url: string }
+      >;
+    };
+  };
+};
