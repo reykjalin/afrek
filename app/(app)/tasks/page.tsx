@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Plus, Search, Sliders } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,10 +39,10 @@ function TasksPageContent() {
 
   const hasActiveFilters = !!search || selectedTags.length > 0;
 
-  const isCurrentWeek = () => {
+  const isCurrentWeek = useCallback(() => {
     const currentWeekStart = getStartOfWeek(new Date());
     return weekStart.toDateString() === currentWeekStart.toDateString();
-  };
+  }, [weekStart]);
 
   const goToCurrentWeek = () => {
     setWeekStart(getStartOfWeek(new Date()));
@@ -118,7 +118,7 @@ function TasksPageContent() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart, readOnly]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart, readOnly, clearFilters, isCurrentWeek]);
 
   // Keyboard shortcuts
   useEffect(() => {

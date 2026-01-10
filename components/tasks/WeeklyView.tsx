@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TaskList } from "./TaskList";
 import { cn } from "@/lib/utils";
-import { toISODateString, getStartOfWeek, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
+import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface WeeklyViewProps {
@@ -69,12 +69,6 @@ export function WeeklyView({
     next.setDate(next.getDate() + 7);
     onWeekChange(next);
   };
-
-  const goToCurrentWeek = () => {
-    onWeekChange(getStartOfWeek(new Date()));
-  };
-
-
 
   const getTasksForDay = (date: string) => {
     return tasks.filter((task) => task.scheduledDate === date);

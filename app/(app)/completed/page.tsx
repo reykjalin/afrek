@@ -92,7 +92,7 @@ function CompletedPageContent() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, clearFilters]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

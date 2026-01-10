@@ -36,7 +36,7 @@ export function PricingCards() {
     try {
       const result = await createCheckout({ productId });
       if (result.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
+        window.location.assign(result.checkoutUrl);
       }
     } catch (error) {
       console.error("Checkout failed:", error);

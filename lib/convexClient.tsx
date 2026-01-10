@@ -15,7 +15,7 @@ function useAuthFromWorkOS() {
   const { getAccessToken } = useAccessToken();
 
   const fetchAccessToken = useCallback(
-    async (_options: { forceRefreshToken: boolean }) => {
+    async () => {
       try {
         const token = await getAccessToken();
         return token ?? null;

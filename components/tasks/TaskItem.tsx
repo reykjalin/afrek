@@ -5,9 +5,7 @@ import { Check, Calendar, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
@@ -24,7 +22,7 @@ import { TaskItemExpanded } from "./TaskItemExpanded";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskAccess } from "@/features/billing";
-import { toISODateString, parseDateString } from "@/lib/date";
+import { parseDateString } from "@/lib/date";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface TaskItemProps {
@@ -65,20 +63,6 @@ export function TaskItem({
       setEditedTitle(task.title);
     }
     setIsEditingTitle(false);
-  };
-
-  const formatScheduledDate = (date?: string) => {
-    if (!date) return "Backlog";
-    const d = parseDateString(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (d.toDateString() === today.toDateString()) return "Today";
-    if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
-
-    return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
   };
 
   const formatCompletedDate = (timestamp?: number) => {

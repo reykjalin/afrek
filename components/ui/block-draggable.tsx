@@ -28,6 +28,10 @@ import { cn } from '@/lib/utils';
 
 const UNDRAGGABLE_KEYS = [KEYS.column, KEYS.tr, KEYS.td];
 
+function DraggableWrapper(props: PlateElementProps) {
+  return <Draggable {...props} />;
+}
+
 export const BlockDraggable: RenderNodeWrapper = (props) => {
   const { editor, element, path } = props;
 
@@ -67,7 +71,7 @@ export const BlockDraggable: RenderNodeWrapper = (props) => {
 
   if (!enabled) return;
 
-  return (props) => <Draggable {...props} />;
+  return DraggableWrapper;
 };
 
 function Draggable(props: PlateElementProps) {

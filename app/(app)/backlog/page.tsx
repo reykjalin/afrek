@@ -105,7 +105,7 @@ function BacklogPageContent() {
     );
 
     return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, readOnly]);
+  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, readOnly, clearFilters]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

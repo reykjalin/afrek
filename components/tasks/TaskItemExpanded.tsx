@@ -46,29 +46,25 @@ export function TaskItemExpanded({
   onDelete,
 }: TaskItemExpandedProps) {
   const { readOnly } = useTaskAccess();
-  const [tags, setTags] = useState(task.tags.join(", "));
+  const tagsStr = task.tags.join(", ");
+  const [tags, setTags] = useState(tagsStr);
+  const [prevTagsStr, setPrevTagsStr] = useState(tagsStr);
   const [notesValue, setNotesValue] = useState<Value>(() =>
     parseNotesJson(task.notesJson)
   );
+  const [prevNotesJson, setPrevNotesJson] = useState(task.notesJson);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prevTagsRef = useRef<string>(task.tags.join(", "));
-  const prevNotesRef = useRef<string>(task.notesJson);
 
   // Sync local state when task data changes (e.g., after decryption unlock)
-  useEffect(() => {
-    const tagsStr = task.tags.join(", ");
-    if (tagsStr !== prevTagsRef.current) {
-      prevTagsRef.current = tagsStr;
-      setTags(tagsStr);
-    }
-  }, [task.tags]);
+  if (tagsStr !== prevTagsStr) {
+    setPrevTagsStr(tagsStr);
+    setTags(tagsStr);
+  }
 
-  useEffect(() => {
-    if (task.notesJson !== prevNotesRef.current) {
-      prevNotesRef.current = task.notesJson;
-      setNotesValue(parseNotesJson(task.notesJson));
-    }
-  }, [task.notesJson]);
+  if (task.notesJson !== prevNotesJson) {
+    setPrevNotesJson(task.notesJson);
+    setNotesValue(parseNotesJson(task.notesJson));
+  }
 
   const handleNotesChange = useCallback(
     (value: Value) => {

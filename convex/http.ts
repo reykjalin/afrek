@@ -4,8 +4,6 @@ import { internal } from "./_generated/api";
 
 import { authKit } from "./auth";
 
-const TRIAL_PERIOD_DAYS = 30;
-
 const http = httpRouter();
 
 authKit.registerRoutes(http);

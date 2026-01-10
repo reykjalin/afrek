@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Inbox, ListTodo, CheckCircle2, Settings } from "lucide-react";
+import { Inbox, ListTodo, CheckCircle2, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

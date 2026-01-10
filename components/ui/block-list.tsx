@@ -31,10 +31,14 @@ const config: Record<
   },
 };
 
+function ListWrapper(props: PlateElementProps) {
+  return <List {...props} />;
+}
+
 export const BlockList: RenderNodeWrapper = (props) => {
   if (!props.element.listStyleType) return;
 
-  return (props) => <List {...props} />;
+  return ListWrapper;
 };
 
 function List(props: PlateElementProps) {

@@ -21,10 +21,14 @@ const config: Record<
   },
 };
 
+function ListWrapper(props: SlateRenderElementProps) {
+  return <List {...props} />;
+}
+
 export const BlockListStatic: RenderStaticNodeWrapper = (props) => {
   if (!props.element.listStyleType) return;
 
-  return (props) => <List {...props} />;
+  return ListWrapper;
 };
 
 function List(props: SlateRenderElementProps) {
