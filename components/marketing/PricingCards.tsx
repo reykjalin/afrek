@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useConvexAuth, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { cn } from "@/lib/utils";
 import { Check, Loader2 } from "lucide-react";
 

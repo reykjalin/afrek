@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { Id } from "@/convex/_generated/dataModel";
 
 export default function AdminTrialsPage() {
@@ -11,6 +12,16 @@ export default function AdminTrialsPage() {
   const deleteTrialEmail = useMutation(api.trialEmails.deleteTrialEmail);
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredEmails = useMemo(() => {
+    if (!trialEmails) return [];
+    if (!searchQuery.trim()) return trialEmails;
+    const query = searchQuery.toLowerCase();
+    return trialEmails.filter((trial) =>
+      trial.email.toLowerCase().includes(query)
+    );
+  }, [trialEmails, searchQuery]);
 
   const handleDelete = (id: Id<"trialEmails">, email: string) => {
     if (
@@ -40,9 +51,19 @@ export default function AdminTrialsPage() {
         to allow them to sign up for a trial again.
       </p>
 
-      {trialEmails.length === 0 ? (
+      <Input
+        type="search"
+        placeholder="Search by email..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="max-w-sm mb-4"
+      />
+
+      {filteredEmails.length === 0 ? (
         <div className="text-muted-foreground">
-          No trial emails recorded yet.
+          {searchQuery.trim()
+            ? "No emails match your search."
+            : "No trial emails recorded yet."}
         </div>
       ) : (
         <div className="border rounded-lg overflow-hidden">
@@ -55,7 +76,7 @@ export default function AdminTrialsPage() {
               </tr>
             </thead>
             <tbody>
-              {trialEmails.map((trial) => (
+              {filteredEmails.map((trial) => (
                 <tr key={trial.id} className="border-t">
                   <td className="p-3">{trial.email}</td>
                   <td className="p-3">
@@ -81,7 +102,9 @@ export default function AdminTrialsPage() {
       )}
 
       <p className="text-sm text-muted-foreground mt-4">
-        Total: {trialEmails.length} trial email{trialEmails.length !== 1 && "s"}
+        {searchQuery.trim()
+          ? `Showing ${filteredEmails.length} of ${trialEmails?.length ?? 0} trial emails`
+          : `Total: ${trialEmails?.length ?? 0} trial email${trialEmails?.length !== 1 ? "s" : ""}`}
       </p>
     </div>
   );

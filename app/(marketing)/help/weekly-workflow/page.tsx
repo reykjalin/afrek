@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Prose } from "@/components/ui/prose";
 import { cn } from "@/lib/utils";
 import { Calendar, ArrowLeft } from "lucide-react";
