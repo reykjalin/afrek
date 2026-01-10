@@ -6,7 +6,7 @@ import type { Task, TaskPriority } from "@/features/tasks/types";
 interface TaskListProps {
   tasks: Task[];
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateTitle: (id: string, titleJson: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
   onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;

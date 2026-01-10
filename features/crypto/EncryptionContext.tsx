@@ -65,14 +65,14 @@ export function EncryptionProvider({ children }: { children: ReactNode }) {
         for (const task of getAllTasks) {
           if (!task.encryptedPayload) {
             const payload: EncryptedTaskPayload = {
-              title: task.title,
+              titleJson: task.titleJson ?? "",
               notesJson: task.notesJson,
               tags: task.tags,
             };
             const blob = await encryptJson(newKey, payload);
             await updateTask({
               id: task._id,
-              title: "[encrypted]",
+              titleJson: "",
               notesJson: "",
               tags: [],
               encryptedPayload: JSON.stringify(blob),
@@ -119,7 +119,7 @@ export function EncryptionProvider({ children }: { children: ReactNode }) {
             const decrypted = await decryptJson<EncryptedTaskPayload>(key, blob);
             await updateTask({
               id: task._id,
-              title: decrypted.title,
+              titleJson: decrypted.titleJson,
               notesJson: decrypted.notesJson,
               tags: decrypted.tags,
               encryptedPayload: null,

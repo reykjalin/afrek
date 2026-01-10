@@ -13,7 +13,7 @@ interface WeeklyViewProps {
   weekStart: Date;
   onWeekChange: (weekStart: Date) => void;
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateTitle: (id: string, titleJson: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
   onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;

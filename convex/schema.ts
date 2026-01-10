@@ -48,11 +48,11 @@ export default defineSchema({
     .index("byEmail", ["email"]),
 
   tasks: defineTable({
-    title: v.string(),
+    titleJson: v.string(), // Rich text Plate.js JSON value
     notesJson: v.string(),
     tags: v.array(v.string()),
-    // Encrypted payload containing title, notesJson, tags when encryption is enabled
-    // When set, title/notesJson/tags contain placeholders
+    // Encrypted payload containing titleJson, notesJson, tags when encryption is enabled
+    // When set, titleJson/notesJson/tags contain placeholders
     encryptedPayload: v.optional(v.string()),
     status: v.union(
       v.literal("backlog"),
@@ -77,7 +77,7 @@ export default defineSchema({
     .index("by_user_scheduled", ["userId", "scheduledDate"])
     .index("by_user_status", ["userId", "status"])
     .searchIndex("search_title", {
-      searchField: "title",
+      searchField: "titleJson",
       filterFields: ["userId"],
     })
     .searchIndex("search_notes", {

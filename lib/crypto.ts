@@ -12,7 +12,7 @@ export interface EncryptedBlob {
 }
 
 export interface EncryptedTaskPayload {
-  title: string;
+  titleJson: string;
   notesJson: string;
   tags: string[];
 }

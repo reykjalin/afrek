@@ -334,9 +334,7 @@ function withTooltip<T extends React.ElementType>(Component: T) {
     if (tooltip && mounted) {
       return (
         <Tooltip {...tooltipProps}>
-          <TooltipTrigger {...tooltipTriggerProps}>
-            {component}
-          </TooltipTrigger>
+          <TooltipTrigger {...tooltipTriggerProps} render={component} />
 
           <TooltipContent {...tooltipContentProps}>{tooltip}</TooltipContent>
         </Tooltip>

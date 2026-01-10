@@ -19,7 +19,7 @@ export const listTasks = query({
         ctx.db
           .query("tasks")
           .withSearchIndex("search_title", (q) =>
-            q.search("title", args.search!).eq("userId", args.userId),
+            q.search("titleJson", args.search!).eq("userId", args.userId),
           )
           .collect(),
         ctx.db
@@ -69,7 +69,7 @@ export const getTask = query({
 export const createTask = mutation({
   args: {
     userId: v.string(),
-    title: v.string(),
+    titleJson: v.string(),
     tags: v.optional(v.array(v.string())),
     scheduledDate: v.optional(v.string()),
     priority: v.optional(
@@ -89,7 +89,7 @@ export const createTask = mutation({
     const now = Date.now();
     return await ctx.db.insert("tasks", {
       userId: args.userId,
-      title: args.title,
+      titleJson: args.titleJson,
       tags: args.tags ?? [],
       scheduledDate: args.scheduledDate,
       priority: args.priority ?? "Normal",
@@ -105,7 +105,7 @@ export const createTask = mutation({
 export const updateTask = mutation({
   args: {
     id: v.id("tasks"),
-    title: v.optional(v.string()),
+    titleJson: v.optional(v.string()),
     notesJson: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
@@ -131,7 +131,7 @@ export const updateTask = mutation({
 
     const updates: Record<string, unknown> = { updatedAt: Date.now() };
 
-    if (args.title !== undefined) updates.title = args.title;
+    if (args.titleJson !== undefined) updates.titleJson = args.titleJson;
     if (args.notesJson !== undefined) updates.notesJson = args.notesJson;
     if (args.tags !== undefined) updates.tags = args.tags;
     if (args.priority !== undefined) updates.priority = args.priority;

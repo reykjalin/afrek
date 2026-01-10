@@ -131,8 +131,8 @@ function CompletedPageContent() {
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
-  const handleUpdateTitle = (id: string, title: string) => {
-    updateTask(id, { title });
+  const handleUpdateTitle = (id: string, titleJson: string) => {
+    updateTask(id, { titleJson });
   };
 
   const handleUpdateNotes = (id: string, notesJson: string) => {

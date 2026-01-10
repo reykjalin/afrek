@@ -100,7 +100,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
 
       return {
         id: t._id,
-        title: decrypted?.title ?? (isLocked ? "[Locked]" : t.title),
+        titleJson: decrypted?.titleJson ?? (isLocked ? "" : (t.titleJson ?? "")),
         notesJson: decrypted?.notesJson ?? (isLocked ? "" : t.notesJson),
         tags: decrypted?.tags ?? (isLocked ? [] : t.tags),
         status: t.status,
@@ -119,7 +119,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         const q = filters.search.toLowerCase();
         result = result.filter(
           (t) =>
-            t.title.toLowerCase().includes(q) ||
+            t.titleJson.toLowerCase().includes(q) ||
             t.notesJson.toLowerCase().includes(q) ||
             t.tags.some((tag) => tag.toLowerCase().includes(q))
         );
@@ -177,14 +177,14 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
       try {
         if (encryptionEnabled && key) {
           const payload: EncryptedTaskPayload = {
-            title: task.title,
+            titleJson: task.titleJson ?? "",
             notesJson: task.notesJson ?? "",
             tags: task.tags,
           };
           const blob = await encryptJson(key, payload);
           await createTaskMutation({
             userId,
-            title: "[encrypted]",
+            titleJson: "",
             tags: [],
             scheduledDate: task.scheduledDate,
             priority: task.priority,
@@ -193,7 +193,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         } else {
           await createTaskMutation({
             userId,
-            title: task.title,
+            titleJson: task.titleJson ?? "",
             tags: task.tags,
             scheduledDate: task.scheduledDate,
             priority: task.priority,
@@ -226,14 +226,14 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
 
         if (encryptionEnabled && key) {
           const payload: EncryptedTaskPayload = {
-            title: updates.title ?? existingTask.title,
+            titleJson: updates.titleJson ?? existingTask.titleJson,
             notesJson: updates.notesJson ?? existingTask.notesJson,
             tags: updates.tags ?? existingTask.tags,
           };
           const blob = await encryptJson(key, payload);
           await updateTaskMutation({
             id: id as Id<"tasks">,
-            title: "[encrypted]",
+            titleJson: "",
             notesJson: "",
             tags: [],
             status: updates.status,
@@ -244,7 +244,7 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         } else {
           await updateTaskMutation({
             id: id as Id<"tasks">,
-            title: updates.title,
+            titleJson: updates.titleJson,
             notesJson: updates.notesJson,
             tags: updates.tags,
             status: updates.status,

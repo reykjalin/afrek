@@ -3,7 +3,7 @@ export type TaskPriority = "Lowest" | "Low" | "Normal" | "Medium" | "High" | "Hi
 
 export interface Task {
   id: string;
-  title: string;
+  titleJson: string; // Rich text Plate.js JSON value
   notesJson: string;
   tags: string[];
   status: TaskStatus;
@@ -17,7 +17,7 @@ export interface Task {
 }
 
 export interface CreateTaskInput {
-  title: string;
+  titleJson: string; // Rich text JSON
   tags?: string[];
   scheduledDate?: string;
   priority?: TaskPriority;
@@ -25,7 +25,7 @@ export interface CreateTaskInput {
 
 export interface UpdateTaskInput {
   id: string;
-  title?: string;
+  titleJson?: string; // Rich text JSON
   notesJson?: string;
   tags?: string[];
   status?: TaskStatus;

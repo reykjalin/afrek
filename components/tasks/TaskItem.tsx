@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Check, Calendar, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
+import type { Value } from "platejs";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
@@ -19,6 +19,7 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 import { TaskItemExpanded } from "./TaskItemExpanded";
+import { TitleEditor, titleValueToText, textToTitleValue } from "@/components/editors/TitleEditor";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskAccess } from "@/features/billing";
@@ -28,7 +29,7 @@ import type { Task, TaskPriority } from "@/features/tasks/types";
 interface TaskItemProps {
   task: Task;
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateTitle: (id: string, titleJson: string) => void;
   onUpdateNotes: (id: string, notes: string) => void;
   onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
@@ -47,7 +48,6 @@ export function TaskItem({
   onUpdatePriority,
 }: TaskItemProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(task.title);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const { handleTagToggle, selectedTags } = useTaskFilter();
   const { expandedTaskIds, toggleTaskExpanded } = useTaskState();
@@ -56,14 +56,38 @@ export function TaskItem({
 
   const isDone = task.status === "done";
 
-  const handleTitleSubmit = () => {
-    if (editedTitle.trim() && editedTitle !== task.title) {
-      onUpdateTitle(task.id, editedTitle.trim());
-    } else {
-      setEditedTitle(task.title);
+  // Parse titleJson
+  const titleValue = useMemo<Value>(() => {
+    if (task.titleJson) {
+      try {
+        return JSON.parse(task.titleJson) as Value;
+      } catch {
+        return textToTitleValue("");
+      }
+    }
+    return textToTitleValue("");
+  }, [task.titleJson]);
+
+  // Track the current editor value while editing
+  const [editedTitleValue, setEditedTitleValue] = useState<Value>(titleValue);
+
+  const handleTitleChange = useCallback((value: Value) => {
+    setEditedTitleValue(value);
+  }, [setEditedTitleValue]);
+
+  const handleTitleSubmit = useCallback(() => {
+    const newText = titleValueToText(editedTitleValue);
+    const newJson = JSON.stringify(editedTitleValue);
+    if (newText.trim() && newJson !== task.titleJson) {
+      onUpdateTitle(task.id, newJson);
     }
     setIsEditingTitle(false);
-  };
+  }, [editedTitleValue, task.id, task.titleJson, onUpdateTitle]);
+
+  const handleTitleCancel = useCallback(() => {
+    setEditedTitleValue(titleValue);
+    setIsEditingTitle(false);
+  }, [titleValue, setEditedTitleValue]);
 
   const formatCompletedDate = (timestamp?: number) => {
     if (!timestamp) return null;
@@ -114,35 +138,50 @@ export function TaskItem({
         </button>
 
         {isEditingTitle ? (
-          <Input
-            value={editedTitle}
-            onChange={(e) => setEditedTitle(e.target.value)}
-            onBlur={handleTitleSubmit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleTitleSubmit();
-              if (e.key === "Escape") {
-                setEditedTitle(task.title);
-                setIsEditingTitle(false);
-              }
-            }}
+          <div
+            className="flex-1 min-w-0"
             onClick={(e) => e.stopPropagation()}
-            className="h-7 min-w-0"
-            autoFocus
-          />
+          >
+            <TitleEditor
+              value={editedTitleValue}
+              onChange={handleTitleChange}
+              onBlur={handleTitleSubmit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleTitleSubmit();
+                }
+                if (e.key === "Escape") {
+                  handleTitleCancel();
+                }
+              }}
+              autoFocus
+              containerClassName="border bg-background shadow-sm"
+              className="px-2 py-1"
+            />
+          </div>
         ) : (
-          <span
+          <div
             onClick={(e) => {
               e.stopPropagation();
-              if (!readOnly) setIsEditingTitle(true);
+              if (!readOnly) {
+                setEditedTitleValue(titleValue);
+                setIsEditingTitle(true);
+              }
             }}
             className={cn(
-              "break-words",
+              "flex-1 min-w-0 break-words",
               isDone && "line-through",
               readOnly ? "cursor-default" : "cursor-text"
             )}
           >
-            {task.title}
-          </span>
+            <TitleEditor
+              value={titleValue}
+              onChange={() => {}}
+              readOnly
+              containerClassName="border-none bg-transparent"
+            />
+          </div>
         )}
 
         <div className="flex-1" onClick={(e) => e.stopPropagation()} />

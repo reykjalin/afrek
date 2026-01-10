@@ -139,8 +139,8 @@ function BacklogPageContent() {
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
-  const handleUpdateTitle = (id: string, title: string) => {
-    updateTask(id, { title });
+  const handleUpdateTitle = (id: string, titleJson: string) => {
+    updateTask(id, { titleJson });
   };
 
   const handleUpdateNotes = (id: string, notesJson: string) => {
@@ -172,9 +172,11 @@ function BacklogPageContent() {
       .map((tag) => tag.trim())
       .filter(Boolean);
 
+    const titleText = newTaskTitle.trim();
+    const titleJson = JSON.stringify([{ type: "p", children: [{ text: titleText }] }]);
     const newTask = {
       id: crypto.randomUUID(),
-      title: newTaskTitle.trim(),
+      titleJson,
       notesJson: "",
       tags,
       status: "backlog" as const,

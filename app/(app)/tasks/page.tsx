@@ -156,8 +156,8 @@ function TasksPageContent() {
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
-  const handleUpdateTitle = (id: string, title: string) => {
-    updateTask(id, { title });
+  const handleUpdateTitle = (id: string, titleJson: string) => {
+    updateTask(id, { titleJson });
   };
 
   const handleUpdateNotes = (id: string, notesJson: string) => {
@@ -189,8 +189,10 @@ function TasksPageContent() {
       .map((tag) => tag.trim())
       .filter(Boolean);
 
+    const titleText = newTaskTitle.trim();
+    const titleJson = JSON.stringify([{ type: "p", children: [{ text: titleText }] }]);
     await addTask({
-      title: newTaskTitle.trim(),
+      titleJson,
       notesJson: "",
       tags,
       status: "scheduled" as const,
