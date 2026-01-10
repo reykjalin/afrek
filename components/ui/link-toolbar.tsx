@@ -8,6 +8,7 @@ import {
   type UseVirtualFloatingOptions,
   flip,
   offset,
+  FloatingPortal,
 } from '@platejs/floating';
 import { getLinkAttributes } from '@platejs/link';
 import {
@@ -28,11 +29,11 @@ import {
   usePluginOption,
 } from 'platejs/react';
 
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button-variants';
 import { Separator } from '@/components/ui/separator';
 
 const popoverVariants = cva(
-  'z-50 w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
+  'fixed z-50 w-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden'
 );
 
 const inputVariants = cva(
@@ -158,7 +159,7 @@ export function LinkFloatingToolbar({
   );
 
   return (
-    <>
+    <FloatingPortal>
       <div ref={insertRef} className={popoverVariants()} {...insertProps}>
         {input}
       </div>
@@ -166,7 +167,7 @@ export function LinkFloatingToolbar({
       <div ref={editRef} className={popoverVariants()} {...editProps}>
         {editContent}
       </div>
-    </>
+    </FloatingPortal>
   );
 }
 

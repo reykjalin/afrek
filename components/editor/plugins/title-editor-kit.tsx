@@ -9,14 +9,12 @@ import {
 } from '@platejs/basic-nodes/react';
 import { DatePlugin } from '@platejs/date/react';
 import { LinkPlugin } from '@platejs/link/react';
-import { ParagraphPlugin, createPlatePlugin } from 'platejs/react';
+import { ParagraphPlugin } from 'platejs/react';
 
 import { CodeLeaf } from '@/components/ui/code-node';
 import { DateElement } from '@/components/ui/date-node';
 import { LinkElement } from '@/components/ui/link-node';
 import { LinkFloatingToolbar } from '@/components/ui/link-toolbar';
-import { TitleFloatingToolbar } from '@/components/ui/title-floating-toolbar';
-import { TitleFloatingToolbarButtons } from '@/components/ui/title-floating-toolbar-buttons';
 import { TitleAutoformatKit } from '@/components/editor/plugins/title-autoformat-kit';
 
 export const TitleEditorKit = [
@@ -46,18 +44,6 @@ export const TitleEditorKit = [
     render: {
       node: LinkElement,
       afterEditable: () => <LinkFloatingToolbar />,
-    },
-  }),
-  
-  // Floating toolbar for marks
-  createPlatePlugin({
-    key: 'title-floating-toolbar',
-    render: {
-      afterEditable: () => (
-        <TitleFloatingToolbar>
-          <TitleFloatingToolbarButtons />
-        </TitleFloatingToolbar>
-      ),
     },
   }),
 ];

@@ -158,6 +158,10 @@ export const ToolbarButton = withTooltip(function ToolbarButton({
           className
         )}
         disabled={props.disabled}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          props.onMouseDown?.(e);
+        }}
         onClick={props.onClick}
       >
         {isDropdown ? (
@@ -189,6 +193,10 @@ export const ToolbarButton = withTooltip(function ToolbarButton({
         className
       )}
       {...props}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        props.onMouseDown?.(e);
+      }}
     >
       {children}
     </ToolbarPrimitive.Button>
