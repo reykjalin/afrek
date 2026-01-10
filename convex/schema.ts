@@ -84,4 +84,9 @@ export default defineSchema({
       searchField: "notesJson",
       filterFields: ["userId"],
     }),
+
+  trialEmails: defineTable({
+    email: v.string(),
+    createdAt: v.number(),
+  }).index("byEmail", ["email"]),
 });

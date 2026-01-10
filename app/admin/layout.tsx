@@ -45,6 +45,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             >
               Users
             </Link>
+            <Link
+              href="/admin/trials"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Trials
+            </Link>
             <div className="flex-1" />
             <Link
               href="/tasks"

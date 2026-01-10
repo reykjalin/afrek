@@ -3,6 +3,8 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { checkout, customerPortal } from "./dodo";
 
+const TRIAL_PERIOD_DAYS = 30;
+
 export const createCheckout = action({
   args: {
     productId: v.string(),
@@ -17,6 +19,16 @@ export const createCheckout = action({
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+    let trialPeriodDays: number | undefined;
+    if (user?.email) {
+      const hasUsedTrial = await ctx.runQuery(internal.trialEmails.hasUsedTrial, {
+        email: user.email,
+      });
+      if (!hasUsedTrial) {
+        trialPeriodDays = TRIAL_PERIOD_DAYS;
+      }
+    }
+
     const result = await checkout(ctx, {
       payload: {
         product_cart: [{ product_id: productId, quantity: 1 }],
@@ -30,6 +42,9 @@ export const createCheckout = action({
         metadata: {
           userId: identity.subject,
         },
+        subscription_data: trialPeriodDays
+          ? { trial_period_days: trialPeriodDays }
+          : undefined,
       },
     });
 

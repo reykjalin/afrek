@@ -4,6 +4,8 @@ import { internal } from "./_generated/api";
 
 import { authKit } from "./auth";
 
+const TRIAL_PERIOD_DAYS = 30;
+
 const http = httpRouter();
 
 authKit.registerRoutes(http);
@@ -17,6 +19,8 @@ http.route({
       const userId = payload.data.metadata?.userId as string | undefined;
       const subscriptionId = payload.data.subscription_id;
       const customerId = payload.data.customer?.customer_id;
+      const customerEmail = payload.data.customer?.email;
+      const trialPeriodDays = payload.data.trial_period_days;
 
       if (userId && subscriptionId) {
         await ctx.runMutation(internal.subscriptions.activateByUserId, {
@@ -24,6 +28,13 @@ http.route({
           subscriptionId,
           dodoCustomerId: customerId || "",
         });
+
+        if (trialPeriodDays && trialPeriodDays > 0 && customerEmail) {
+          await ctx.runMutation(internal.trialEmails.recordTrialEmail, {
+            email: customerEmail,
+          });
+          console.log(`📝 Recorded trial email: ${customerEmail}`);
+        }
       } else {
         console.warn("Missing userId in metadata or subscriptionId:", {
           userId,
