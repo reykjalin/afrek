@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Trash2, Calendar, ArrowRight, Inbox } from "lucide-react";
 import type { Value } from "platejs";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { NotesEditor } from "@/components/editors/NotesEditor";
 import { toISODateString, parseDateString } from "@/lib/date";
 import type { Task } from "@/features/tasks/types";
 import { useTaskAccess } from "@/features/billing";
+import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
 
 interface TaskItemExpandedProps {
   task: Task;
@@ -53,7 +54,6 @@ export function TaskItemExpanded({
     parseNotesJson(task.notesJson)
   );
   const [prevNotesJson, setPrevNotesJson] = useState(task.notesJson);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync local state when task data changes (e.g., after decryption unlock)
   if (tagsStr !== prevTagsStr) {
@@ -66,31 +66,23 @@ export function TaskItemExpanded({
     setNotesValue(parseNotesJson(task.notesJson));
   }
 
+  const debouncedUpdateNotes = useDebouncedCallback(
+    (value: Value) => {
+      const json = JSON.stringify(value);
+      onUpdateNotes(task.id, json);
+    },
+    500
+  );
+
   const handleNotesChange = useCallback(
     (value: Value) => {
       if (readOnly) return;
-      
+
       setNotesValue(value);
-
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-
-      debounceRef.current = setTimeout(() => {
-        const json = JSON.stringify(value);
-        onUpdateNotes(task.id, json);
-      }, 500);
+      debouncedUpdateNotes(value);
     },
-    [onUpdateNotes, task.id, readOnly]
+    [readOnly, debouncedUpdateNotes]
   );
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
 
   const handleTagsBlur = () => {
     const newTags = tags
