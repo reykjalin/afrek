@@ -194,6 +194,8 @@ function TasksPageContent() {
     await addTask({
       titleJson,
       notesJson: "",
+      titleText,
+      notesText: "",
       tags,
       status: "scheduled" as const,
       priority: "Normal" as const,

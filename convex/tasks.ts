@@ -19,13 +19,13 @@ export const listTasks = query({
         ctx.db
           .query("tasks")
           .withSearchIndex("search_title", (q) =>
-            q.search("titleJson", args.search!).eq("userId", args.userId),
+            q.search("titleText", args.search!).eq("userId", args.userId),
           )
           .collect(),
         ctx.db
           .query("tasks")
           .withSearchIndex("search_notes", (q) =>
-            q.search("notesJson", args.search!).eq("userId", args.userId),
+            q.search("notesText", args.search!).eq("userId", args.userId),
           )
           .collect(),
       ]);
@@ -70,6 +70,8 @@ export const createTask = mutation({
   args: {
     userId: v.string(),
     titleJson: v.string(),
+    titleText: v.optional(v.string()),
+    notesText: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     scheduledDate: v.optional(v.string()),
     priority: v.optional(
@@ -87,14 +89,17 @@ export const createTask = mutation({
   handler: async (ctx, args) => {
     await requireActiveSubscription(ctx);
     const now = Date.now();
+    const encrypted = !!args.encryptedPayload;
     return await ctx.db.insert("tasks", {
       userId: args.userId,
-      titleJson: args.titleJson,
-      tags: args.tags ?? [],
+      titleJson: encrypted ? "" : args.titleJson,
+      titleText: encrypted ? "" : (args.titleText ?? ""),
+      notesJson: "",
+      notesText: encrypted ? "" : (args.notesText ?? ""),
+      tags: encrypted ? [] : (args.tags ?? []),
       scheduledDate: args.scheduledDate,
       priority: args.priority ?? "Normal",
       status: args.scheduledDate ? "scheduled" : "backlog",
-      notesJson: "",
       encryptedPayload: args.encryptedPayload,
       createdAt: now,
       updatedAt: now,
@@ -107,6 +112,8 @@ export const updateTask = mutation({
     id: v.id("tasks"),
     titleJson: v.optional(v.string()),
     notesJson: v.optional(v.string()),
+    titleText: v.optional(v.string()),
+    notesText: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
       v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done")),
@@ -133,11 +140,21 @@ export const updateTask = mutation({
 
     if (args.titleJson !== undefined) updates.titleJson = args.titleJson;
     if (args.notesJson !== undefined) updates.notesJson = args.notesJson;
+    if (args.titleText !== undefined) updates.titleText = args.titleText;
+    if (args.notesText !== undefined) updates.notesText = args.notesText;
     if (args.tags !== undefined) updates.tags = args.tags;
     if (args.priority !== undefined) updates.priority = args.priority;
+
     if (args.encryptedPayload !== undefined) {
       updates.encryptedPayload =
         args.encryptedPayload === null ? undefined : args.encryptedPayload;
+      if (args.encryptedPayload) {
+        updates.titleJson = "";
+        updates.notesJson = "";
+        updates.titleText = "";
+        updates.notesText = "";
+        updates.tags = [];
+      }
     }
 
     if (args.scheduledDate !== undefined) {

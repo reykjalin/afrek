@@ -21,6 +21,7 @@ import {
   type EncryptedBlob,
   type EncryptedTaskPayload,
 } from "@/lib/crypto";
+import { richTextJsonToText } from "@/lib/richText";
 
 interface EncryptionContextType {
   enabled: boolean;
@@ -64,9 +65,13 @@ export function EncryptionProvider({ children }: { children: ReactNode }) {
       if (getAllTasks && getAllTasks.length > 0) {
         for (const task of getAllTasks) {
           if (!task.encryptedPayload) {
+            const titleJson = task.titleJson ?? "";
+            const notesJson = task.notesJson ?? "";
             const payload: EncryptedTaskPayload = {
-              titleJson: task.titleJson ?? "",
-              notesJson: task.notesJson,
+              titleJson,
+              notesJson,
+              titleText: richTextJsonToText(titleJson),
+              notesText: richTextJsonToText(notesJson),
               tags: task.tags,
             };
             const blob = await encryptJson(newKey, payload);
@@ -74,6 +79,8 @@ export function EncryptionProvider({ children }: { children: ReactNode }) {
               id: task._id,
               titleJson: "",
               notesJson: "",
+              titleText: "",
+              notesText: "",
               tags: [],
               encryptedPayload: JSON.stringify(blob),
             });

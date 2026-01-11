@@ -178,6 +178,8 @@ function BacklogPageContent() {
       id: crypto.randomUUID(),
       titleJson,
       notesJson: "",
+      titleText,
+      notesText: "",
       tags,
       status: "backlog" as const,
       priority: "Normal" as const,

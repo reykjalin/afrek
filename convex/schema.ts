@@ -50,9 +50,12 @@ export default defineSchema({
   tasks: defineTable({
     titleJson: v.string(), // Rich text Plate.js JSON value
     notesJson: v.string(),
+    // Plain text versions for search indexing (extracted from JSON)
+    titleText: v.optional(v.string()),
+    notesText: v.optional(v.string()),
     tags: v.array(v.string()),
-    // Encrypted payload containing titleJson, notesJson, tags when encryption is enabled
-    // When set, titleJson/notesJson/tags contain placeholders
+    // Encrypted payload containing titleJson, notesJson, titleText, notesText, tags when encryption is enabled
+    // When set, all content fields contain empty placeholders
     encryptedPayload: v.optional(v.string()),
     status: v.union(
       v.literal("backlog"),
@@ -77,11 +80,11 @@ export default defineSchema({
     .index("by_user_scheduled", ["userId", "scheduledDate"])
     .index("by_user_status", ["userId", "status"])
     .searchIndex("search_title", {
-      searchField: "titleJson",
+      searchField: "titleText",
       filterFields: ["userId"],
     })
     .searchIndex("search_notes", {
-      searchField: "notesJson",
+      searchField: "notesText",
       filterFields: ["userId"],
     }),
 

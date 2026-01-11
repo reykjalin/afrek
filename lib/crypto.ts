@@ -14,6 +14,8 @@ export interface EncryptedBlob {
 export interface EncryptedTaskPayload {
   titleJson: string;
   notesJson: string;
+  titleText: string;
+  notesText: string;
   tags: string[];
 }
 

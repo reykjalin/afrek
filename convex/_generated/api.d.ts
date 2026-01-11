@@ -14,6 +14,7 @@ import type * as adminActions from "../adminActions.js";
 import type * as auth from "../auth.js";
 import type * as dodo from "../dodo.js";
 import type * as http from "../http.js";
+import type * as migrations_backfillPlaintext from "../migrations/backfillPlaintext.js";
 import type * as payments from "../payments.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as tasks from "../tasks.js";
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   dodo: typeof dodo;
   http: typeof http;
+  "migrations/backfillPlaintext": typeof migrations_backfillPlaintext;
   payments: typeof payments;
   subscriptions: typeof subscriptions;
   tasks: typeof tasks;

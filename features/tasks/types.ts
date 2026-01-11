@@ -5,6 +5,8 @@ export interface Task {
   id: string;
   titleJson: string; // Rich text Plate.js JSON value
   notesJson: string;
+  titleText: string; // Plain text for search
+  notesText: string; // Plain text for search
   tags: string[];
   status: TaskStatus;
   priority: TaskPriority;

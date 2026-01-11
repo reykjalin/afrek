@@ -27,6 +27,7 @@ import {
   type EncryptedBlob,
   type EncryptedTaskPayload,
 } from "@/lib/crypto";
+import { richTextJsonToText } from "@/lib/richText";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface TaskStateContextType {
@@ -102,6 +103,8 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         id: t._id,
         titleJson: decrypted?.titleJson ?? (isLocked ? "" : (t.titleJson ?? "")),
         notesJson: decrypted?.notesJson ?? (isLocked ? "" : t.notesJson),
+        titleText: decrypted?.titleText ?? (isLocked ? "" : (t.titleText ?? "")),
+        notesText: decrypted?.notesText ?? (isLocked ? "" : (t.notesText ?? "")),
         tags: decrypted?.tags ?? (isLocked ? [] : t.tags),
         status: t.status,
         priority: t.priority,
@@ -119,8 +122,8 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         const q = filters.search.toLowerCase();
         result = result.filter(
           (t) =>
-            t.titleJson.toLowerCase().includes(q) ||
-            t.notesJson.toLowerCase().includes(q) ||
+            t.titleText.toLowerCase().includes(q) ||
+            t.notesText.toLowerCase().includes(q) ||
             t.tags.some((tag) => tag.toLowerCase().includes(q))
         );
       }
@@ -175,16 +178,25 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         return;
       }
       try {
+        const titleJson = task.titleJson ?? "";
+        const notesJson = task.notesJson ?? "";
+        const titleText = richTextJsonToText(titleJson);
+        const notesText = richTextJsonToText(notesJson);
+
         if (encryptionEnabled && key) {
           const payload: EncryptedTaskPayload = {
-            titleJson: task.titleJson ?? "",
-            notesJson: task.notesJson ?? "",
+            titleJson,
+            notesJson,
+            titleText,
+            notesText,
             tags: task.tags,
           };
           const blob = await encryptJson(key, payload);
           await createTaskMutation({
             userId,
             titleJson: "",
+            titleText: "",
+            notesText: "",
             tags: [],
             scheduledDate: task.scheduledDate,
             priority: task.priority,
@@ -193,7 +205,9 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         } else {
           await createTaskMutation({
             userId,
-            titleJson: task.titleJson ?? "",
+            titleJson,
+            titleText,
+            notesText,
             tags: task.tags,
             scheduledDate: task.scheduledDate,
             priority: task.priority,
@@ -224,17 +238,27 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
         const existingTask = tasks.find((t) => t.id === id);
         if (!existingTask) return;
 
+        const newTitleJson = updates.titleJson ?? existingTask.titleJson;
+        const newNotesJson = updates.notesJson ?? existingTask.notesJson;
+        const newTags = updates.tags ?? existingTask.tags;
+        const titleText = richTextJsonToText(newTitleJson);
+        const notesText = richTextJsonToText(newNotesJson);
+
         if (encryptionEnabled && key) {
           const payload: EncryptedTaskPayload = {
-            titleJson: updates.titleJson ?? existingTask.titleJson,
-            notesJson: updates.notesJson ?? existingTask.notesJson,
-            tags: updates.tags ?? existingTask.tags,
+            titleJson: newTitleJson,
+            notesJson: newNotesJson,
+            titleText,
+            notesText,
+            tags: newTags,
           };
           const blob = await encryptJson(key, payload);
           await updateTaskMutation({
             id: id as Id<"tasks">,
             titleJson: "",
             notesJson: "",
+            titleText: "",
+            notesText: "",
             tags: [],
             status: updates.status,
             priority: updates.priority,
@@ -246,6 +270,8 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
             id: id as Id<"tasks">,
             titleJson: updates.titleJson,
             notesJson: updates.notesJson,
+            titleText: updates.titleJson !== undefined ? titleText : undefined,
+            notesText: updates.notesJson !== undefined ? notesText : undefined,
             tags: updates.tags,
             status: updates.status,
             priority: updates.priority,

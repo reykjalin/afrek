@@ -8,6 +8,7 @@ import { TitleEditorKit } from "@/components/editor/plugins/title-editor-kit";
 import { Editor, EditorContainer } from "@/components/ui/editor";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
+import { richTextValueToText } from "@/lib/richText";
 
 interface TitleEditorProps {
   value: Value;
@@ -91,23 +92,4 @@ export function textToTitleValue(text: string): Value {
  * Utility to extract plain text from Plate.js Value format
  * This is useful for search indexing and display in contexts where rich text isn't supported
  */
-export function titleValueToText(value: Value): string {
-  if (!value || value.length === 0) {
-    return "";
-  }
-
-  const extractText = (node: unknown): string => {
-    if (typeof node === "object" && node !== null) {
-      const nodeObj = node as Record<string, unknown>;
-      if ("text" in nodeObj && typeof nodeObj.text === "string") {
-        return nodeObj.text;
-      }
-      if ("children" in nodeObj && Array.isArray(nodeObj.children)) {
-        return nodeObj.children.map(extractText).join("");
-      }
-    }
-    return "";
-  };
-
-  return value.map(extractText).join("\n");
-}
+export const titleValueToText = richTextValueToText;
