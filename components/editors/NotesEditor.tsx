@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback } from "react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
 import { NotesEditorKit } from "@/components/editor/plugins/notes-editor-kit";
 import { Editor, EditorContainer } from "@/components/ui/editor";
+import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
 
 interface NotesEditorProps {
   value: Value;
@@ -21,6 +22,8 @@ const emptyValue: Value = [
   },
 ];
 
+const DEBOUNCE_DELAY = 100;
+
 export function NotesEditor({
   value,
   onChange,
@@ -32,26 +35,13 @@ export function NotesEditor({
     value: value.length > 0 ? value : emptyValue,
   });
 
-  const prevValueRef = useRef<string>(JSON.stringify(value));
-  const editorValueRef = useRef<string>(JSON.stringify(value));
-
-  useEffect(() => {
-    const valueStr = JSON.stringify(value);
-    // Only update editor if the external value changed AND it's different from
-    // what the editor currently has (avoids resetting on our own edits)
-    if (valueStr !== prevValueRef.current && valueStr !== editorValueRef.current) {
-      editor.tf.setValue(value.length > 0 ? value : emptyValue);
-      editorValueRef.current = valueStr;
-    }
-    prevValueRef.current = valueStr;
-  }, [value, editor]);
+  const debouncedOnChange = useDebouncedCallback(onChange, DEBOUNCE_DELAY);
 
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {
-      editorValueRef.current = JSON.stringify(value);
-      onChange(value);
+      debouncedOnChange(value);
     },
-    [onChange]
+    [debouncedOnChange]
   );
 
   return (

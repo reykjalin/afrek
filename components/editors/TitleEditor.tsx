@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
 import { TitleEditorKit } from "@/components/editor/plugins/title-editor-kit";
 import { Editor, EditorContainer } from "@/components/ui/editor";
 import { cn } from "@/lib/utils";
+import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
 
 interface TitleEditorProps {
   value: Value;
@@ -27,6 +28,8 @@ const emptyValue: Value = [
   },
 ];
 
+const DEBOUNCE_DELAY = 100;
+
 export function TitleEditor({
   value,
   onChange,
@@ -43,33 +46,19 @@ export function TitleEditor({
     value: value.length > 0 ? value : emptyValue,
   });
 
-  const prevValueRef = useRef<string>(JSON.stringify(value));
-  const editorValueRef = useRef<string>(JSON.stringify(value));
-
-  useEffect(() => {
-    const valueStr = JSON.stringify(value);
-    // Only update editor if the external value changed AND it's different from
-    // what the editor currently has (avoids resetting on our own edits)
-    if (valueStr !== prevValueRef.current && valueStr !== editorValueRef.current) {
-      editor.tf.setValue(value.length > 0 ? value : emptyValue);
-      editorValueRef.current = valueStr;
-    }
-    prevValueRef.current = valueStr;
-  }, [value, editor]);
-
   useEffect(() => {
     if (autoFocus) {
-      // Focus at the end of the content
-      editor.tf.focus({ edge: 'end' });
+      editor.tf.focus({ edge: "end" });
     }
   }, [autoFocus, editor]);
 
+  const debouncedOnChange = useDebouncedCallback(onChange, DEBOUNCE_DELAY);
+
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {
-      editorValueRef.current = JSON.stringify(value);
-      onChange(value);
+      debouncedOnChange(value);
     },
-    [onChange]
+    [debouncedOnChange]
   );
 
   return (
@@ -108,8 +97,7 @@ export function titleValueToText(value: Value): string {
   if (!value || value.length === 0) {
     return "";
   }
-  
-  // Recursively extract text from all nodes
+
   const extractText = (node: unknown): string => {
     if (typeof node === "object" && node !== null) {
       const nodeObj = node as Record<string, unknown>;
@@ -122,6 +110,6 @@ export function titleValueToText(value: Value): string {
     }
     return "";
   };
-  
+
   return value.map(extractText).join("\n");
 }
