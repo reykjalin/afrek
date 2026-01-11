@@ -71,7 +71,7 @@ export function TaskItemExpanded({
       const json = JSON.stringify(value);
       onUpdateNotes(task.id, json);
     },
-    500
+    100
   );
 
   const handleNotesChange = useCallback(

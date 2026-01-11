@@ -36,7 +36,7 @@ const TaskFilterContext = createContext<TaskFilterContextType | undefined>(
   undefined,
 );
 
-const DEBOUNCE_DELAY = 300;
+const DEBOUNCE_DELAY = 100;
 
 export function TaskFilterProvider({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
