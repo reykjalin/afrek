@@ -36,7 +36,7 @@ const TaskFilterContext = createContext<TaskFilterContextType | undefined>(
   undefined,
 );
 
-const DEBOUNCE_DELAY = 100;
+
 
 export function TaskFilterProvider({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
@@ -50,7 +50,7 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     return tags ? tags.split(",").filter(Boolean) : [];
   });
 
-  const debouncedSearch = useDebouncedValue(search, DEBOUNCE_DELAY);
+  const debouncedSearch = useDebouncedValue(search);
 
   const filters = useMemo<TaskFilters>(
     () => ({

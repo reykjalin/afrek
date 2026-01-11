@@ -22,8 +22,6 @@ const emptyValue: Value = [
   },
 ];
 
-const DEBOUNCE_DELAY = 100;
-
 export function NotesEditor({
   value,
   onChange,
@@ -35,7 +33,7 @@ export function NotesEditor({
     value: value.length > 0 ? value : emptyValue,
   });
 
-  const debouncedOnChange = useDebouncedCallback(onChange, DEBOUNCE_DELAY);
+  const debouncedOnChange = useDebouncedCallback(onChange);
 
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {

@@ -28,8 +28,6 @@ const emptyValue: Value = [
   },
 ];
 
-const DEBOUNCE_DELAY = 100;
-
 export function TitleEditor({
   value,
   onChange,
@@ -52,7 +50,7 @@ export function TitleEditor({
     }
   }, [autoFocus, editor]);
 
-  const debouncedOnChange = useDebouncedCallback(onChange, DEBOUNCE_DELAY);
+  const debouncedOnChange = useDebouncedCallback(onChange);
 
   const handleChange = useCallback(
     ({ value }: { value: Value }) => {

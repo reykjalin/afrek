@@ -66,13 +66,10 @@ export function TaskItemExpanded({
     setNotesValue(parseNotesJson(task.notesJson));
   }
 
-  const debouncedUpdateNotes = useDebouncedCallback(
-    (value: Value) => {
-      const json = JSON.stringify(value);
-      onUpdateNotes(task.id, json);
-    },
-    100
-  );
+  const debouncedUpdateNotes = useDebouncedCallback((value: Value) => {
+    const json = JSON.stringify(value);
+    onUpdateNotes(task.id, json);
+  });
 
   const handleNotesChange = useCallback(
     (value: Value) => {
