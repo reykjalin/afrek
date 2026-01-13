@@ -46,6 +46,11 @@ export function TitleEditor({
   });
 
   useEffect(() => {
+    const newValue = value.length > 0 ? value : emptyValue;
+    editor.tf.setValue(newValue);
+  }, [value, editor]);
+
+  useEffect(() => {
     if (autoFocus) {
       editor.tf.focus({ edge: "end" });
     }

@@ -3,6 +3,7 @@
 import { CommandBar, CommandBarTrigger } from "@/components/command-bar";
 import { useGlobalShortcuts } from "@/hooks/useGlobalShortcuts";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { EncryptionModalTrigger } from "./EncryptionModalTrigger";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ export function AppShell({ children }: AppShellProps) {
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
       <CommandBar />
+      <EncryptionModalTrigger />
     </>
   );
 }

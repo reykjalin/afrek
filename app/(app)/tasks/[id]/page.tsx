@@ -171,6 +171,17 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     notFound();
   }
 
+  if (task.isLocked) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center text-muted-foreground">
+          <p className="text-lg font-medium">Task is encrypted</p>
+          <p className="text-sm mt-1">Unlock encryption to view this task</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Content */}

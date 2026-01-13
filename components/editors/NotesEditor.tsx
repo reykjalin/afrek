@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type { Value } from "platejs";
 import { Plate, usePlateEditor } from "platejs/react";
 
@@ -32,6 +32,11 @@ export function NotesEditor({
     plugins: NotesEditorKit,
     value: value.length > 0 ? value : emptyValue,
   });
+
+  useEffect(() => {
+    const newValue = value.length > 0 ? value : emptyValue;
+    editor.tf.setValue(newValue);
+  }, [value, editor]);
 
   const debouncedOnChange = useDebouncedCallback(onChange);
 

@@ -15,12 +15,15 @@ interface CommandBarContextType {
   mode: CommandBarMode;
   focusedTaskId: string | null;
   createTaskRequested: boolean;
+  encryptionModalRequested: boolean;
   openCommandBar: () => void;
   closeCommandBar: () => void;
   setMode: (mode: CommandBarMode) => void;
   setFocusedTaskId: (id: string | null) => void;
   requestCreateTask: () => void;
   clearCreateTaskRequest: () => void;
+  requestEncryptionModal: () => void;
+  clearEncryptionModalRequest: () => void;
 }
 
 const CommandBarContext = createContext<CommandBarContextType | undefined>(
@@ -32,6 +35,7 @@ export function CommandBarProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<CommandBarMode>("commands");
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
   const [createTaskRequested, setCreateTaskRequested] = useState(false);
+  const [encryptionModalRequested, setEncryptionModalRequested] = useState(false);
 
   const openCommandBar = useCallback(() => {
     setModeState("commands");
@@ -55,6 +59,15 @@ export function CommandBarProvider({ children }: { children: ReactNode }) {
     setCreateTaskRequested(false);
   }, []);
 
+  const requestEncryptionModal = useCallback(() => {
+    setEncryptionModalRequested(true);
+    setOpen(false);
+  }, []);
+
+  const clearEncryptionModalRequest = useCallback(() => {
+    setEncryptionModalRequested(false);
+  }, []);
+
   return (
     <CommandBarContext.Provider
       value={{
@@ -62,12 +75,15 @@ export function CommandBarProvider({ children }: { children: ReactNode }) {
         mode,
         focusedTaskId,
         createTaskRequested,
+        encryptionModalRequested,
         openCommandBar,
         closeCommandBar,
         setMode,
         setFocusedTaskId,
         requestCreateTask,
         clearCreateTaskRequest,
+        requestEncryptionModal,
+        clearEncryptionModalRequest,
       }}
     >
       {children}

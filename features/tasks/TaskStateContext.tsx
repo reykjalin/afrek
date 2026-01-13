@@ -56,9 +56,8 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(
     new Set(),
   );
-  const [decryptedCache, setDecryptedCache] = useState<
-    Map<string, EncryptedTaskPayload>
-  >(new Map());
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasksInitialized, setTasksInitialized] = useState(false);
 
   const tasksData = useTasksQuery(userId ?? undefined, {
     search: encryptionEnabled ? undefined : filters.search,
@@ -71,53 +70,78 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
   const toggleDoneMutation = useToggleDone();
 
   useEffect(() => {
-    if (!tasksData || !key) return;
+    if (!tasksData) {
+      setTasks([]);
+      setTasksInitialized(false);
+      return;
+    }
 
-    const decryptTasks = async () => {
-      const newCache = new Map<string, EncryptedTaskPayload>();
-      for (const task of tasksData) {
-        if (task.encryptedPayload) {
+    if (!encryptionEnabled || encryptionLocked || !key) {
+      const result = tasksData.map((t) => {
+        const isLocked = !!t.encryptedPayload;
+        return {
+          id: t._id,
+          titleJson: isLocked ? "" : (t.titleJson ?? ""),
+          notesJson: isLocked ? "" : t.notesJson,
+          titleText: isLocked ? "" : (t.titleText ?? ""),
+          notesText: isLocked ? "" : (t.notesText ?? ""),
+          tags: isLocked ? [] : t.tags,
+          status: t.status,
+          priority: t.priority,
+          scheduledDate: t.scheduledDate,
+          completedAt: t.completedAt,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+          userId: t.userId,
+          isLocked,
+        };
+      });
+      setTasks(result);
+      setTasksInitialized(true);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      const decryptedById = new Map<string, EncryptedTaskPayload>();
+
+      for (const t of tasksData) {
+        if (t.encryptedPayload) {
           try {
-            const blob: EncryptedBlob = JSON.parse(task.encryptedPayload);
+            const blob: EncryptedBlob = JSON.parse(t.encryptedPayload);
             const decrypted = await decryptJson<EncryptedTaskPayload>(key, blob);
-            newCache.set(task._id, decrypted);
+            decryptedById.set(t._id, decrypted);
           } catch (e) {
-            console.error("Failed to decrypt task:", task._id, e);
+            console.error("Failed to decrypt task:", t._id, e);
           }
         }
       }
-      setDecryptedCache(newCache);
-    };
 
-    decryptTasks();
-  }, [tasksData, key]);
+      if (cancelled) return;
 
-  const tasks = useMemo<Task[]>(() => {
-    if (!tasksData) return [];
+      let result = tasksData.map((t) => {
+        const decrypted = decryptedById.get(t._id);
+        const isLocked = !!t.encryptedPayload && !decrypted;
 
-    let result = tasksData.map((t) => {
-      const decrypted = decryptedCache.get(t._id);
-      const isLocked = !!t.encryptedPayload && !decrypted;
+        return {
+          id: t._id,
+          titleJson: decrypted?.titleJson ?? (isLocked ? "" : (t.titleJson ?? "")),
+          notesJson: decrypted?.notesJson ?? (isLocked ? "" : t.notesJson),
+          titleText: decrypted?.titleText ?? (isLocked ? "" : (t.titleText ?? "")),
+          notesText: decrypted?.notesText ?? (isLocked ? "" : (t.notesText ?? "")),
+          tags: decrypted?.tags ?? (isLocked ? [] : t.tags),
+          status: t.status,
+          priority: t.priority,
+          scheduledDate: t.scheduledDate,
+          completedAt: t.completedAt,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+          userId: t.userId,
+          isLocked,
+        };
+      });
 
-      return {
-        id: t._id,
-        titleJson: decrypted?.titleJson ?? (isLocked ? "" : (t.titleJson ?? "")),
-        notesJson: decrypted?.notesJson ?? (isLocked ? "" : t.notesJson),
-        titleText: decrypted?.titleText ?? (isLocked ? "" : (t.titleText ?? "")),
-        notesText: decrypted?.notesText ?? (isLocked ? "" : (t.notesText ?? "")),
-        tags: decrypted?.tags ?? (isLocked ? [] : t.tags),
-        status: t.status,
-        priority: t.priority,
-        scheduledDate: t.scheduledDate,
-        completedAt: t.completedAt,
-        createdAt: t.createdAt,
-        updatedAt: t.updatedAt,
-        userId: t.userId,
-        isLocked,
-      };
-    });
-
-    if (encryptionEnabled && !encryptionLocked) {
       if (filters.search) {
         const q = filters.search.toLowerCase();
         result = result.filter(
@@ -132,12 +156,17 @@ export function TaskStateProvider({ children }: { children: ReactNode }) {
           t.tags.some((tag) => filters.tags!.includes(tag))
         );
       }
-    }
 
-    return result;
-  }, [tasksData, decryptedCache, encryptionEnabled, encryptionLocked, filters]);
+      setTasks(result);
+      setTasksInitialized(true);
+    })();
 
-  const isLoading = tasksData === undefined;
+    return () => {
+      cancelled = true;
+    };
+  }, [tasksData, key, encryptionEnabled, encryptionLocked, filters]);
+
+  const isLoading = tasksData === undefined || !tasksInitialized;
   const readOnly = encryptionEnabled && encryptionLocked;
 
   const handleMutationError = (error: unknown, action: string) => {

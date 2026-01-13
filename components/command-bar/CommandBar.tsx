@@ -14,6 +14,8 @@ import {
   ArrowLeft,
   Plus,
   CalendarPlus,
+  ShieldCheck,
+  LockOpen,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -29,16 +31,18 @@ import { useCommandBar } from "@/features/command-bar";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
+import { useEncryption } from "@/features/crypto";
 import { toISODateString, parseDateString } from "@/lib/date";
 
 export function CommandBar() {
-  const { open, mode, closeCommandBar, setMode, requestCreateTask } = useCommandBar();
+  const { open, mode, closeCommandBar, setMode, requestCreateTask, requestEncryptionModal } = useCommandBar();
   const router = useRouter();
   const { search, setSearch, selectedTags, handleTagToggle, clearFilters, debouncedSearch } =
     useTaskFilter();
   const { tasks, updateTask } = useTaskState();
   const { signOut } = useAuth();
   const { focusedTaskId } = useTaskFocus();
+  const { enabled: encryptionEnabled, locked: encryptionLocked } = useEncryption();
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -89,6 +93,9 @@ export function CommandBar() {
         break;
       case "create-task":
         requestCreateTask();
+        break;
+      case "toggle-encryption":
+        requestEncryptionModal();
         break;
       case "logout":
         signOut({ returnTo: "/" });
@@ -197,6 +204,16 @@ export function CommandBar() {
               </CommandGroup>
 
               <CommandGroup heading="Account">
+                {encryptionEnabled && encryptionLocked && (
+                  <CommandItem onSelect={() => handleSelect("toggle-encryption")}>
+                    <LockOpen className="mr-2 h-4 w-4" />
+                    Unlock Tasks
+                  </CommandItem>
+                )}
+                <CommandItem onSelect={() => handleSelect("toggle-encryption")}>
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Toggle Encryption
+                </CommandItem>
                 <CommandItem onSelect={() => handleSelect("logout")}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
