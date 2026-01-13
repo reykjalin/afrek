@@ -88,12 +88,14 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
 
   const handleTagToggle = useCallback(
     (tag: string) => {
-      const newTags = selectedTags.includes(tag)
-        ? selectedTags.filter((t) => t !== tag)
-        : [...selectedTags, tag];
-      setSelectedTags(newTags);
+      setSelectedTagsState((prev) => {
+        const hasTag = prev.includes(tag);
+        const newTags = hasTag ? prev.filter((t) => t !== tag) : [...prev, tag];
+        updateUrl(debouncedSearch, newTags);
+        return newTags;
+      });
     },
-    [selectedTags, setSelectedTags],
+    [updateUrl, debouncedSearch],
   );
 
   const clearFilters = useCallback(() => {

@@ -6,7 +6,7 @@ import { Check, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import type { Value } from "platejs";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { TagPill } from "@/components/ui/tag-pill";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
@@ -27,7 +27,6 @@ import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskAccess } from "@/features/billing";
 import {
   parseDateString,
-  getTomorrowString,
   toISODateString,
 } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
@@ -67,13 +66,16 @@ export function TaskRow({
     return textToTitleValue("");
   }, [task.titleJson]);
 
-  const handleRescheduleToTomorrow = useCallback(
+  const handleRescheduleToNextDay = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (readOnly) return;
-      onSchedule(task.id, getTomorrowString());
+      // Move to next day from current scheduled date (not tomorrow from today)
+      const currentDate = task.scheduledDate ? parseDateString(task.scheduledDate) : new Date();
+      currentDate.setDate(currentDate.getDate() + 1);
+      onSchedule(task.id, toISODateString(currentDate));
     },
-    [readOnly, task.id, onSchedule]
+    [readOnly, task.id, task.scheduledDate, onSchedule]
   );
 
   const handleDateSelect = useCallback(
@@ -142,17 +144,11 @@ export function TaskRow({
       {task.tags.length > 0 && (
         <div className="flex items-center gap-1 shrink-0">
           {task.tags.map((tag) => (
-            <Badge
+            <TagPill
               key={tag}
-              variant="secondary"
-              className="text-[10px] px-1.5 py-0 h-5 cursor-pointer hover:bg-secondary/80"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTagToggle(tag);
-              }}
-            >
-              {tag}
-            </Badge>
+              tag={tag}
+              onClick={() => handleTagToggle(tag)}
+            />
           ))}
         </div>
       )}
@@ -162,19 +158,13 @@ export function TaskRow({
         {!isDone && (
           <Tooltip>
             <TooltipTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleRescheduleToTomorrow}
-                  disabled={readOnly}
-                  className="h-6 w-6"
-                />
-              }
+              onClick={handleRescheduleToNextDay}
+              disabled={readOnly}
+              render={<Button variant="ghost" size="icon-sm" className="h-6 w-6" />}
             >
               <CalendarPlus className="h-3.5 w-3.5" />
             </TooltipTrigger>
-            <TooltipContent>Reschedule to tomorrow</TooltipContent>
+            <TooltipContent>Move to next day</TooltipContent>
           </Tooltip>
         )}
 

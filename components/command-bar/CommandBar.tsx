@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
 import {
@@ -29,7 +29,7 @@ import { useCommandBar } from "@/features/command-bar";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
-import { getTomorrowString } from "@/lib/date";
+import { toISODateString, parseDateString } from "@/lib/date";
 
 export function CommandBar() {
   const { open, mode, closeCommandBar, setMode, requestCreateTask } = useCommandBar();
@@ -46,7 +46,22 @@ export function CommandBar() {
     return Array.from(tagSet).sort();
   }, [tasks]);
 
+  const focusedTask = useMemo(
+    () => tasks.find((t) => t.id === focusedTaskId),
+    [tasks, focusedTaskId]
+  );
+
   const hasActiveFilters = !!debouncedSearch || selectedTags.length > 0;
+
+  // Local state for tag filter input - cleared when entering tags mode
+  const [tagFilter, setTagFilter] = useState("");
+
+  // Clear tag filter when entering tags mode
+  useEffect(() => {
+    if (mode === "tags") {
+      setTagFilter("");
+    }
+  }, [mode]);
 
   const handleSelect = (action: string) => {
     switch (action) {
@@ -78,10 +93,14 @@ export function CommandBar() {
       case "logout":
         signOut({ returnTo: "/" });
         break;
-      case "reschedule-tomorrow":
-        if (focusedTaskId) {
-          updateTask(focusedTaskId, {
-            scheduledDate: getTomorrowString(),
+      case "reschedule-next-day":
+        if (focusedTask) {
+          const currentDate = focusedTask.scheduledDate
+            ? parseDateString(focusedTask.scheduledDate)
+            : new Date();
+          currentDate.setDate(currentDate.getDate() + 1);
+          updateTask(focusedTask.id, {
+            scheduledDate: toISODateString(currentDate),
             status: "scheduled",
           });
         }
@@ -117,7 +136,11 @@ export function CommandBar() {
             onKeyDown={handleSearchKeyDown}
           />
         ) : mode === "tags" ? (
-          <CommandInput placeholder="Filter by tag..." />
+          <CommandInput
+            placeholder="Filter by tag..."
+            value={tagFilter}
+            onValueChange={setTagFilter}
+          />
         ) : (
           <CommandInput placeholder="Type a command..." />
         )}
@@ -147,9 +170,9 @@ export function CommandBar() {
                   Filter by Tag
                 </CommandItem>
                 {focusedTaskId && (
-                  <CommandItem onSelect={() => handleSelect("reschedule-tomorrow")}>
+                  <CommandItem onSelect={() => handleSelect("reschedule-next-day")}>
                     <CalendarPlus className="mr-2 h-4 w-4" />
-                    Reschedule to Tomorrow
+                    Move to Next Day
                     <CommandShortcut>T</CommandShortcut>
                   </CommandItem>
                 )}

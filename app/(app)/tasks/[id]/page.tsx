@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+import { TagPill } from "@/components/ui/tag-pill";
 import { Input } from "@/components/ui/input";
 import { TitleEditor, textToTitleValue } from "@/components/editors/TitleEditor";
 import { NotesEditor } from "@/components/editors/NotesEditor";
@@ -25,7 +25,7 @@ interface TaskDetailPageProps {
 
 function TaskDetailContent({ taskId }: { taskId: string }) {
   const router = useRouter();
-  const { tasks, updateTask } = useTaskState();
+  const { tasks, updateTask, isLoading } = useTaskState();
   const { readOnly } = useTaskAccess();
   
   const task = useMemo(() => tasks.find(t => t.id === taskId), [tasks, taskId]);
@@ -101,6 +101,18 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     setNewTag("");
   }, [readOnly, task, updateTask, newTag]);
 
+  const availableTags = useMemo(() => {
+    if (!task) return [];
+    const tagSet = new Set<string>();
+    tasks.forEach(t => t.tags.forEach(tag => tagSet.add(tag)));
+    return Array.from(tagSet).filter(t => !task.tags.includes(t)).sort();
+  }, [tasks, task]);
+
+  const filteredTags = useMemo(() => {
+    if (!newTag) return [];
+    return availableTags.filter(t => t.toLowerCase().includes(newTag.toLowerCase()));
+  }, [availableTags, newTag]);
+
   const handleClose = () => {
     startViewTransition(() => router.back());
   };
@@ -113,26 +125,24 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     if (nextTaskId) startViewTransition(() => router.push(`/tasks/${nextTaskId}`));
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   if (!task) {
     notFound();
   }
-
-  const availableTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    tasks.forEach(t => t.tags.forEach(tag => tagSet.add(tag)));
-    return Array.from(tagSet).filter(t => !task.tags.includes(t)).sort();
-  }, [tasks, task.tags]);
-
-  const filteredTags = newTag 
-    ? availableTags.filter(t => t.toLowerCase().includes(newTag.toLowerCase()))
-    : [];
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b">
         <Tooltip>
-          <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={handleClose} />}>
+          <TooltipTrigger onClick={handleClose} render={<Button variant="ghost" size="icon" />}>
             <X className="h-4 w-4" />
           </TooltipTrigger>
           <TooltipContent>Close</TooltipContent>
@@ -140,13 +150,13 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
         
         <div className="flex items-center gap-1">
           <Tooltip>
-            <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={goToPrev} disabled={!prevTaskId} />}>
+            <TooltipTrigger onClick={goToPrev} disabled={!prevTaskId} render={<Button variant="ghost" size="icon" />}>
               <ChevronLeft className="h-4 w-4" />
             </TooltipTrigger>
             <TooltipContent>Previous task</TooltipContent>
           </Tooltip>
           <Tooltip>
-            <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={goToNext} disabled={!nextTaskId} />}>
+            <TooltipTrigger onClick={goToNext} disabled={!nextTaskId} render={<Button variant="ghost" size="icon" />}>
               <ChevronRight className="h-4 w-4" />
             </TooltipTrigger>
             <TooltipContent>Next task</TooltipContent>
@@ -156,112 +166,100 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6" style={{ viewTransitionName: "task-detail" }}>
-        <div className="mx-auto max-w-[46rem] space-y-8">
+        <div className="mx-auto max-w-[46rem]">
           {/* Title */}
           <TitleEditor
             value={titleValue}
             onChange={handleTitleChange}
             readOnly={readOnly}
-            containerClassName="text-2xl font-semibold border-none bg-transparent"
+            containerClassName="text-2xl font-semibold border-none bg-transparent px-0 py-0"
           />
 
-          {/* Metadata: Schedule + Tags */}
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-12">
+          {/* Metadata: inline under title */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
             {/* Scheduled date */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Scheduled
-              </label>
-              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                <PopoverTrigger
-                  disabled={readOnly}
-                  className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors disabled:opacity-60"
-                >
-                  <Calendar className="h-4 w-4" />
+            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+              <PopoverTrigger
+                disabled={readOnly}
+                className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 hover:bg-muted/60 transition-colors disabled:opacity-60"
+              >
+                <Calendar className="h-3 w-3" />
+                <span>
                   {task.scheduledDate
-                    ? format(parseDateString(task.scheduledDate), "EEEE, MMMM d, yyyy")
-                    : "Not scheduled"}
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={task.scheduledDate ? parseDateString(task.scheduledDate) : undefined}
-                    onSelect={handleSchedule}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+                    ? format(parseDateString(task.scheduledDate), "EEE, MMM d")
+                    : "Add date"}
+                </span>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={task.scheduledDate ? parseDateString(task.scheduledDate) : undefined}
+                  onSelect={handleSchedule}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* Divider dot */}
+            {(task.tags.length > 0 || !readOnly) && <span>•</span>}
 
             {/* Tags */}
-            <div className="space-y-1.5 flex-1">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Tags
-              </label>
-              <div className="flex flex-wrap items-center gap-2">
-                {task.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-                    {tag}
-                    {!readOnly && (
-                      <button
-                        onClick={() => handleRemoveTag(tag)}
-                        className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    )}
-                  </Badge>
-                ))}
-                {!readOnly && (
-                  <div className="relative">
-                    <Input
-                      placeholder="Add tag..."
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddTag();
-                        }
-                      }}
-                      className="h-7 w-28 text-sm"
-                    />
-                    {filteredTags.length > 0 && newTag && (
-                      <div className="absolute top-full left-0 mt-1 w-full bg-popover border rounded-md shadow-md z-10 max-h-32 overflow-auto">
-                        {filteredTags.slice(0, 5).map(tag => (
-                          <button
-                            key={tag}
-                            onClick={() => {
-                              if (!task.tags.includes(tag)) {
-                                updateTask(task.id, { tags: [...task.tags, tag] });
-                              }
-                              setNewTag("");
-                            }}
-                            className="w-full px-2 py-1.5 text-left text-sm hover:bg-accent"
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {task.tags.map(tag => (
+                <TagPill
+                  key={tag}
+                  tag={tag}
+                  onRemove={!readOnly ? () => handleRemoveTag(tag) : undefined}
+                />
+              ))}
+
+              {!readOnly && (
+                <div className="relative">
+                  <Input
+                    placeholder="+ tag"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                    className="h-5 w-16 border-none bg-transparent px-1 py-0 text-[11px] shadow-none focus-visible:ring-0"
+                  />
+                  {filteredTags.length > 0 && newTag && (
+                    <div className="absolute top-full left-0 mt-1 w-40 max-h-32 overflow-auto rounded-md border bg-popover text-xs shadow-md z-10">
+                      {filteredTags.slice(0, 5).map(tag => (
+                        <button
+                          key={tag}
+                          onClick={() => {
+                            if (!task.tags.includes(tag)) {
+                              updateTask(task.id, { tags: [...task.tags, tag] });
+                            }
+                            setNewTag("");
+                          }}
+                          className="w-full px-2 py-1.5 text-left hover:bg-accent focus:bg-accent focus:outline-none"
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Notes */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Notes
-            </label>
-            <div className="min-h-[300px] rounded-lg border bg-muted/5 p-4">
+          <section className="pt-6">
+            <h2 className="sr-only">Notes</h2>
+            <div className="min-h-[60vh]">
               <NotesEditor
                 value={notesValue}
                 onChange={handleNotesChange}
                 readOnly={readOnly}
               />
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

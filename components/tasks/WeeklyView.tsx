@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Value } from "platejs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { TagPill } from "@/components/ui/tag-pill";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TitleEditor, textToTitleValue, titleValueToText } from "@/components/editors/TitleEditor";
 import { TaskRow } from "./TaskRow";
@@ -86,6 +86,7 @@ export function WeeklyView({
 
   // Local input state for the tag text box
   const [newTagInput, setNewTagInput] = useState("");
+  const tagInputRef = useRef<HTMLInputElement>(null);
 
   // Parse current tags from comma-separated string
   const currentTags = useMemo(() => {
@@ -130,6 +131,8 @@ export function WeeklyView({
       updateNewTaskTags([...currentTags, tag]);
     }
     setNewTagInput("");
+    // Refocus input for continuous tag entry
+    setTimeout(() => tagInputRef.current?.focus(), 0);
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -237,21 +240,17 @@ export function WeeklyView({
                   {/* Tags: pills + autocomplete */}
                   <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                     {currentTags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="gap-1 pr-1 text-xs">
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tag)}
-                          className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5"
-                        >
-                          <X className="h-2.5 w-2.5" />
-                        </button>
-                      </Badge>
+                      <TagPill
+                        key={tag}
+                        tag={tag}
+                        onRemove={() => handleRemoveTag(tag)}
+                      />
                     ))}
 
                     <div className="relative">
                       <Input
-                        placeholder="Add tag..."
+                        ref={tagInputRef}
+                        placeholder="+ tag"
                         value={newTagInput}
                         onChange={(e) => setNewTagInput(e.target.value)}
                         onKeyDown={(e) => {
@@ -267,17 +266,17 @@ export function WeeklyView({
                             onCancelCreate?.();
                           }
                         }}
-                        className="h-6 w-20 text-xs"
+                        className="h-5 w-16 border-none bg-transparent px-1 py-0 text-[11px] shadow-none focus-visible:ring-0"
                       />
                       {filteredTags.length > 0 && newTagInput && (
-                        <div className="absolute top-full left-0 mt-1 w-32 bg-popover border rounded-md shadow-md z-10 max-h-32 overflow-auto">
+                        <div className="absolute top-full left-0 mt-1 w-40 max-h-32 overflow-auto rounded-md border bg-popover text-xs shadow-md z-10">
                           {filteredTags.slice(0, 5).map((tag) => (
                             <button
                               key={tag}
                               type="button"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleAddTagFromSuggestion(tag)}
-                              className="w-full px-2 py-1 text-left text-xs hover:bg-accent"
+                              className="w-full px-2 py-1.5 text-left hover:bg-accent focus:bg-accent focus:outline-none"
                             >
                               {tag}
                             </button>
