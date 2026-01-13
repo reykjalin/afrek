@@ -38,8 +38,10 @@ function TasksPageContent() {
   const { createTaskRequested, clearCreateTaskRequest } = useCommandBar();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [createTaskDate, setCreateTaskDate] = useState<string | null>(null);
   const [newTaskTitleValue, setNewTaskTitleValue] = useState<Value>(textToTitleValue(""));
   const [newTaskTags, setNewTaskTags] = useState("");
+  const [titleFocusKey, setTitleFocusKey] = useState(0);
 
   const visibleTaskIds = useMemo(() => {
     const weekDays = getWeekDays(weekStart);
@@ -94,6 +96,7 @@ function TasksPageContent() {
   useEffect(() => {
     if (createTaskRequested && !isCreatingTask) {
       setIsCreatingTask(true);
+      setCreateTaskDate(getTodayString());
       clearCreateTaskRequest();
     }
   }, [createTaskRequested, isCreatingTask, clearCreateTaskRequest]);
@@ -101,7 +104,6 @@ function TasksPageContent() {
   const handleCreateTask = async () => {
     const titleText = titleValueToText(newTaskTitleValue).trim();
     if (!titleText) {
-      setIsCreatingTask(false);
       return;
     }
     const titleJson = JSON.stringify(newTaskTitleValue);
@@ -117,20 +119,26 @@ function TasksPageContent() {
       tags,
       status: "scheduled",
       priority: "Normal",
-      scheduledDate: getTodayString(),
+      scheduledDate: createTaskDate ?? getTodayString(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
       userId: "demo",
     });
     setNewTaskTitleValue(textToTitleValue(""));
     setNewTaskTags("");
-    setIsCreatingTask(false);
+    setTitleFocusKey((k) => k + 1);
   };
 
   const handleCancelCreate = () => {
     setNewTaskTitleValue(textToTitleValue(""));
     setNewTaskTags("");
     setIsCreatingTask(false);
+    setCreateTaskDate(null);
+  };
+
+  const handleStartCreate = (date: string) => {
+    setCreateTaskDate(date);
+    setIsCreatingTask(true);
   };
 
   return (
@@ -158,12 +166,15 @@ function TasksPageContent() {
           onDelete={handleDelete}
           onUpdatePriority={handleUpdatePriority}
           isCreatingTask={isCreatingTask}
+          createTaskDate={createTaskDate}
+          titleFocusKey={titleFocusKey}
           newTaskTitleValue={newTaskTitleValue}
           onNewTaskTitleChange={setNewTaskTitleValue}
           newTaskTags={newTaskTags}
           onNewTaskTagsChange={setNewTaskTags}
           onCreateTask={handleCreateTask}
           onCancelCreate={handleCancelCreate}
+          onStartCreate={handleStartCreate}
         />
       </div>
     </div>

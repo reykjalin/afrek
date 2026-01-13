@@ -35,12 +35,15 @@ interface WeeklyViewProps {
   onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
   isCreatingTask?: boolean;
+  createTaskDate?: string | null;
+  titleFocusKey?: number;
   newTaskTitleValue?: Value;
   onNewTaskTitleChange?: (value: Value) => void;
   newTaskTags?: string;
   onNewTaskTagsChange?: (tags: string) => void;
   onCreateTask?: () => void;
   onCancelCreate?: () => void;
+  onStartCreate?: (date: string) => void;
 }
 
 function getWeekDays(startMonday: Date): { label: string; date: string; isToday: boolean }[] {
@@ -74,12 +77,15 @@ export function WeeklyView({
   onSchedule,
   onUpdatePriority,
   isCreatingTask,
+  createTaskDate,
+  titleFocusKey,
   newTaskTitleValue,
   onNewTaskTitleChange,
   newTaskTags,
   onNewTaskTagsChange,
   onCreateTask,
   onCancelCreate,
+  onStartCreate,
 }: WeeklyViewProps) {
   const weekDays = getWeekDays(weekStart);
   const { focusedTaskId, setFocusedTaskId } = useTaskFocus();
@@ -87,6 +93,7 @@ export function WeeklyView({
   // Local input state for the tag text box
   const [newTagInput, setNewTagInput] = useState("");
   const tagInputRef = useRef<HTMLInputElement>(null);
+  const blurTimeoutRef = useRef<number | null>(null);
 
   // Parse current tags from comma-separated string
   const currentTags = useMemo(() => {
@@ -96,6 +103,23 @@ export function WeeklyView({
       .map((t) => t.trim())
       .filter(Boolean);
   }, [newTaskTags]);
+
+  const handleCreateFocusIn = () => {
+    if (blurTimeoutRef.current) {
+      window.clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+  };
+
+  const handleCreateFocusOut = () => {
+    blurTimeoutRef.current = window.setTimeout(() => {
+      const titleText = titleValueToText(newTaskTitleValue ?? textToTitleValue("")).trim();
+      const hasTags = currentTags.length > 0;
+      if (!titleText && !hasTags) {
+        onCancelCreate?.();
+      }
+    }, 0);
+  };
 
   // All existing tags for autocomplete
   const allTags = useMemo(() => {
@@ -213,11 +237,16 @@ export function WeeklyView({
               ) : (
                 <p className="text-sm text-muted-foreground/50 italic">No tasks</p>
               )}
-              {isToday && isCreatingTask && (
-                <div className="mt-2 flex flex-col sm:flex-row sm:items-start gap-2 p-2 rounded-lg border bg-muted/30">
+              {isCreatingTask && createTaskDate === date ? (
+                <div
+                  className="mt-2 flex flex-col sm:flex-row sm:items-start gap-2 p-2 rounded-lg border bg-muted/30"
+                  onFocusCapture={handleCreateFocusIn}
+                  onBlurCapture={handleCreateFocusOut}
+                >
                   {/* Title editor - rich text */}
                   <div className="flex-1 min-w-0">
                     <TitleEditor
+                      key={titleFocusKey}
                       value={newTaskTitleValue ?? textToTitleValue("")}
                       onChange={(value) => onNewTaskTitleChange?.(value)}
                       placeholder="Task title..."
@@ -286,6 +315,23 @@ export function WeeklyView({
                     </div>
                   </div>
                 </div>
+              ) : (
+                <button
+                  type="button"
+                  className={cn(
+                    "mt-1 w-full flex items-center gap-1.5 rounded-md px-2 py-1 text-xs",
+                    "text-muted-foreground/50 hover:text-foreground hover:bg-muted/40",
+                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                    "transition-colors"
+                  )}
+                  onClick={() => onStartCreate?.(date)}
+                  aria-label={`Add task for ${label}`}
+                >
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-dashed border-current text-[10px]">
+                    +
+                  </span>
+                  <span>Add task</span>
+                </button>
               )}
             </div>
           );
