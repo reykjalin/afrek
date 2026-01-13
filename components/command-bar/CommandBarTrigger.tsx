@@ -20,7 +20,7 @@ export function CommandBarTrigger() {
       onClick={handleClick}
       style={{ viewTransitionName: "command-bar" }}
       className={cn(
-        "mx-auto w-full max-w-[500px]",
+        "w-[500px] max-w-full",
         "flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground",
         "hover:bg-accent hover:text-accent-foreground",
         "transition-all duration-150 shadow-sm",

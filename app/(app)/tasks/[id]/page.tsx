@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useCallback, useMemo } from "react";
+import { use, useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ import { TitleEditor, textToTitleValue } from "@/components/editors/TitleEditor"
 import { NotesEditor } from "@/components/editors/NotesEditor";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
+import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { parseDateString } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
 
@@ -27,6 +28,7 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
   const router = useRouter();
   const { tasks, updateTask, isLoading } = useTaskState();
   const { readOnly } = useTaskAccess();
+  const { setLeftContent, setRightContent } = useTopNavActions();
   
   const task = useMemo(() => tasks.find(t => t.id === taskId), [tasks, taskId]);
   
@@ -113,17 +115,49 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     return availableTags.filter(t => t.toLowerCase().includes(newTag.toLowerCase()));
   }, [availableTags, newTag]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     startViewTransition(() => router.back());
-  };
+  }, [router]);
 
-  const goToPrev = () => {
+  const goToPrev = useCallback(() => {
     if (prevTaskId) startViewTransition(() => router.push(`/tasks/${prevTaskId}`));
-  };
+  }, [router, prevTaskId]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     if (nextTaskId) startViewTransition(() => router.push(`/tasks/${nextTaskId}`));
-  };
+  }, [router, nextTaskId]);
+
+  // Set top nav actions
+  useEffect(() => {
+    setLeftContent(
+      <Tooltip>
+        <TooltipTrigger onClick={handleClose} render={<Button variant="ghost" size="icon" />}>
+          <X className="h-4 w-4" />
+        </TooltipTrigger>
+        <TooltipContent>Close</TooltipContent>
+      </Tooltip>
+    );
+    setRightContent(
+      <div className="flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger onClick={goToPrev} disabled={!prevTaskId} render={<Button variant="ghost" size="icon" />}>
+            <ChevronLeft className="h-4 w-4" />
+          </TooltipTrigger>
+          <TooltipContent>Previous task</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger onClick={goToNext} disabled={!nextTaskId} render={<Button variant="ghost" size="icon" />}>
+            <ChevronRight className="h-4 w-4" />
+          </TooltipTrigger>
+          <TooltipContent>Next task</TooltipContent>
+        </Tooltip>
+      </div>
+    );
+    return () => {
+      setLeftContent(undefined);
+      setRightContent(undefined);
+    };
+  }, [setLeftContent, setRightContent, handleClose, goToPrev, goToNext, prevTaskId, nextTaskId]);
 
   if (isLoading) {
     return (
@@ -139,31 +173,6 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b">
-        <Tooltip>
-          <TooltipTrigger onClick={handleClose} render={<Button variant="ghost" size="icon" />}>
-            <X className="h-4 w-4" />
-          </TooltipTrigger>
-          <TooltipContent>Close</TooltipContent>
-        </Tooltip>
-        
-        <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger onClick={goToPrev} disabled={!prevTaskId} render={<Button variant="ghost" size="icon" />}>
-              <ChevronLeft className="h-4 w-4" />
-            </TooltipTrigger>
-            <TooltipContent>Previous task</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger onClick={goToNext} disabled={!nextTaskId} render={<Button variant="ghost" size="icon" />}>
-              <ChevronRight className="h-4 w-4" />
-            </TooltipTrigger>
-            <TooltipContent>Next task</TooltipContent>
-          </Tooltip>
-        </div>
-      </header>
-
       {/* Content */}
       <div className="flex-1 overflow-auto p-6" style={{ viewTransitionName: "task-detail" }}>
         <div className="mx-auto max-w-[46rem]">

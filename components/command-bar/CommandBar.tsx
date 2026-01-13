@@ -125,7 +125,7 @@ export function CommandBar() {
       onOpenChange={(isOpen) => !isOpen && closeCommandBar()}
       withOverlay={false}
       style={{ viewTransitionName: "command-bar" }}
-      className="fixed left-1/2 -translate-x-1/2 top-4 sm:top-16 w-[calc(100%-2rem)] max-w-[500px] shadow-lg translate-y-0!"
+      className="fixed left-1/2 -translate-x-1/2 top-4 sm:top-16 w-full max-w-[500px] shadow-lg translate-y-0!"
     >
       <Command shouldFilter={mode === "commands" || mode === "tags"}>
         {mode === "search" ? (

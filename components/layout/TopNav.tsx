@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 const UserButton = dynamic(
@@ -24,7 +24,6 @@ import {
 import { cn } from "@/lib/utils";
 
 export function TopNav() {
-  const { leftContent } = useTopNavActions();
   const { enabled, locked, migrating } = useEncryption();
   const [showEncryptionModal, setShowEncryptionModal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -40,10 +39,8 @@ export function TopNav() {
 
   return (
     <>
-      <div className="flex flex-1 items-center justify-between">
-        <div className="flex items-center gap-2">{leftContent}</div>
-        <div className="flex items-center gap-2">
-          <Tooltip>
+      <div className="flex items-center gap-2">
+        <Tooltip>
             <TooltipTrigger
               render={
                 <Button
@@ -91,9 +88,8 @@ export function TopNav() {
               )}
             </TooltipTrigger>
             <TooltipContent>{getEncryptionTooltip()}</TooltipContent>
-          </Tooltip>
-          <UserButton />
-        </div>
+        </Tooltip>
+        <UserButton />
       </div>
       <EncryptionModal
         open={showEncryptionModal}
