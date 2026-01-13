@@ -247,3 +247,25 @@
   }
 
 }
+
+/* View Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 150ms;
+  animation-timing-function: ease-out;
+}
+
+/* Task row to detail transition */
+::view-transition-old(task-detail),
+::view-transition-new(task-detail) {
+  animation-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(task-detail),
+  ::view-transition-new(task-detail) {
+    animation: none;
+  }
+}

@@ -1,35 +1,20 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Search, Sliders } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { Kbd } from "@/components/ui/kbd";
 import { TaskList } from "@/components/tasks/TaskList";
-import { TaskFilters } from "@/components/tasks";
 import { UpgradeCTA } from "@/components/UpgradeCTA";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
-import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
-import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { getStartOfWeek, getWeekNumber, formatWeekRange } from "@/lib/date";
-import { isEditableElement } from "@/lib/keyboard";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 function CompletedPageContent() {
   const { tasks, updateTask, deleteTask, toggleTaskDone } = useTaskState();
-  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
-  const { setLeftContent } = useTopNavActions();
   const { readOnly, isLoading: isAccessLoading } = useTaskAccess();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
-  const [showFilters, setShowFilters] = useState(false);
-
-  const availableTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    tasks.forEach((task) => task.tags.forEach((tag) => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
-  }, [tasks]);
 
   const completedTasks = useMemo(() => {
     return tasks
@@ -46,76 +31,6 @@ function CompletedPageContent() {
       return taskWeekStart.toDateString() === weekStart.toDateString();
     });
   }, [completedTasks, weekStart]);
-
-  const hasActiveFilters = !!search || selectedTags.length > 0;
-
-  useEffect(() => {
-    setLeftContent(
-      <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowFilters(true)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            }
-          />
-          <TooltipContent>
-            <div className="flex items-center gap-2">
-              <span>Search</span>
-              <Kbd>/</Kbd>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-        {hasActiveFilters && (
-          <Tooltip>
-            <TooltipTrigger
-              onClick={() => clearFilters()}
-              className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-            >
-              <Sliders className="h-4 w-4" />
-              Filtering
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="start" style={{ maxWidth: "500px" }}>
-              <div className="text-xs space-y-1">
-                {search && <div>Search: {search}</div>}
-                {selectedTags.length > 0 && <div>Tags: {selectedTags.join(", ")}</div>}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        )}
-      </div>
-    );
-
-    return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, clearFilters]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip shortcuts when typing in editable elements
-      if (isEditableElement(e.target)) {
-        if (e.key === "Escape") {
-          setShowFilters(false);
-        }
-        return;
-      }
-
-      if (e.key === "/" && !showFilters) {
-        e.preventDefault();
-        setShowFilters(true);
-      }
-      if (e.key === "Escape") {
-        setShowFilters(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showFilters]);
 
   const goToPreviousWeek = () => {
     const prev = new Date(weekStart);
@@ -191,29 +106,6 @@ function CompletedPageContent() {
           />
         </div>
       </div>
-
-      <Dialog open={showFilters} onOpenChange={setShowFilters}>
-        <DialogContent
-          className="max-w-lg"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              setShowFilters(false);
-            }
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>Search & Filter</DialogTitle>
-          </DialogHeader>
-          <TaskFilters
-            search={search}
-            onSearchChange={setSearch}
-            selectedTags={selectedTags}
-            onTagToggle={handleTagToggle}
-            availableTags={availableTags}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

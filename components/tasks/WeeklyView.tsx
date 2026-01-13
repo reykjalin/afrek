@@ -2,11 +2,22 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { TaskList } from "./TaskList";
+import { TaskRow } from "./TaskRow";
 import { cn } from "@/lib/utils";
 import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
+import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
 import type { Task, TaskPriority } from "@/features/tasks/types";
+
+const PRIORITY_ORDER: Record<TaskPriority, number> = {
+  Highest: 0,
+  High: 1,
+  Medium: 2,
+  Normal: 3,
+  Low: 4,
+  Lowest: 5,
+};
 
 interface WeeklyViewProps {
   tasks: Task[];
@@ -19,6 +30,11 @@ interface WeeklyViewProps {
   onSchedule: (id: string, date: string | null) => void;
   onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
+  isCreatingTask?: boolean;
+  newTaskTitle?: string;
+  onNewTaskTitleChange?: (title: string) => void;
+  onCreateTask?: () => void;
+  onCancelCreate?: () => void;
 }
 
 function getWeekDays(startMonday: Date): { label: string; date: string; isToday: boolean }[] {
@@ -49,14 +65,16 @@ export function WeeklyView({
   weekStart,
   onWeekChange,
   onToggleDone,
-  onUpdateTitle,
-  onUpdateNotes,
-  onUpdateTags,
   onSchedule,
-  onDelete,
   onUpdatePriority,
+  isCreatingTask,
+  newTaskTitle,
+  onNewTaskTitleChange,
+  onCreateTask,
+  onCancelCreate,
 }: WeeklyViewProps) {
   const weekDays = getWeekDays(weekStart);
+  const { focusedTaskId, setFocusedTaskId } = useTaskFocus();
 
   const goToPreviousWeek = () => {
     const prev = new Date(weekStart);
@@ -71,27 +89,29 @@ export function WeeklyView({
   };
 
   const getTasksForDay = (date: string) => {
-    return tasks.filter((task) => task.scheduledDate === date);
+    return tasks
+      .filter((task) => task.scheduledDate === date)
+      .sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
   };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-center gap-1">
-         <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
-           <ChevronLeft className="h-4 w-4" />
-         </Button>
-         <Tooltip>
-           <TooltipTrigger>
-             <h2 className="text-lg font-semibold w-[160px] text-center">
-               Week {getWeekNumber(weekStart)}
-             </h2>
-           </TooltipTrigger>
-           <TooltipContent>{formatWeekRange(weekStart)}</TooltipContent>
-         </Tooltip>
-         <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
-           <ChevronRight className="h-4 w-4" />
-         </Button>
-       </div>
+        <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Tooltip>
+          <TooltipTrigger>
+            <h2 className="text-lg font-semibold w-[160px] text-center">
+              Week {getWeekNumber(weekStart)}
+            </h2>
+          </TooltipTrigger>
+          <TooltipContent>{formatWeekRange(weekStart)}</TooltipContent>
+        </Tooltip>
+        <Button variant="outline" size="icon-sm" onClick={goToNextWeek}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
 
       <div className="flex flex-col gap-6">
         {weekDays.map(({ label, date, isToday }) => {
@@ -107,18 +127,38 @@ export function WeeklyView({
                 {label}
               </div>
               {dayTasks.length > 0 ? (
-                <TaskList
-                  tasks={dayTasks}
-                  onToggleDone={onToggleDone}
-                  onUpdateTitle={onUpdateTitle}
-                  onUpdateNotes={onUpdateNotes}
-                  onUpdateTags={onUpdateTags}
-                  onSchedule={onSchedule}
-                  onDelete={onDelete}
-                  onUpdatePriority={onUpdatePriority}
-                />
+                <div className="space-y-1">
+                  {dayTasks.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      isFocused={focusedTaskId === task.id}
+                      onToggleDone={onToggleDone}
+                      onSchedule={onSchedule}
+                      onUpdatePriority={onUpdatePriority}
+                      onFocus={() => setFocusedTaskId(task.id)}
+                    />
+                  ))}
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground/50 italic">No tasks</p>
+              )}
+              {isToday && isCreatingTask && (
+                <div className="mt-2">
+                  <Input
+                    autoFocus
+                    placeholder="Task title..."
+                    value={newTaskTitle}
+                    onChange={(e) => onNewTaskTitleChange?.(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") onCreateTask?.();
+                      if (e.key === "Escape") onCancelCreate?.();
+                    }}
+                    onBlur={() => {
+                      if (!newTaskTitle?.trim()) onCancelCreate?.();
+                    }}
+                  />
+                </div>
               )}
             </div>
           );

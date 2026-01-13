@@ -1,43 +1,56 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { Plus, Search, Sliders } from "lucide-react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { Kbd } from "@/components/ui/kbd";
-import { TaskFilters, WeeklyView } from "@/components/tasks";
+import { WeeklyView } from "@/components/tasks";
 import { UpgradeCTA } from "@/components/UpgradeCTA";
-import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
-import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
-import { getStartOfWeek, getTodayString } from "@/lib/date";
-import { isEditableElement } from "@/lib/keyboard";
-import type { TaskPriority } from "@/features/tasks/types";
+import { useCommandBar } from "@/features/command-bar";
+import { useTaskListKeyboard } from "@/hooks/useTaskListKeyboard";
+import { getStartOfWeek, getTodayString, toISODateString } from "@/lib/date";
+import type { Task, TaskPriority } from "@/features/tasks/types";
 
-const today = getTodayString();
+const PRIORITY_ORDER: Record<TaskPriority, number> = {
+  Highest: 0,
+  High: 1,
+  Medium: 2,
+  Normal: 3,
+  Low: 4,
+  Lowest: 5,
+};
+
+function getWeekDays(startMonday: Date): string[] {
+  const days: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startMonday);
+    date.setDate(startMonday.getDate() + i);
+    days.push(toISODateString(date));
+  }
+  return days;
+}
 
 function TasksPageContent() {
-  const { search, setSearch, selectedTags, setSelectedTags, handleTagToggle, clearFilters } = useTaskFilter();
-  const { tasks, addTask, updateTask, deleteTask, toggleTaskDone } = useTaskState();
-  const { setLeftContent } = useTopNavActions();
+  const { tasks, updateTask, deleteTask, toggleTaskDone, addTask } = useTaskState();
   const { readOnly, isLoading: isAccessLoading } = useTaskAccess();
+  const { createTaskRequested, clearCreateTaskRequest } = useCommandBar();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskTags, setNewTaskTags] = useState("");
-  const [showNewTask, setShowNewTask] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
-  const availableTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    tasks.forEach((task) => task.tags.forEach((tag) => tagSet.add(tag)));
-    return Array.from(tagSet).sort();
-  }, [tasks]);
+  const visibleTaskIds = useMemo(() => {
+    const weekDays = getWeekDays(weekStart);
+    const ids: string[] = [];
+    for (const date of weekDays) {
+      const dayTasks = tasks
+        .filter((task: Task) => task.scheduledDate === date)
+        .sort((a: Task, b: Task) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+      ids.push(...dayTasks.map((t: Task) => t.id));
+    }
+    return ids;
+  }, [tasks, weekStart]);
 
-  const hasActiveFilters = !!search || selectedTags.length > 0;
+  useTaskListKeyboard({ taskIds: visibleTaskIds });
 
   const isCurrentWeek = useCallback(() => {
     const currentWeekStart = getStartOfWeek(new Date());
@@ -47,112 +60,6 @@ function TasksPageContent() {
   const goToCurrentWeek = () => {
     setWeekStart(getStartOfWeek(new Date()));
   };
-
-  // Set top nav content
-  useEffect(() => {
-    setLeftContent(
-      <div className="flex items-center gap-2">
-        {!readOnly && (
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowNewTask(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              }
-            />
-            <TooltipContent>
-              <div className="flex items-center gap-2">
-                <span>Create Task</span>
-                <Kbd>N</Kbd>
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        )}
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowFilters(true)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            }
-          />
-          <TooltipContent>
-            <div className="flex items-center gap-2">
-              <span>Search</span>
-              <Kbd>/</Kbd>
-            </div>
-          </TooltipContent>
-        </Tooltip>
-        {hasActiveFilters && (
-          <Tooltip>
-            <TooltipTrigger
-              onClick={() => clearFilters()}
-              className="flex items-center gap-2 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-            >
-              <Sliders className="h-4 w-4" />
-              Filtering
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="start" style={{ maxWidth: "500px" }}>
-              <div className="text-xs space-y-1">
-                {search && <div>Search: {search}</div>}
-                {selectedTags.length > 0 && <div>Tags: {selectedTags.join(", ")}</div>}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        )}
-        {!isCurrentWeek() && (
-          <Button size="sm" onClick={goToCurrentWeek}>
-            Go to current week
-          </Button>
-        )}
-      </div>
-    );
-
-    return () => setLeftContent(undefined);
-  }, [setLeftContent, hasActiveFilters, search, selectedTags, setSearch, setSelectedTags, weekStart, readOnly, clearFilters, isCurrentWeek]);
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip shortcuts when typing in editable elements (inputs, textareas, rich text editors)
-      if (isEditableElement(e.target)) {
-        // Still allow Escape to close modals
-        if (e.key === "Escape") {
-          setShowNewTask(false);
-          setShowFilters(false);
-        }
-        return;
-      }
-
-      // N key for new task (only when not readOnly)
-      if (e.key === "n" && !readOnly && !showNewTask && !showFilters) {
-        e.preventDefault();
-        setShowNewTask(true);
-      }
-      // / key for search/filters
-      if (e.key === "/" && !showNewTask && !showFilters) {
-        e.preventDefault();
-        setShowFilters(true);
-      }
-      // Escape to close modals
-      if (e.key === "Escape") {
-        setShowNewTask(false);
-        setShowFilters(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showNewTask, showFilters, readOnly]);
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
@@ -181,14 +88,18 @@ function TasksPageContent() {
     updateTask(id, { priority });
   };
 
-  const handleAddTask = async () => {
-    if (!newTaskTitle.trim()) return;
+  useEffect(() => {
+    if (createTaskRequested && !isCreatingTask) {
+      setIsCreatingTask(true);
+      clearCreateTaskRequest();
+    }
+  }, [createTaskRequested, isCreatingTask, clearCreateTaskRequest]);
 
-    const tags = newTaskTags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
-
+  const handleCreateTask = async () => {
+    if (!newTaskTitle.trim()) {
+      setIsCreatingTask(false);
+      return;
+    }
     const titleText = newTaskTitle.trim();
     const titleJson = JSON.stringify([{ type: "p", children: [{ text: titleText }] }]);
     await addTask({
@@ -196,108 +107,54 @@ function TasksPageContent() {
       notesJson: "",
       titleText,
       notesText: "",
-      tags,
-      status: "scheduled" as const,
-      priority: "Normal" as const,
-      scheduledDate: today,
+      tags: [],
+      status: "scheduled",
+      priority: "Normal",
+      scheduledDate: getTodayString(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
       userId: "demo",
     });
-
     setNewTaskTitle("");
-    setNewTaskTags("");
-    setShowNewTask(false);
+    setIsCreatingTask(false);
+  };
+
+  const handleCancelCreate = () => {
+    setNewTaskTitle("");
+    setIsCreatingTask(false);
   };
 
   return (
     <div className="flex flex-col gap-6 p-6 h-full">
       <div className="mx-auto w-full max-w-4xl flex flex-col gap-4">
         {!isAccessLoading && readOnly && <UpgradeCTA />}
-        {/* Weekly view */}
-        <WeeklyView
-        tasks={tasks}
-        weekStart={weekStart}
-        onWeekChange={setWeekStart}
-        onToggleDone={handleToggleDone}
-        onUpdateTitle={handleUpdateTitle}
-        onUpdateNotes={handleUpdateNotes}
-        onUpdateTags={handleUpdateTags}
-        onSchedule={handleSchedule}
-        onDelete={handleDelete}
-        onUpdatePriority={handleUpdatePriority}
-        />
-        </div>
 
-        {/* New task modal */}
-      <Dialog open={showNewTask} onOpenChange={setShowNewTask}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New Task</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="task-title">
-                Title
-              </Label>
-              <Input
-                id="task-title"
-                placeholder="Task title..."
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddTask();
-                }}
-                autoFocus
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="task-tags">
-                Tags
-              </Label>
-              <Input
-                id="task-tags"
-                placeholder="Tags (comma-separated)..."
-                value={newTaskTags}
-                onChange={(e) => setNewTaskTags(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddTask();
-                }}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowNewTask(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddTask}>Create</Button>
-            </div>
+        {!isCurrentWeek() && (
+          <div className="flex justify-center">
+            <Button size="sm" onClick={goToCurrentWeek}>
+              Go to current week
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        )}
 
-      {/* Search and filters modal */}
-      <Dialog open={showFilters} onOpenChange={setShowFilters}>
-        <DialogContent
-          className="max-w-lg"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              setShowFilters(false);
-            }
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>Search & Filter</DialogTitle>
-          </DialogHeader>
-          <TaskFilters
-            search={search}
-            onSearchChange={setSearch}
-            selectedTags={selectedTags}
-            onTagToggle={handleTagToggle}
-            availableTags={availableTags}
-          />
-        </DialogContent>
-      </Dialog>
+        <WeeklyView
+          tasks={tasks}
+          weekStart={weekStart}
+          onWeekChange={setWeekStart}
+          onToggleDone={handleToggleDone}
+          onUpdateTitle={handleUpdateTitle}
+          onUpdateNotes={handleUpdateNotes}
+          onUpdateTags={handleUpdateTags}
+          onSchedule={handleSchedule}
+          onDelete={handleDelete}
+          onUpdatePriority={handleUpdatePriority}
+          isCreatingTask={isCreatingTask}
+          newTaskTitle={newTaskTitle}
+          onNewTaskTitleChange={setNewTaskTitle}
+          onCreateTask={handleCreateTask}
+          onCancelCreate={handleCancelCreate}
+        />
+      </div>
     </div>
   );
 }
