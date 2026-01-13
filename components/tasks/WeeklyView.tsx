@@ -1,9 +1,13 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import type { Value } from "platejs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { TitleEditor, textToTitleValue, titleValueToText } from "@/components/editors/TitleEditor";
 import { TaskRow } from "./TaskRow";
 import { cn } from "@/lib/utils";
 import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
@@ -31,8 +35,10 @@ interface WeeklyViewProps {
   onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
   isCreatingTask?: boolean;
-  newTaskTitle?: string;
-  onNewTaskTitleChange?: (title: string) => void;
+  newTaskTitleValue?: Value;
+  onNewTaskTitleChange?: (value: Value) => void;
+  newTaskTags?: string;
+  onNewTaskTagsChange?: (tags: string) => void;
   onCreateTask?: () => void;
   onCancelCreate?: () => void;
 }
@@ -68,13 +74,74 @@ export function WeeklyView({
   onSchedule,
   onUpdatePriority,
   isCreatingTask,
-  newTaskTitle,
+  newTaskTitleValue,
   onNewTaskTitleChange,
+  newTaskTags,
+  onNewTaskTagsChange,
   onCreateTask,
   onCancelCreate,
 }: WeeklyViewProps) {
   const weekDays = getWeekDays(weekStart);
   const { focusedTaskId, setFocusedTaskId } = useTaskFocus();
+
+  // Local input state for the tag text box
+  const [newTagInput, setNewTagInput] = useState("");
+
+  // Parse current tags from comma-separated string
+  const currentTags = useMemo(() => {
+    if (!newTaskTags) return [];
+    return newTaskTags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }, [newTaskTags]);
+
+  // All existing tags for autocomplete
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    tasks.forEach((t) => t.tags.forEach((tag) => set.add(tag)));
+    return Array.from(set).sort();
+  }, [tasks]);
+
+  const availableTags = useMemo(
+    () => allTags.filter((t) => !currentTags.includes(t)),
+    [allTags, currentTags]
+  );
+
+  const filteredTags = newTagInput
+    ? availableTags.filter((t) => t.toLowerCase().includes(newTagInput.toLowerCase()))
+    : [];
+
+  const updateNewTaskTags = (tags: string[]) => {
+    onNewTaskTagsChange?.(tags.join(","));
+  };
+
+  const handleAddTagFromInput = () => {
+    const trimmed = newTagInput.trim().replace(/,/g, "");
+    if (!trimmed) return;
+    if (!currentTags.includes(trimmed)) {
+      updateNewTaskTags([...currentTags, trimmed]);
+    }
+    setNewTagInput("");
+  };
+
+  const handleAddTagFromSuggestion = (tag: string) => {
+    if (!currentTags.includes(tag)) {
+      updateNewTaskTags([...currentTags, tag]);
+    }
+    setNewTagInput("");
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    updateNewTaskTags(currentTags.filter((t) => t !== tagToRemove));
+  };
+
+  // Reset tag input when not creating
+  useEffect(() => {
+    if (!isCreatingTask) {
+      setNewTagInput("");
+    }
+  }, [isCreatingTask]);
 
   const goToPreviousWeek = () => {
     const prev = new Date(weekStart);
@@ -144,20 +211,81 @@ export function WeeklyView({
                 <p className="text-sm text-muted-foreground/50 italic">No tasks</p>
               )}
               {isToday && isCreatingTask && (
-                <div className="mt-2">
-                  <Input
-                    autoFocus
-                    placeholder="Task title..."
-                    value={newTaskTitle}
-                    onChange={(e) => onNewTaskTitleChange?.(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") onCreateTask?.();
-                      if (e.key === "Escape") onCancelCreate?.();
-                    }}
-                    onBlur={() => {
-                      if (!newTaskTitle?.trim()) onCancelCreate?.();
-                    }}
-                  />
+                <div className="mt-2 flex flex-col sm:flex-row sm:items-start gap-2 p-2 rounded-lg border bg-muted/30">
+                  {/* Title editor - rich text */}
+                  <div className="flex-1 min-w-0">
+                    <TitleEditor
+                      value={newTaskTitleValue ?? textToTitleValue("")}
+                      onChange={(value) => onNewTaskTitleChange?.(value)}
+                      placeholder="Task title..."
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") onCancelCreate?.();
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          const titleText = titleValueToText(newTaskTitleValue ?? textToTitleValue(""));
+                          if (titleText.trim()) {
+                            onCreateTask?.();
+                          }
+                        }
+                      }}
+                      containerClassName="border-none bg-transparent [&_p]:my-0"
+                      className="text-sm"
+                    />
+                  </div>
+
+                  {/* Tags: pills + autocomplete */}
+                  <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                    {currentTags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="gap-1 pr-1 text-xs">
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="ml-0.5 rounded-full hover:bg-muted-foreground/20 p-0.5"
+                        >
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </Badge>
+                    ))}
+
+                    <div className="relative">
+                      <Input
+                        placeholder="Add tag..."
+                        value={newTagInput}
+                        onChange={(e) => setNewTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (newTagInput.trim()) {
+                              handleAddTagFromInput();
+                            } else {
+                              onCreateTask?.();
+                            }
+                          }
+                          if (e.key === "Escape") {
+                            onCancelCreate?.();
+                          }
+                        }}
+                        className="h-6 w-20 text-xs"
+                      />
+                      {filteredTags.length > 0 && newTagInput && (
+                        <div className="absolute top-full left-0 mt-1 w-32 bg-popover border rounded-md shadow-md z-10 max-h-32 overflow-auto">
+                          {filteredTags.slice(0, 5).map((tag) => (
+                            <button
+                              key={tag}
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleAddTagFromSuggestion(tag)}
+                              className="w-full px-2 py-1 text-left text-xs hover:bg-accent"
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

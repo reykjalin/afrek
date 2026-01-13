@@ -46,7 +46,7 @@ export function CommandBar() {
     return Array.from(tagSet).sort();
   }, [tasks]);
 
-  const hasActiveSearch = !!debouncedSearch;
+  const hasActiveFilters = !!debouncedSearch || selectedTags.length > 0;
 
   const handleSelect = (action: string) => {
     switch (action) {
@@ -101,8 +101,14 @@ export function CommandBar() {
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={(isOpen) => !isOpen && closeCommandBar()}>
-      <Command shouldFilter={mode === "commands"}>
+    <CommandDialog 
+      open={open} 
+      onOpenChange={(isOpen) => !isOpen && closeCommandBar()}
+      withOverlay={false}
+      style={{ viewTransitionName: "command-bar" }}
+      className="fixed left-1/2 -translate-x-1/2 top-4 sm:top-16 w-[calc(100%-2rem)] max-w-[500px] shadow-lg translate-y-0!"
+    >
+      <Command shouldFilter={mode === "commands" || mode === "tags"}>
         {mode === "search" ? (
           <CommandInput
             placeholder="Search tasks..."
@@ -130,10 +136,10 @@ export function CommandBar() {
                   Search
                   <CommandShortcut>/</CommandShortcut>
                 </CommandItem>
-                {hasActiveSearch && (
+                {hasActiveFilters && (
                   <CommandItem onSelect={() => handleSelect("clear-search")}>
                     <X className="mr-2 h-4 w-4" />
-                    Clear Search
+                    Clear Filters
                   </CommandItem>
                 )}
                 <CommandItem onSelect={() => handleSelect("tags")}>

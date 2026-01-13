@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useEffect } from "react";
+import type { Value } from "platejs";
 import { Button } from "@/components/ui/button";
 import { WeeklyView } from "@/components/tasks";
 import { UpgradeCTA } from "@/components/UpgradeCTA";
@@ -9,6 +10,7 @@ import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { useCommandBar } from "@/features/command-bar";
 import { useTaskListKeyboard } from "@/hooks/useTaskListKeyboard";
 import { getStartOfWeek, getTodayString, toISODateString } from "@/lib/date";
+import { titleValueToText, textToTitleValue } from "@/components/editors/TitleEditor";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 const PRIORITY_ORDER: Record<TaskPriority, number> = {
@@ -36,7 +38,8 @@ function TasksPageContent() {
   const { createTaskRequested, clearCreateTaskRequest } = useCommandBar();
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskTitleValue, setNewTaskTitleValue] = useState<Value>(textToTitleValue(""));
+  const [newTaskTags, setNewTaskTags] = useState("");
 
   const visibleTaskIds = useMemo(() => {
     const weekDays = getWeekDays(weekStart);
@@ -96,18 +99,22 @@ function TasksPageContent() {
   }, [createTaskRequested, isCreatingTask, clearCreateTaskRequest]);
 
   const handleCreateTask = async () => {
-    if (!newTaskTitle.trim()) {
+    const titleText = titleValueToText(newTaskTitleValue).trim();
+    if (!titleText) {
       setIsCreatingTask(false);
       return;
     }
-    const titleText = newTaskTitle.trim();
-    const titleJson = JSON.stringify([{ type: "p", children: [{ text: titleText }] }]);
+    const titleJson = JSON.stringify(newTaskTitleValue);
+    const tags = newTaskTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
     await addTask({
       titleJson,
       notesJson: "",
       titleText,
       notesText: "",
-      tags: [],
+      tags,
       status: "scheduled",
       priority: "Normal",
       scheduledDate: getTodayString(),
@@ -115,12 +122,14 @@ function TasksPageContent() {
       updatedAt: Date.now(),
       userId: "demo",
     });
-    setNewTaskTitle("");
+    setNewTaskTitleValue(textToTitleValue(""));
+    setNewTaskTags("");
     setIsCreatingTask(false);
   };
 
   const handleCancelCreate = () => {
-    setNewTaskTitle("");
+    setNewTaskTitleValue(textToTitleValue(""));
+    setNewTaskTags("");
     setIsCreatingTask(false);
   };
 
@@ -149,8 +158,10 @@ function TasksPageContent() {
           onDelete={handleDelete}
           onUpdatePriority={handleUpdatePriority}
           isCreatingTask={isCreatingTask}
-          newTaskTitle={newTaskTitle}
-          onNewTaskTitleChange={setNewTaskTitle}
+          newTaskTitleValue={newTaskTitleValue}
+          onNewTaskTitleChange={setNewTaskTitleValue}
+          newTaskTags={newTaskTags}
+          onNewTaskTagsChange={setNewTaskTags}
           onCreateTask={handleCreateTask}
           onCancelCreate={handleCancelCreate}
         />

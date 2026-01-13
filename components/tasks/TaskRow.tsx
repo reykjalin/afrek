@@ -2,11 +2,10 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Calendar, CalendarPlus } from "lucide-react";
+import { Check, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import type { Value } from "platejs";
 import { cn } from "@/lib/utils";
-import { startViewTransition } from "@/lib/viewTransition";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -15,6 +14,11 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import {
   TitleEditor,
   textToTitleValue,
@@ -26,6 +30,7 @@ import {
   getTomorrowString,
   toISODateString,
 } from "@/lib/date";
+import { startViewTransition } from "@/lib/viewTransition";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface TaskRowProps {
@@ -97,120 +102,122 @@ export function TaskRow({
     <div
       onClick={handleRowClick}
       className={cn(
-        "group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50",
-        isFocused && "ring-2 ring-primary ring-offset-2",
+        "group flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors hover:bg-muted/50",
+        "mx-auto w-full max-w-4xl",
+        isFocused && "ring-2 ring-primary ring-offset-1",
         isDone && "opacity-60"
       )}
     >
-      {/* Row 1 on mobile / Main row on desktop */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        {/* Checkbox */}
-        <button
-          onClick={handleCheckboxClick}
-          disabled={readOnly}
-          className={cn(
-            "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
-            isDone
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground/30 hover:border-primary",
-            readOnly && "opacity-60 cursor-default"
-          )}
-        >
-          {isDone && <Check className="h-3 w-3" />}
-        </button>
+      {/* Checkbox */}
+      <button
+        onClick={handleCheckboxClick}
+        disabled={readOnly}
+        className={cn(
+          "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
+          isDone
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-muted-foreground/30 hover:border-primary",
+          readOnly && "opacity-60 cursor-default"
+        )}
+      >
+        {isDone && <Check className="h-2.5 w-2.5" />}
+      </button>
 
-        {/* Title - takes up 65-70% on desktop */}
-        <div
-          className={cn(
-            "flex-1 min-w-0 sm:max-w-[70%]",
-            isDone && "line-through"
-          )}
-        >
-          <TitleEditor
-            value={titleValue}
-            onChange={() => {}}
-            readOnly
-            containerClassName="border-none bg-transparent"
-          />
-        </div>
+      {/* Title */}
+      <div
+        className={cn(
+          "flex-1 min-w-0 truncate text-sm",
+          isDone && "line-through text-muted-foreground"
+        )}
+      >
+        <TitleEditor
+          value={titleValue}
+          onChange={() => {}}
+          readOnly
+          containerClassName="border-none bg-transparent [&_p]:my-0"
+        />
       </div>
 
-      {/* Row 2 on mobile: Tags */}
-      <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-        {task.tags.map((tag) => (
-          <Badge
-            key={tag}
-            variant="secondary"
-            className="text-xs cursor-pointer hover:bg-secondary/80"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleTagToggle(tag);
-            }}
-          >
-            {tag}
-          </Badge>
-        ))}
-      </div>
-
-      {/* Row 3 on mobile / End of row on desktop: Quick actions */}
-      <div className="flex items-center gap-1 shrink-0">
-        {!isDone && (
-          <>
-            {/* Reschedule to tomorrow */}
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={handleRescheduleToTomorrow}
-              disabled={readOnly}
-              className="h-7 w-7"
-              title="Reschedule to tomorrow"
+      {/* Tags */}
+      {task.tags.length > 0 && (
+        <div className="flex items-center gap-1 shrink-0">
+          {task.tags.map((tag) => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="text-[10px] px-1.5 py-0 h-5 cursor-pointer hover:bg-secondary/80"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTagToggle(tag);
+              }}
             >
-              <CalendarPlus className="h-4 w-4" />
-            </Button>
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )}
 
-            {/* Reschedule calendar picker */}
-            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-              <PopoverTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={readOnly}
-                    className="h-7 w-7"
-                    title="Reschedule"
-                  />
-                }
-              >
-                <Calendar className="h-4 w-4" />
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-auto p-0"
-                align="end"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <CalendarComponent
-                  mode="single"
-                  selected={
-                    task.scheduledDate
-                      ? parseDateString(task.scheduledDate)
-                      : undefined
-                  }
-                  onSelect={handleDateSelect}
+      {/* Quick actions + Date */}
+      <div className="flex items-center gap-0.5 shrink-0">
+        {!isDone && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleRescheduleToTomorrow}
+                  disabled={readOnly}
+                  className="h-6 w-6"
                 />
-              </PopoverContent>
-            </Popover>
-          </>
+              }
+            >
+              <CalendarPlus className="h-3.5 w-3.5" />
+            </TooltipTrigger>
+            <TooltipContent>Reschedule to tomorrow</TooltipContent>
+          </Tooltip>
         )}
 
-        {/* Show scheduled/completed date */}
-        <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
-          {isDone && task.completedAt
-            ? format(new Date(task.completedAt), "MMM d")
-            : task.scheduledDate
-              ? format(parseDateString(task.scheduledDate), "MMM d")
-              : "Backlog"}
-        </span>
+        {/* Date - clicking opens calendar picker */}
+        {!isDone ? (
+          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+            <PopoverTrigger
+              onClick={(e) => e.stopPropagation()}
+              disabled={readOnly}
+              className={cn(
+                "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
+                "text-muted-foreground hover:text-foreground hover:bg-muted",
+                "transition-colors cursor-pointer",
+                readOnly && "opacity-60 cursor-default"
+              )}
+            >
+              {task.scheduledDate
+                ? format(parseDateString(task.scheduledDate), "MMM d")
+                : "Backlog"}
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto p-0"
+              align="end"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CalendarComponent
+                mode="single"
+                selected={
+                  task.scheduledDate
+                    ? parseDateString(task.scheduledDate)
+                    : undefined
+                }
+                onSelect={handleDateSelect}
+              />
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {task.completedAt
+              ? format(new Date(task.completedAt), "MMM d")
+              : "Done"}
+          </span>
+        )}
       </div>
     </div>
   );
