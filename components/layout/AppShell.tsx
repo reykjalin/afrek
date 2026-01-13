@@ -16,17 +16,19 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <>
       <div className="flex min-h-screen flex-col">
-        <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-4 px-4">
+        <header className="flex h-14 items-center gap-4 px-4">
           {/* Left */}
-          <div className="flex items-center justify-start">
+          <div className="flex items-center justify-start shrink-0">
             {leftContent}
           </div>
           
           {/* Center: command bar trigger */}
-          <CommandBarTrigger />
+          <div className="flex-1 flex justify-center min-w-0">
+            <CommandBarTrigger />
+          </div>
           
           {/* Right */}
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-2 shrink-0">
             {rightContent}
           </div>
         </header>

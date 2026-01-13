@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { TagPill } from "@/components/ui/tag-pill";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TitleEditor, textToTitleValue, titleValueToText } from "@/components/editors/TitleEditor";
-import { TaskRow } from "./TaskRow";
+import { TaskItem } from "./TaskItem";
 import { cn } from "@/lib/utils";
 import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
 import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
@@ -28,11 +28,7 @@ interface WeeklyViewProps {
   weekStart: Date;
   onWeekChange: (weekStart: Date) => void;
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, titleJson: string) => void;
-  onUpdateNotes: (id: string, notes: string) => void;
-  onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
-  onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
   isCreatingTask?: boolean;
   createTaskDate?: string | null;
@@ -223,7 +219,7 @@ export function WeeklyView({
               {dayTasks.length > 0 ? (
                 <div className="space-y-1">
                   {dayTasks.map((task) => (
-                    <TaskRow
+                    <TaskItem
                       key={task.id}
                       task={task}
                       isFocused={focusedTaskId === task.id}

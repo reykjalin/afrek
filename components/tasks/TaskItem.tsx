@@ -1,62 +1,67 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { Check, Calendar, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import type { Value } from "platejs";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { TagPill } from "@/components/ui/tag-pill";
+import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import { TaskItemExpanded } from "./TaskItemExpanded";
-import { TitleEditor, titleValueToText, textToTitleValue } from "@/components/editors/TitleEditor";
+  TitleEditor,
+  textToTitleValue,
+} from "@/components/editors/TitleEditor";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
-import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { useTaskAccess } from "@/features/billing";
-import { parseDateString } from "@/lib/date";
+import {
+  parseDateString,
+  toISODateString,
+} from "@/lib/date";
+import { startViewTransition } from "@/lib/viewTransition";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 interface TaskItemProps {
   task: Task;
+  isFocused?: boolean;
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, titleJson: string) => void;
-  onUpdateNotes: (id: string, notes: string) => void;
-  onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
-  onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
+  onFocus?: () => void;
 }
 
 export function TaskItem({
   task,
+  isFocused = false,
   onToggleDone,
-  onUpdateTitle,
-  onUpdateNotes,
-  onUpdateTags,
   onSchedule,
-  onDelete,
   onUpdatePriority,
+  onFocus,
 }: TaskItemProps) {
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const router = useRouter();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const { handleTagToggle, selectedTags } = useTaskFilter();
-  const { expandedTaskIds, toggleTaskExpanded } = useTaskState();
+  const { handleTagToggle } = useTaskFilter();
   const { readOnly } = useTaskAccess();
-  const isExpanded = expandedTaskIds.has(task.id);
 
   const isDone = task.status === "done";
 
-  // Parse titleJson
   const titleValue = useMemo<Value>(() => {
     if (task.titleJson) {
       try {
@@ -68,139 +73,94 @@ export function TaskItem({
     return textToTitleValue("");
   }, [task.titleJson]);
 
-  // Track the current editor value while editing
-  const [editedTitleValue, setEditedTitleValue] = useState<Value>(titleValue);
+  const handleRescheduleToNextDay = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (readOnly) return;
+      // Move to next day from current scheduled date (not tomorrow from today)
+      const currentDate = task.scheduledDate ? parseDateString(task.scheduledDate) : new Date();
+      currentDate.setDate(currentDate.getDate() + 1);
+      onSchedule(task.id, toISODateString(currentDate));
+    },
+    [readOnly, task.id, task.scheduledDate, onSchedule]
+  );
 
-  const handleTitleChange = useCallback((value: Value) => {
-    setEditedTitleValue(value);
-  }, [setEditedTitleValue]);
+  const handleDateSelect = useCallback(
+    (date: Date | undefined) => {
+      if (!date || readOnly) return;
+      onSchedule(task.id, toISODateString(date));
+      setIsDatePickerOpen(false);
+    },
+    [readOnly, task.id, onSchedule]
+  );
 
-  const handleTitleSubmit = useCallback(() => {
-    const newText = titleValueToText(editedTitleValue);
-    const newJson = JSON.stringify(editedTitleValue);
-    if (newText.trim() && newJson !== task.titleJson) {
-      onUpdateTitle(task.id, newJson);
-    }
-    setIsEditingTitle(false);
-  }, [editedTitleValue, task.id, task.titleJson, onUpdateTitle]);
-
-  const handleTitleCancel = useCallback(() => {
-    setEditedTitleValue(titleValue);
-    setIsEditingTitle(false);
-  }, [titleValue, setEditedTitleValue]);
-
-  const formatCompletedDate = (timestamp?: number) => {
-    if (!timestamp) return null;
-    return new Date(timestamp).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
+  const handleRowClick = () => {
+    onFocus?.();
+    startViewTransition(() => {
+      router.push(`/tasks/${task.id}`);
     });
   };
 
-  const toggleExpanded = () => toggleTaskExpanded(task.id);
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (readOnly) return;
+    onToggleDone(task.id);
+  };
 
   return (
-    <Collapsible
-      open={isExpanded}
-      onOpenChange={toggleExpanded}
+    <div
+      onClick={handleRowClick}
       className={cn(
-        "rounded-lg border bg-card transition-colors",
+        "group flex flex-col gap-1.5 px-2 py-2 rounded cursor-pointer transition-colors hover:bg-muted/50",
+        "sm:flex-row sm:items-center sm:gap-2 sm:py-1.5",
+        "mx-auto w-full max-w-4xl",
+        isFocused && "ring-2 ring-primary ring-offset-1",
         isDone && "opacity-60"
       )}
     >
-      <div
-        className="flex items-center gap-2 p-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors"
-        onClick={toggleExpanded}
-      >
-        <ChevronRight
-          className={cn(
-            "h-4 w-4 shrink-0 transition-transform",
-            isExpanded && "rotate-90"
-          )}
-        />
-
+      {/* Row 1: Checkbox + Title */}
+      <div className="flex items-center gap-2 sm:flex-1 sm:min-w-0">
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (readOnly) return;
-            onToggleDone(task.id);
-          }}
+          onClick={handleCheckboxClick}
           disabled={readOnly}
           className={cn(
-            "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
+            "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
             isDone
               ? "border-primary bg-primary text-primary-foreground"
               : "border-muted-foreground/30 hover:border-primary",
             readOnly && "opacity-60 cursor-default"
           )}
         >
-          {isDone && <Check className="h-3 w-3" />}
+          {isDone && <Check className="h-2.5 w-2.5" />}
         </button>
 
-        {isEditingTitle ? (
-          <div
-            className="flex-1 min-w-0"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <TitleEditor
-              value={editedTitleValue}
-              onChange={handleTitleChange}
-              onBlur={handleTitleSubmit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleTitleSubmit();
-                }
-                if (e.key === "Escape") {
-                  handleTitleCancel();
-                }
-              }}
-              autoFocus
-              containerClassName="border bg-background shadow-sm"
-              className="px-2 py-1"
-            />
-          </div>
-        ) : (
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!readOnly) {
-                setEditedTitleValue(titleValue);
-                setIsEditingTitle(true);
-              }
-            }}
-            className={cn(
-              "flex-1 min-w-0 break-words",
-              isDone && "line-through",
-              readOnly ? "cursor-default" : "cursor-text"
-            )}
-          >
-            <TitleEditor
-              value={titleValue}
-              onChange={() => {}}
-              readOnly
-              containerClassName="border-none bg-transparent"
-            />
-          </div>
-        )}
-
-        <div className="flex-1" onClick={(e) => e.stopPropagation()} />
-
-        <div className="flex items-center gap-1.5">
-          {task.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={selectedTags.includes(tag) ? "default" : "secondary"}
-              className="text-xs cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTagToggle(tag);
-              }}
-            >
-              {tag}
-            </Badge>
-          ))}
+        <div
+          className={cn(
+            "flex-1 min-w-0 text-sm",
+            isDone && "line-through text-muted-foreground"
+          )}
+        >
+          <TitleEditor
+            value={titleValue}
+            onChange={() => {}}
+            readOnly
+            containerClassName="border-none bg-transparent [&_p]:my-0"
+          />
         </div>
+      </div>
+
+      {/* Row 2: Tags + Priority */}
+      <div 
+        className="flex flex-wrap items-center gap-1 pl-6 sm:pl-0 sm:shrink-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {task.tags.map((tag) => (
+          <TagPill
+            key={tag}
+            tag={tag}
+            onClick={() => handleTagToggle(tag)}
+          />
+        ))}
 
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -210,20 +170,19 @@ export function TaskItem({
             }}
             disabled={readOnly}
             className={cn(
-              "flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer",
+              "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
+              "text-muted-foreground hover:text-foreground hover:bg-muted",
+              "transition-colors cursor-pointer",
               readOnly && "opacity-60 cursor-default"
             )}
           >
             {task.priority}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuContent align="end" className="w-32" onClick={(e) => e.stopPropagation()}>
             {(["Highest", "High", "Medium", "Normal", "Low", "Lowest"] as TaskPriority[]).map((priority) => (
               <DropdownMenuItem
                 key={priority}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUpdatePriority(task.id, priority);
-                }}
+                onClick={() => onUpdatePriority(task.id, priority)}
                 className="cursor-pointer"
               >
                 {priority}
@@ -231,64 +190,66 @@ export function TaskItem({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
 
-        {isDone ? (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            {formatCompletedDate(task.completedAt)}
-          </div>
-        ) : (
-          <Popover open={isDatePickerOpen} onOpenChange={(open) => {
-            if (!readOnly) setIsDatePickerOpen(open);
-          }}>
+      {/* Row 3: Scheduling actions */}
+      <div 
+        className="flex items-center gap-0.5 pl-6 sm:pl-0 sm:shrink-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {!isDone && (
+          <Tooltip>
+            <TooltipTrigger
+              onClick={handleRescheduleToNextDay}
+              disabled={readOnly}
+              render={<Button variant="ghost" size="icon-sm" className="h-6 w-6" />}
+            >
+              <CalendarPlus className="h-3.5 w-3.5" />
+            </TooltipTrigger>
+            <TooltipContent>Move to next day</TooltipContent>
+          </Tooltip>
+        )}
+
+        {!isDone ? (
+          <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
             <PopoverTrigger
-              onClick={(e) => {
-                e.stopPropagation();
-                if (readOnly) e.preventDefault();
-              }}
+              onClick={(e) => e.stopPropagation()}
               disabled={readOnly}
               className={cn(
-                "flex items-center gap-1.5 rounded border border-border bg-muted px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors cursor-pointer whitespace-nowrap",
+                "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
+                "text-muted-foreground hover:text-foreground hover:bg-muted",
+                "transition-colors cursor-pointer",
                 readOnly && "opacity-60 cursor-default"
               )}
             >
-              <Calendar className="h-4 w-4" />
               {task.scheduledDate
                 ? format(parseDateString(task.scheduledDate), "MMM d")
                 : "Backlog"}
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
+            <PopoverContent
+              className="w-auto p-0"
+              align="end"
+              onClick={(e) => e.stopPropagation()}
+            >
               <CalendarComponent
                 mode="single"
                 selected={
-                  task.scheduledDate ? parseDateString(task.scheduledDate) : undefined
+                  task.scheduledDate
+                    ? parseDateString(task.scheduledDate)
+                    : undefined
                 }
-                onSelect={(date) => {
-                  if (date) {
-                    // Ensure we're using local date values, not UTC
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, "0");
-                    const day = String(date.getDate()).padStart(2, "0");
-                    const dateString = `${year}-${month}-${day}`;
-                    onSchedule(task.id, dateString);
-                    setIsDatePickerOpen(false);
-                  }
-                }}
+                onSelect={handleDateSelect}
               />
             </PopoverContent>
           </Popover>
+        ) : (
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {task.completedAt
+              ? format(new Date(task.completedAt), "MMM d")
+              : "Done"}
+          </span>
         )}
       </div>
-
-      <CollapsibleContent className="px-3 pb-4">
-        <TaskItemExpanded
-          task={task}
-          onUpdateNotes={onUpdateNotes}
-          onUpdateTags={onUpdateTags}
-          onSchedule={onSchedule}
-          onDelete={onDelete}
-        />
-      </CollapsibleContent>
-    </Collapsible>
+    </div>
   );
 }

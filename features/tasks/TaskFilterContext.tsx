@@ -90,12 +90,10 @@ export function TaskFilterProvider({ children }: { children: ReactNode }) {
     (tag: string) => {
       setSelectedTagsState((prev) => {
         const hasTag = prev.includes(tag);
-        const newTags = hasTag ? prev.filter((t) => t !== tag) : [...prev, tag];
-        updateUrl(debouncedSearch, newTags);
-        return newTags;
+        return hasTag ? prev.filter((t) => t !== tag) : [...prev, tag];
       });
     },
-    [updateUrl, debouncedSearch],
+    [],
   );
 
   const clearFilters = useCallback(() => {

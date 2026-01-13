@@ -6,13 +6,11 @@ import type { Task, TaskPriority } from "@/features/tasks/types";
 interface TaskListProps {
   tasks: Task[];
   onToggleDone: (id: string) => void;
-  onUpdateTitle: (id: string, titleJson: string) => void;
-  onUpdateNotes: (id: string, notes: string) => void;
-  onUpdateTags: (id: string, tags: string[]) => void;
   onSchedule: (id: string, date: string | null) => void;
-  onDelete: (id: string) => void;
   onUpdatePriority: (id: string, priority: TaskPriority) => void;
   emptyMessage?: string;
+  focusedTaskId?: string;
+  onTaskFocus?: (id: string) => void;
 }
 
 const PRIORITY_ORDER: Record<TaskPriority, number> = {
@@ -27,13 +25,11 @@ const PRIORITY_ORDER: Record<TaskPriority, number> = {
 export function TaskList({
   tasks,
   onToggleDone,
-  onUpdateTitle,
-  onUpdateNotes,
-  onUpdateTags,
   onSchedule,
-  onDelete,
   onUpdatePriority,
   emptyMessage = "No tasks",
+  focusedTaskId,
+  onTaskFocus,
 }: TaskListProps) {
   if (tasks.length === 0) {
     return (
@@ -48,18 +44,16 @@ export function TaskList({
   });
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       {sortedTasks.map((task) => (
         <TaskItem
           key={task.id}
           task={task}
+          isFocused={focusedTaskId === task.id}
           onToggleDone={onToggleDone}
-          onUpdateTitle={onUpdateTitle}
-          onUpdateNotes={onUpdateNotes}
-          onUpdateTags={onUpdateTags}
           onSchedule={onSchedule}
-          onDelete={onDelete}
           onUpdatePriority={onUpdatePriority}
+          onFocus={() => onTaskFocus?.(task.id)}
         />
       ))}
     </div>

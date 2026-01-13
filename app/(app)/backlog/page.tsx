@@ -139,26 +139,12 @@ function BacklogPageContent() {
 
   const handleToggleDone = (id: string) => toggleTaskDone(id);
 
-  const handleUpdateTitle = (id: string, titleJson: string) => {
-    updateTask(id, { titleJson });
-  };
-
-  const handleUpdateNotes = (id: string, notesJson: string) => {
-    updateTask(id, { notesJson });
-  };
-
-  const handleUpdateTags = (id: string, tags: string[]) => {
-    updateTask(id, { tags });
-  };
-
   const handleSchedule = (id: string, date: string | null) => {
     updateTask(id, {
       scheduledDate: date ?? undefined,
       status: date ? "scheduled" : "backlog",
     });
   };
-
-  const handleDelete = (id: string) => deleteTask(id);
 
   const handleUpdatePriority = (id: string, priority: TaskPriority) => {
     updateTask(id, { priority });
@@ -206,11 +192,7 @@ function BacklogPageContent() {
         <TaskList
           tasks={backlogTasks}
           onToggleDone={handleToggleDone}
-          onUpdateTitle={handleUpdateTitle}
-          onUpdateNotes={handleUpdateNotes}
-          onUpdateTags={handleUpdateTags}
           onSchedule={handleSchedule}
-          onDelete={handleDelete}
           onUpdatePriority={handleUpdatePriority}
           emptyMessage="No tasks in backlog"
         />
