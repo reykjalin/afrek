@@ -20,6 +20,12 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
   TitleEditor,
   textToTitleValue,
 } from "@/components/editors/TitleEditor";
@@ -46,6 +52,7 @@ export function TaskRow({
   isFocused = false,
   onToggleDone,
   onSchedule,
+  onUpdatePriority,
   onFocus,
 }: TaskRowProps) {
   const router = useRouter();
@@ -155,6 +162,36 @@ export function TaskRow({
 
       {/* Quick actions + Date */}
       <div className="flex items-center gap-0.5 shrink-0">
+        {/* Priority picker */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            onClick={(e) => {
+              e.stopPropagation();
+              if (readOnly) e.preventDefault();
+            }}
+            disabled={readOnly}
+            className={cn(
+              "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
+              "text-muted-foreground hover:text-foreground hover:bg-muted",
+              "transition-colors cursor-pointer",
+              readOnly && "opacity-60 cursor-default"
+            )}
+          >
+            {task.priority}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32" onClick={(e) => e.stopPropagation()}>
+            {(["Highest", "High", "Medium", "Normal", "Low", "Lowest"] as TaskPriority[]).map((priority) => (
+              <DropdownMenuItem
+                key={priority}
+                onClick={() => onUpdatePriority(task.id, priority)}
+                className="cursor-pointer"
+              >
+                {priority}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {!isDone && (
           <Tooltip>
             <TooltipTrigger

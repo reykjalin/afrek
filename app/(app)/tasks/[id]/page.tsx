@@ -19,6 +19,7 @@ import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { parseDateString } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
+import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
 
 interface TaskDetailPageProps {
   params: Promise<{ id: string }>;
@@ -40,45 +41,56 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
 
-  const titleJson = task?.titleJson;
-  const titleValue = useMemo<Value>(() => {
-    if (titleJson) {
+  // Local state for editors to prevent full page rerenders on each keystroke
+  // Component is keyed by taskId in the parent, so state resets on task change
+  const [titleValue, setTitleValue] = useState<Value>(() => {
+    if (task?.titleJson) {
       try {
-        return JSON.parse(titleJson) as Value;
+        return JSON.parse(task.titleJson) as Value;
       } catch {
         return textToTitleValue("");
       }
     }
     return textToTitleValue("");
-  }, [titleJson]);
+  });
 
-  const notesJson = task?.notesJson;
-  const notesValue = useMemo<Value>(() => {
-    if (notesJson) {
+  const [notesValue, setNotesValue] = useState<Value>(() => {
+    if (task?.notesJson) {
       try {
-        return JSON.parse(notesJson) as Value;
+        return JSON.parse(task.notesJson) as Value;
       } catch {
         return [{ type: "p", children: [{ text: "" }] }];
       }
     }
     return [{ type: "p", children: [{ text: "" }] }];
-  }, [notesJson]);
+  });
 
-  const handleTitleChange = useCallback((value: Value) => {
+  // Debounced persistence to avoid global state updates on each keystroke
+  const debouncedPersistTitle = useDebouncedCallback((value: Value) => {
     if (readOnly || !task) return;
     const newJson = JSON.stringify(value);
     if (newJson !== task.titleJson) {
       updateTask(task.id, { titleJson: newJson });
     }
-  }, [readOnly, task, updateTask]);
+  }, 400);
 
-  const handleNotesChange = useCallback((value: Value) => {
+  const debouncedPersistNotes = useDebouncedCallback((value: Value) => {
     if (readOnly || !task) return;
     const newJson = JSON.stringify(value);
     if (newJson !== task.notesJson) {
       updateTask(task.id, { notesJson: newJson });
     }
-  }, [readOnly, task, updateTask]);
+  }, 400);
+
+  const handleTitleChange = useCallback((value: Value) => {
+    setTitleValue(value);
+    debouncedPersistTitle(value);
+  }, [debouncedPersistTitle]);
+
+  const handleNotesChange = useCallback((value: Value) => {
+    setNotesValue(value);
+    debouncedPersistNotes(value);
+  }, [debouncedPersistNotes]);
 
   const handleSchedule = useCallback((date: Date | undefined) => {
     if (readOnly || !task || !date) return;
@@ -291,7 +303,8 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   
   return (
     <TaskAccessProvider>
-      <TaskDetailContent taskId={id} />
+      {/* Key forces remount when navigating between tasks, resetting editor state */}
+      <TaskDetailContent key={id} taskId={id} />
     </TaskAccessProvider>
   );
 }
