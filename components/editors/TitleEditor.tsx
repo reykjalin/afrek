@@ -47,7 +47,12 @@ export function TitleEditor({
 
   useEffect(() => {
     const newValue = value.length > 0 ? value : emptyValue;
-    editor.tf.setValue(newValue);
+    const currentText = richTextValueToText(editor.children);
+    const incomingText = richTextValueToText(newValue);
+    // Only sync if external value differs from current editor content
+    if (currentText !== incomingText) {
+      editor.tf.setValue(newValue);
+    }
   }, [value, editor]);
 
   useEffect(() => {
