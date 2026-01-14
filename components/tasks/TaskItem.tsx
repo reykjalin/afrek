@@ -168,8 +168,9 @@ export function TaskItem({
             }}
             disabled={readOnly}
             className={cn(
-              "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
-              "text-muted-foreground hover:text-foreground hover:bg-muted",
+              "text-xs whitespace-nowrap px-2 py-1 rounded-md",
+              "border border-border bg-background",
+              "text-muted-foreground hover:text-foreground hover:bg-muted hover:border-muted-foreground/50",
               "transition-colors cursor-pointer",
               readOnly && "opacity-60 cursor-default"
             )}
@@ -214,8 +215,9 @@ export function TaskItem({
               onClick={(e) => e.stopPropagation()}
               disabled={readOnly}
               className={cn(
-                "text-xs whitespace-nowrap px-1.5 py-0.5 rounded",
-                "text-muted-foreground hover:text-foreground hover:bg-muted",
+                "text-xs whitespace-nowrap px-2 py-1 rounded-md",
+                "border border-border bg-background",
+                "text-muted-foreground hover:text-foreground hover:bg-muted hover:border-muted-foreground/50",
                 "transition-colors cursor-pointer",
                 readOnly && "opacity-60 cursor-default"
               )}
