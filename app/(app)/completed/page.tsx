@@ -49,7 +49,7 @@ function CompletedPageContent() {
   const handleSchedule = (id: string, date: string | null) => {
     updateTask(id, {
       scheduledDate: date ?? undefined,
-      status: date ? "scheduled" : "backlog",
+      status: "scheduled",
     });
   };
 

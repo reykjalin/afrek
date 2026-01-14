@@ -1,4 +1,4 @@
-export type TaskStatus = "backlog" | "scheduled" | "done";
+export type TaskStatus = "scheduled" | "done";
 export type TaskPriority = "Lowest" | "Low" | "Normal" | "Medium" | "High" | "Highest";
 
 export interface Task {
@@ -36,7 +36,7 @@ export interface UpdateTaskInput {
 }
 
 export interface TaskFilters {
-  view?: "all" | "backlog" | "week";
+  view?: "all" | "week";
   weekStart?: string;
   search?: string;
   tags?: string[];

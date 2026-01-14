@@ -8,7 +8,7 @@ export const listTasks = query({
     search: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
-      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done")),
+       v.union(v.literal("scheduled"), v.literal("done")),
     ),
   },
   handler: async (ctx, args) => {
@@ -99,7 +99,7 @@ export const createTask = mutation({
       tags: encrypted ? [] : (args.tags ?? []),
       scheduledDate: args.scheduledDate,
       priority: args.priority ?? "Normal",
-      status: args.scheduledDate ? "scheduled" : "backlog",
+      status: "scheduled",
       encryptedPayload: args.encryptedPayload,
       createdAt: now,
       updatedAt: now,
@@ -116,7 +116,7 @@ export const updateTask = mutation({
     notesText: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     status: v.optional(
-      v.union(v.literal("backlog"), v.literal("scheduled"), v.literal("done")),
+      v.union(v.literal("scheduled"), v.literal("done")),
     ),
     priority: v.optional(
       v.union(
@@ -183,11 +183,11 @@ export const toggleDone = mutation({
     if (!task) throw new Error("Task not found");
 
     if (task.status === "done") {
-      await ctx.db.patch(args.id, {
-        status: task.scheduledDate ? "scheduled" : "backlog",
-        completedAt: undefined,
-        updatedAt: Date.now(),
-      });
+     await ctx.db.patch(args.id, {
+       status: "scheduled",
+       completedAt: undefined,
+       updatedAt: Date.now(),
+     });
     } else {
       await ctx.db.patch(args.id, {
         status: "done",

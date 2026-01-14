@@ -233,8 +233,8 @@ export function TaskItem({
               )}
             >
               {task.scheduledDate
-                ? format(parseDateString(task.scheduledDate), "MMM d")
-                : "Backlog"}
+                 ? format(parseDateString(task.scheduledDate), "MMM d")
+                 : "Unscheduled"}
             </PopoverTrigger>
             <PopoverContent
               className="w-auto p-0"

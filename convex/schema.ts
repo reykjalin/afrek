@@ -58,7 +58,6 @@ export default defineSchema({
     // When set, all content fields contain empty placeholders
     encryptedPayload: v.optional(v.string()),
     status: v.union(
-      v.literal("backlog"),
       v.literal("scheduled"),
       v.literal("done"),
     ),
