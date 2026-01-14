@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CalendarPlus } from "lucide-react";
+import { Check, CalendarArrowDown } from "lucide-react";
 import { format } from "date-fns";
 import type { Value } from "platejs";
 import { cn } from "@/lib/utils";
@@ -31,10 +31,7 @@ import {
 } from "@/components/editors/TitleEditor";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
 import { useTaskAccess } from "@/features/billing";
-import {
-  parseDateString,
-  toISODateString,
-} from "@/lib/date";
+import { parseDateString, toISODateString } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
@@ -78,11 +75,13 @@ export function TaskItem({
       e.stopPropagation();
       if (readOnly) return;
       // Move to next day from current scheduled date (not tomorrow from today)
-      const currentDate = task.scheduledDate ? parseDateString(task.scheduledDate) : new Date();
+      const currentDate = task.scheduledDate
+        ? parseDateString(task.scheduledDate)
+        : new Date();
       currentDate.setDate(currentDate.getDate() + 1);
       onSchedule(task.id, toISODateString(currentDate));
     },
-    [readOnly, task.id, task.scheduledDate, onSchedule]
+    [readOnly, task.id, task.scheduledDate, onSchedule],
   );
 
   const handleDateSelect = useCallback(
@@ -91,7 +90,7 @@ export function TaskItem({
       onSchedule(task.id, toISODateString(date));
       setIsDatePickerOpen(false);
     },
-    [readOnly, task.id, onSchedule]
+    [readOnly, task.id, onSchedule],
   );
 
   const handleRowClick = () => {
@@ -115,7 +114,7 @@ export function TaskItem({
         "sm:flex-row sm:items-center sm:gap-2 sm:py-1.5",
         "mx-auto w-full max-w-4xl",
         isFocused && "ring-2 ring-primary ring-offset-1",
-        isDone && "opacity-60"
+        isDone && "opacity-60",
       )}
     >
       {/* Row 1: Checkbox + Title */}
@@ -128,7 +127,7 @@ export function TaskItem({
             isDone
               ? "border-primary bg-primary text-primary-foreground"
               : "border-muted-foreground/30 hover:border-primary",
-            readOnly && "opacity-60 cursor-default"
+            readOnly && "opacity-60 cursor-default",
           )}
         >
           {isDone && <Check className="h-2.5 w-2.5" />}
@@ -137,7 +136,7 @@ export function TaskItem({
         <div
           className={cn(
             "flex-1 min-w-0 text-sm",
-            isDone && "line-through text-muted-foreground"
+            isDone && "line-through text-muted-foreground",
           )}
         >
           <TitleEditorStatic
@@ -148,16 +147,12 @@ export function TaskItem({
       </div>
 
       {/* Row 2: Tags + Priority */}
-      <div 
+      <div
         className="flex flex-wrap items-center gap-1 pl-6 sm:pl-0 sm:shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
         {task.tags.map((tag) => (
-          <TagPill
-            key={tag}
-            tag={tag}
-            onClick={() => handleTagToggle(tag)}
-          />
+          <TagPill key={tag} tag={tag} onClick={() => handleTagToggle(tag)} />
         ))}
 
         <DropdownMenu>
@@ -172,13 +167,26 @@ export function TaskItem({
               "border border-border bg-background",
               "text-muted-foreground hover:text-foreground hover:bg-muted hover:border-muted-foreground/50",
               "transition-colors cursor-pointer",
-              readOnly && "opacity-60 cursor-default"
+              readOnly && "opacity-60 cursor-default",
             )}
           >
             {task.priority}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32" onClick={(e) => e.stopPropagation()}>
-            {(["Highest", "High", "Medium", "Normal", "Low", "Lowest"] as TaskPriority[]).map((priority) => (
+          <DropdownMenuContent
+            align="end"
+            className="w-32"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(
+              [
+                "Highest",
+                "High",
+                "Medium",
+                "Normal",
+                "Low",
+                "Lowest",
+              ] as TaskPriority[]
+            ).map((priority) => (
               <DropdownMenuItem
                 key={priority}
                 onClick={() => onUpdatePriority(task.id, priority)}
@@ -192,7 +200,7 @@ export function TaskItem({
       </div>
 
       {/* Row 3: Scheduling actions */}
-      <div 
+      <div
         className="flex items-center gap-0.5 pl-6 sm:pl-0 sm:shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
@@ -201,9 +209,11 @@ export function TaskItem({
             <TooltipTrigger
               onClick={handleRescheduleToNextDay}
               disabled={readOnly}
-              render={<Button variant="ghost" size="icon-sm" className="h-6 w-6" />}
+              render={
+                <Button variant="outline" size="icon-sm" className="h-6 w-6" />
+              }
             >
-              <CalendarPlus className="h-3.5 w-3.5" />
+              <CalendarArrowDown className="h-3.5 w-3.5" />
             </TooltipTrigger>
             <TooltipContent>Move to next day</TooltipContent>
           </Tooltip>
@@ -219,7 +229,7 @@ export function TaskItem({
                 "border border-border bg-background",
                 "text-muted-foreground hover:text-foreground hover:bg-muted hover:border-muted-foreground/50",
                 "transition-colors cursor-pointer",
-                readOnly && "opacity-60 cursor-default"
+                readOnly && "opacity-60 cursor-default",
               )}
             >
               {task.scheduledDate
