@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Value } from "platejs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TagPill } from "@/components/ui/tag-pill";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { TitleEditor, textToTitleValue, titleValueToText } from "@/components/editors/TitleEditor";
+import {
+  TitleEditorCreate,
+  type TitleEditorRef,
+} from "@/components/editors/TitleEditor";
 import { TaskItem } from "./TaskItem";
 import { cn } from "@/lib/utils";
 import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
@@ -33,8 +35,7 @@ interface WeeklyViewProps {
   isCreatingTask?: boolean;
   createTaskDate?: string | null;
   titleFocusKey?: number;
-  newTaskTitleValue?: Value;
-  onNewTaskTitleChange?: (value: Value) => void;
+  titleEditorRef?: React.RefObject<TitleEditorRef | null>;
   newTaskTags?: string;
   onNewTaskTagsChange?: (tags: string) => void;
   onCreateTask?: () => void;
@@ -75,8 +76,7 @@ export function WeeklyView({
   isCreatingTask,
   createTaskDate,
   titleFocusKey,
-  newTaskTitleValue,
-  onNewTaskTitleChange,
+  titleEditorRef,
   newTaskTags,
   onNewTaskTagsChange,
   onCreateTask,
@@ -109,7 +109,7 @@ export function WeeklyView({
 
   const handleCreateFocusOut = () => {
     blurTimeoutRef.current = window.setTimeout(() => {
-      const titleText = titleValueToText(newTaskTitleValue ?? textToTitleValue("")).trim();
+      const titleText = titleEditorRef?.current?.getMarkdown().trim() ?? "";
       const hasTags = currentTags.length > 0;
       if (!titleText && !hasTags) {
         onCancelCreate?.();
@@ -241,18 +241,17 @@ export function WeeklyView({
                 >
                   {/* Title editor - rich text */}
                   <div className="flex-1 min-w-0">
-                    <TitleEditor
+                    <TitleEditorCreate
                       key={titleFocusKey}
-                      value={newTaskTitleValue ?? textToTitleValue("")}
-                      onChange={(value) => onNewTaskTitleChange?.(value)}
+                      ref={titleEditorRef}
                       placeholder="Task title..."
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === "Escape") onCancelCreate?.();
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
-                          const titleText = titleValueToText(newTaskTitleValue ?? textToTitleValue(""));
-                          if (titleText.trim()) {
+                          const titleText = titleEditorRef?.current?.getMarkdown().trim() ?? "";
+                          if (titleText) {
                             onCreateTask?.();
                           }
                         }
@@ -301,6 +300,12 @@ export function WeeklyView({
                               type="button"
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => handleAddTagFromSuggestion(tag)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.stopPropagation();
+                                  handleAddTagFromSuggestion(tag);
+                                }
+                              }}
                               className="w-full px-2 py-1.5 text-left hover:bg-accent focus:bg-accent focus:outline-none"
                             >
                               {tag}

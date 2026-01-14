@@ -1,5 +1,6 @@
 'use client';
 
+import { MarkdownPlugin } from '@platejs/markdown';
 import { TrailingBlockPlugin } from '@platejs/utils';
 
 import { BasicNodesKit } from '@/components/editor/plugins/basic-nodes-kit';
@@ -39,4 +40,5 @@ export const NotesEditorKit = [
   ...EmojiKit,
   ...SlashKit,
   TrailingBlockPlugin,
+  MarkdownPlugin,
 ];

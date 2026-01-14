@@ -12,14 +12,17 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { TagPill } from "@/components/ui/tag-pill";
 import { Input } from "@/components/ui/input";
-import { TitleEditor, textToTitleValue } from "@/components/editors/TitleEditor";
-import { NotesEditor } from "@/components/editors/NotesEditor";
+import {
+  TitleEditor,
+  TitleEditorStatic,
+  textToTitleValue,
+} from "@/components/editors/TitleEditor";
+import { NotesEditor, NotesEditorStatic } from "@/components/editors/NotesEditor";
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
 import { parseDateString } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
-import { useDebouncedCallback } from "@/lib/hooks/useDebouncedCallback";
 
 interface TaskDetailPageProps {
   params: Promise<{ id: string }>;
@@ -41,56 +44,46 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
 
-  // Local state for editors to prevent full page rerenders on each keystroke
-  // Component is keyed by taskId in the parent, so state resets on task change
-  const [titleValue, setTitleValue] = useState<Value>(() => {
-    if (task?.titleJson) {
+  const titleJson = task?.titleJson;
+  const notesJson = task?.notesJson;
+
+  const initialTitleValue = useMemo<Value>(() => {
+    if (titleJson) {
       try {
-        return JSON.parse(task.titleJson) as Value;
+        return JSON.parse(titleJson) as Value;
       } catch {
         return textToTitleValue("");
       }
     }
     return textToTitleValue("");
-  });
+  }, [titleJson]);
 
-  const [notesValue, setNotesValue] = useState<Value>(() => {
-    if (task?.notesJson) {
+  const initialNotesValue = useMemo<Value>(() => {
+    if (notesJson) {
       try {
-        return JSON.parse(task.notesJson) as Value;
+        return JSON.parse(notesJson) as Value;
       } catch {
         return [{ type: "p", children: [{ text: "" }] }];
       }
     }
     return [{ type: "p", children: [{ text: "" }] }];
-  });
+  }, [notesJson]);
 
-  // Debounced persistence to avoid global state updates on each keystroke
-  const debouncedPersistTitle = useDebouncedCallback((value: Value) => {
+  const handleTitleSave = useCallback((value: Value) => {
     if (readOnly || !task) return;
     const newJson = JSON.stringify(value);
     if (newJson !== task.titleJson) {
       updateTask(task.id, { titleJson: newJson });
     }
-  }, 400);
+  }, [readOnly, task, updateTask]);
 
-  const debouncedPersistNotes = useDebouncedCallback((value: Value) => {
+  const handleNotesSave = useCallback((value: Value) => {
     if (readOnly || !task) return;
     const newJson = JSON.stringify(value);
     if (newJson !== task.notesJson) {
       updateTask(task.id, { notesJson: newJson });
     }
-  }, 400);
-
-  const handleTitleChange = useCallback((value: Value) => {
-    setTitleValue(value);
-    debouncedPersistTitle(value);
-  }, [debouncedPersistTitle]);
-
-  const handleNotesChange = useCallback((value: Value) => {
-    setNotesValue(value);
-    debouncedPersistNotes(value);
-  }, [debouncedPersistNotes]);
+  }, [readOnly, task, updateTask]);
 
   const handleSchedule = useCallback((date: Date | undefined) => {
     if (readOnly || !task || !date) return;
@@ -139,7 +132,6 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     if (nextTaskId) startViewTransition(() => router.push(`/tasks/${nextTaskId}`));
   }, [router, nextTaskId]);
 
-  // Set top nav actions
   useEffect(() => {
     setLeftContent(
       <Tooltip>
@@ -196,20 +188,22 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Content */}
       <div className="flex-1 overflow-auto p-6" style={{ viewTransitionName: "task-detail" }}>
         <div className="mx-auto max-w-[46rem]">
-          {/* Title */}
-          <TitleEditor
-            value={titleValue}
-            onChange={handleTitleChange}
-            readOnly={readOnly}
-            containerClassName="text-2xl font-semibold border-none bg-transparent px-0 py-0"
-          />
+          {readOnly ? (
+            <TitleEditorStatic
+              value={initialTitleValue}
+              containerClassName="text-2xl font-semibold border-none bg-transparent px-0 py-0"
+            />
+          ) : (
+            <TitleEditor
+              initialValue={initialTitleValue}
+              onSave={handleTitleSave}
+              containerClassName="text-2xl font-semibold border-none bg-transparent px-0 py-0"
+            />
+          )}
 
-          {/* Metadata: inline under title */}
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
-            {/* Scheduled date */}
             <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
               <PopoverTrigger
                 disabled={readOnly}
@@ -231,10 +225,8 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
               </PopoverContent>
             </Popover>
 
-            {/* Divider dot */}
             {(task.tags.length > 0 || !readOnly) && <span>•</span>}
 
-            {/* Tags */}
             <div className="flex flex-wrap items-center gap-1.5">
               {task.tags.map(tag => (
                 <TagPill
@@ -281,15 +273,17 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
             </div>
           </div>
 
-          {/* Notes */}
           <section className="pt-6">
             <h2 className="sr-only">Notes</h2>
             <div className="min-h-[60vh]">
-              <NotesEditor
-                value={notesValue}
-                onChange={handleNotesChange}
-                readOnly={readOnly}
-              />
+              {readOnly ? (
+                <NotesEditorStatic value={initialNotesValue} />
+              ) : (
+                <NotesEditor
+                  initialValue={initialNotesValue}
+                  onSave={handleNotesSave}
+                />
+              )}
             </div>
           </section>
         </div>
@@ -303,7 +297,6 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
   
   return (
     <TaskAccessProvider>
-      {/* Key forces remount when navigating between tasks, resetting editor state */}
       <TaskDetailContent key={id} taskId={id} />
     </TaskAccessProvider>
   );

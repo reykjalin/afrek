@@ -26,7 +26,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
-  TitleEditor,
+  TitleEditorStatic,
   textToTitleValue,
 } from "@/components/editors/TitleEditor";
 import { useTaskFilter } from "@/features/tasks/TaskFilterContext";
@@ -140,10 +140,8 @@ export function TaskItem({
             isDone && "line-through text-muted-foreground"
           )}
         >
-          <TitleEditor
+          <TitleEditorStatic
             value={titleValue}
-            onChange={() => {}}
-            readOnly
             containerClassName="border-none bg-transparent [&_p]:my-0"
           />
         </div>

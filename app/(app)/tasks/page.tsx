@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import type { Value } from "platejs";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { WeeklyView } from "@/components/tasks";
 import { UpgradeCTA } from "@/components/UpgradeCTA";
@@ -10,7 +9,7 @@ import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { useCommandBar } from "@/features/command-bar";
 import { useTaskListKeyboard } from "@/hooks/useTaskListKeyboard";
 import { getStartOfWeek, getTodayString, toISODateString } from "@/lib/date";
-import { titleValueToText, textToTitleValue } from "@/components/editors/TitleEditor";
+import type { TitleEditorRef } from "@/components/editors/TitleEditor";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
 const PRIORITY_ORDER: Record<TaskPriority, number> = {
@@ -39,9 +38,9 @@ function TasksPageContent() {
   const [weekStart, setWeekStart] = useState(() => getStartOfWeek(new Date()));
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [createTaskDate, setCreateTaskDate] = useState<string | null>(null);
-  const [newTaskTitleValue, setNewTaskTitleValue] = useState<Value>(textToTitleValue(""));
   const [newTaskTags, setNewTaskTags] = useState("");
   const [titleFocusKey, setTitleFocusKey] = useState(0);
+  const titleEditorRef = useRef<TitleEditorRef>(null);
 
   const visibleTaskIds = useMemo(() => {
     const weekDays = getWeekDays(weekStart);
@@ -88,11 +87,12 @@ function TasksPageContent() {
   }, [createTaskRequested, isCreatingTask, clearCreateTaskRequest]);
 
   const handleCreateTask = async () => {
-    const titleText = titleValueToText(newTaskTitleValue).trim();
-    if (!titleText) {
+    const titleValue = titleEditorRef.current?.getValue();
+    const titleText = titleEditorRef.current?.getMarkdown().trim() ?? "";
+    if (!titleText || !titleValue) {
       return;
     }
-    const titleJson = JSON.stringify(newTaskTitleValue);
+    const titleJson = JSON.stringify(titleValue);
     const tags = newTaskTags
       .split(",")
       .map((tag) => tag.trim())
@@ -110,13 +110,13 @@ function TasksPageContent() {
       updatedAt: Date.now(),
       userId: "demo",
     });
-    setNewTaskTitleValue(textToTitleValue(""));
+    titleEditorRef.current?.clear();
     setNewTaskTags("");
     setTitleFocusKey((k) => k + 1);
   };
 
   const handleCancelCreate = () => {
-    setNewTaskTitleValue(textToTitleValue(""));
+    titleEditorRef.current?.clear();
     setNewTaskTags("");
     setIsCreatingTask(false);
     setCreateTaskDate(null);
@@ -150,8 +150,7 @@ function TasksPageContent() {
           isCreatingTask={isCreatingTask}
           createTaskDate={createTaskDate}
           titleFocusKey={titleFocusKey}
-          newTaskTitleValue={newTaskTitleValue}
-          onNewTaskTitleChange={setNewTaskTitleValue}
+          titleEditorRef={titleEditorRef}
           newTaskTags={newTaskTags}
           onNewTaskTagsChange={setNewTaskTags}
           onCreateTask={handleCreateTask}

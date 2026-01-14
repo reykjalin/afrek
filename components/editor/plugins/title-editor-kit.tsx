@@ -1,5 +1,6 @@
 'use client';
 
+import { MarkdownPlugin } from '@platejs/markdown';
 import { SingleLinePlugin } from '@platejs/utils';
 import {
   BoldPlugin,
@@ -46,4 +47,7 @@ export const TitleEditorKit = [
       afterEditable: () => <LinkFloatingToolbar />,
     },
   }),
+  
+  // Markdown plugin for serialization/deserialization
+  MarkdownPlugin,
 ];
