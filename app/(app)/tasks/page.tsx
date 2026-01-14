@@ -70,7 +70,6 @@ function TasksPageContent() {
   const handleSchedule = (id: string, date: string | null) => {
     updateTask(id, {
       scheduledDate: date,
-      status: date ? "scheduled" : "backlog",
     });
   };
 

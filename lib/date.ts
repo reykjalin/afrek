@@ -131,3 +131,20 @@ export function formatWeekRange(startMonday: Date): string {
   }
   return `${startMonth} ${startMonday.getDate()} - ${endMonth} ${endOfWeek.getDate()}`;
 }
+
+/**
+ * Check if a date string is before today (comparing dates only, in local timezone).
+ * A task due today is NOT overdue. Only tasks due on previous days are overdue.
+ *
+ * @param dateString ISO date string (YYYY-MM-DD)
+ * @returns true if dateString < today
+ *
+ * @example
+ * // Today is Jan 13, 2025
+ * isOverdue("2025-01-12") // true
+ * isOverdue("2025-01-13") // false (today)
+ * isOverdue("2025-01-14") // false (future)
+ */
+export function isOverdue(dateString: string): boolean {
+  return dateString < getTodayString();
+}

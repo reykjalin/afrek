@@ -11,8 +11,9 @@ import {
   type TitleEditorRef,
 } from "@/components/editors/TitleEditor";
 import { TaskItem } from "./TaskItem";
+import { OverdueTasksAlert } from "./OverdueTasksAlert";
 import { cn } from "@/lib/utils";
-import { toISODateString, getTodayString, getWeekNumber, formatWeekRange } from "@/lib/date";
+import { toISODateString, getTodayString, getWeekNumber, formatWeekRange, isOverdue } from "@/lib/date";
 import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
@@ -85,6 +86,21 @@ export function WeeklyView({
 }: WeeklyViewProps) {
   const weekDays = getWeekDays(weekStart);
   const { focusedTaskId, setFocusedTaskId } = useTaskFocus();
+
+  // Filter overdue tasks
+  const overdueTasks = useMemo(() => {
+    return tasks
+      .filter((task) => {
+        // Only show scheduled, non-done, non-locked tasks that are overdue
+        return (
+          task.scheduledDate &&
+          task.status !== "done" &&
+          !task.isLocked &&
+          isOverdue(task.scheduledDate)
+        );
+      })
+      .sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+  }, [tasks]);
 
   // Local input state for the tag text box
   const [newTagInput, setNewTagInput] = useState("");
@@ -198,6 +214,18 @@ export function WeeklyView({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Render overdue tasks alert if any exist */}
+      {overdueTasks.length > 0 && (
+        <OverdueTasksAlert
+          tasks={overdueTasks}
+          onToggleDone={onToggleDone}
+          onSchedule={onSchedule}
+          onUpdatePriority={onUpdatePriority}
+          focusedTaskId={focusedTaskId || undefined}
+          onTaskFocus={(id) => setFocusedTaskId(id)}
+        />
+      )}
+
       <div className="flex items-center justify-center gap-1">
         <Button variant="outline" size="icon-sm" onClick={goToPreviousWeek}>
           <ChevronLeft className="h-4 w-4" />
