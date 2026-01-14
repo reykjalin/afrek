@@ -90,6 +90,18 @@ export function WeeklyView({
   const [newTagInput, setNewTagInput] = useState("");
   const tagInputRef = useRef<HTMLInputElement>(null);
   const blurTimeoutRef = useRef<number | null>(null);
+  const createRowRef = useRef<HTMLDivElement>(null);
+
+  // Scroll the create row into view when it appears
+  useEffect(() => {
+    if (!isCreatingTask || !createTaskDate) return;
+    if (!createRowRef.current) return;
+
+    createRowRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [isCreatingTask, createTaskDate]);
 
   // Parse current tags from comma-separated string
   const currentTags = useMemo(() => {
@@ -235,6 +247,7 @@ export function WeeklyView({
               )}
               {isCreatingTask && createTaskDate === date ? (
                 <div
+                  ref={createRowRef}
                   className="mt-2 flex flex-col sm:flex-row sm:items-start gap-2 p-2 rounded-lg border bg-muted/30"
                   onFocusCapture={handleCreateFocusIn}
                   onBlurCapture={handleCreateFocusOut}
