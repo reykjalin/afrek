@@ -5,7 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TagPill } from "@/components/ui/tag-pill";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import {
   TitleEditorCreate,
   type TitleEditorRef,
@@ -13,7 +17,13 @@ import {
 import { TaskItem } from "./TaskItem";
 import { OverdueTasksAlert } from "./OverdueTasksAlert";
 import { cn } from "@/lib/utils";
-import { toISODateString, getTodayString, getWeekNumber, formatWeekRange, isOverdue } from "@/lib/date";
+import {
+  toISODateString,
+  getTodayString,
+  getWeekNumber,
+  formatWeekRange,
+  isOverdue,
+} from "@/lib/date";
 import { useTaskFocus } from "@/features/tasks/TaskFocusContext";
 import type { Task, TaskPriority } from "@/features/tasks/types";
 
@@ -44,10 +54,25 @@ interface WeeklyViewProps {
   onStartCreate?: (date: string) => void;
 }
 
-function getWeekDays(startMonday: Date): { label: string; date: string; isToday: boolean }[] {
+function getWeekDays(
+  startMonday: Date,
+): { label: string; date: string; isToday: boolean }[] {
   const days: { label: string; date: string; isToday: boolean }[] = [];
   const todayStr = getTodayString();
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startMonday);
@@ -137,11 +162,19 @@ export function WeeklyView({
 
   const handleCreateFocusOut = () => {
     blurTimeoutRef.current = window.setTimeout(() => {
-      const titleText = titleEditorRef?.current?.getMarkdown().trim() ?? "";
+      const markdown = titleEditorRef?.current?.getMarkdown() ?? "";
+      // Remove zero-width spaces and trim whitespace
+      const titleText = markdown.replace(/\u200B/g, "").trim();
       const hasTags = currentTags.length > 0;
+      
       if (!titleText && !hasTags) {
+        // Both empty: cancel
         onCancelCreate?.();
+      } else if (titleText) {
+        // Has title: create
+        onCreateTask?.();
       }
+      // If only tags but no title: do nothing (keep form open)
     }, 0);
   };
 
@@ -154,11 +187,13 @@ export function WeeklyView({
 
   const availableTags = useMemo(
     () => allTags.filter((t) => !currentTags.includes(t)),
-    [allTags, currentTags]
+    [allTags, currentTags],
   );
 
   const filteredTags = newTagInput
-    ? availableTags.filter((t) => t.toLowerCase().includes(newTagInput.toLowerCase()))
+    ? availableTags.filter((t) =>
+        t.toLowerCase().includes(newTagInput.toLowerCase()),
+      )
     : [];
 
   const updateNewTaskTags = (tags: string[]) => {
@@ -251,7 +286,9 @@ export function WeeklyView({
               <div
                 className={cn(
                   "mb-2 border-b pb-1 text-sm font-semibold",
-                  isToday ? "border-primary text-primary" : "border-border text-muted-foreground"
+                  isToday
+                    ? "border-primary text-primary"
+                    : "border-border text-muted-foreground",
                 )}
               >
                 {label}
@@ -271,7 +308,9 @@ export function WeeklyView({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground/50 italic">No tasks</p>
+                <p className="text-sm text-muted-foreground/50 italic">
+                  No tasks
+                </p>
               )}
               {isCreatingTask && createTaskDate === date ? (
                 <div
@@ -291,7 +330,8 @@ export function WeeklyView({
                         if (e.key === "Escape") onCancelCreate?.();
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
-                          const titleText = titleEditorRef?.current?.getMarkdown().trim() ?? "";
+                          const titleText =
+                            titleEditorRef?.current?.getMarkdown().trim() ?? "";
                           if (titleText) {
                             onCreateTask?.();
                           }
@@ -364,7 +404,7 @@ export function WeeklyView({
                     "mt-1 w-full flex items-center gap-1.5 rounded-md px-2 py-1 text-xs",
                     "text-muted-foreground/50 hover:text-foreground hover:bg-muted/40",
                     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                    "transition-colors"
+                    "transition-colors",
                   )}
                   onClick={() => onStartCreate?.(date)}
                   aria-label={`Add task for ${label}`}
