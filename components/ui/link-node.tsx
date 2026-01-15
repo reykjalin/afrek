@@ -9,6 +9,8 @@ import { PlateElement } from "platejs/react";
 import { cn } from "@/lib/utils";
 
 export function LinkElement(props: PlateElementProps<TLinkElement>) {
+  const linkAttributes = getLinkAttributes(props.editor, props.element);
+
   return (
     <PlateElement
       {...props}
@@ -18,7 +20,9 @@ export function LinkElement(props: PlateElementProps<TLinkElement>) {
       )}
       attributes={{
         ...props.attributes,
-        ...getLinkAttributes(props.editor, props.element),
+        ...linkAttributes,
+        target: '_blank',
+        rel: 'noopener noreferrer',
         onMouseOver: (e) => {
           e.stopPropagation();
         },

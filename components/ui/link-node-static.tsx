@@ -7,6 +7,8 @@ import { getLinkAttributes } from '@platejs/link';
 import { SlateElement } from 'platejs/static';
 
 export function LinkElementStatic(props: SlateElementProps<TLinkElement>) {
+  const linkAttributes = getLinkAttributes(props.editor, props.element);
+
   return (
     <SlateElement
       {...props}
@@ -14,7 +16,12 @@ export function LinkElementStatic(props: SlateElementProps<TLinkElement>) {
       className="font-medium text-primary underline decoration-primary underline-offset-4"
       attributes={{
         ...props.attributes,
-        ...getLinkAttributes(props.editor, props.element),
+        ...linkAttributes,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        onClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+        },
       }}
     >
       {props.children}
