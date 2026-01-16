@@ -4,8 +4,9 @@ import { use, useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { X, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Calendar, Trash2 } from "lucide-react";
 import type { Value } from "platejs";
+import type { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -21,6 +22,7 @@ import { NotesEditor, NotesEditorStatic } from "@/components/editors/NotesEditor
 import { useTaskState } from "@/features/tasks/TaskStateContext";
 import { TaskAccessProvider, useTaskAccess } from "@/features/billing";
 import { useTopNavActions } from "@/features/layout/TopNavActionsContext";
+import { useDeleteTask } from "@/features/tasks/api";
 import { parseDateString } from "@/lib/date";
 import { startViewTransition } from "@/lib/viewTransition";
 
@@ -33,6 +35,7 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
   const { tasks, updateTask, isLoading } = useTaskState();
   const { readOnly } = useTaskAccess();
   const { setLeftContent, setRightContent } = useTopNavActions();
+  const deleteTask = useDeleteTask();
   
   const task = useMemo(() => tasks.find(t => t.id === taskId), [tasks, taskId]);
   
@@ -120,6 +123,14 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
     return availableTags.filter(t => t.toLowerCase().includes(newTag.toLowerCase()));
   }, [availableTags, newTag]);
 
+  const handleDelete = useCallback(() => {
+    if (!task || readOnly) return;
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      deleteTask({ id: task.id as Id<"tasks"> });
+      startViewTransition(() => router.back());
+    }
+  }, [task, readOnly, deleteTask, router]);
+
   const handleClose = useCallback(() => {
     startViewTransition(() => router.back());
   }, [router]);
@@ -203,74 +214,85 @@ function TaskDetailContent({ taskId }: { taskId: string }) {
             />
           )}
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
-            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-              <PopoverTrigger
-                disabled={readOnly}
-                className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 hover:bg-muted/60 transition-colors disabled:opacity-60"
-              >
-                <Calendar className="h-3 w-3" />
-                <span>
-                  {task.scheduledDate
-                    ? format(parseDateString(task.scheduledDate), "EEE, MMM d")
-                    : "Add date"}
-                </span>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent
-                  mode="single"
-                  selected={task.scheduledDate ? parseDateString(task.scheduledDate) : undefined}
-                  onSelect={handleSchedule}
-                />
-              </PopoverContent>
-            </Popover>
-
-            {(task.tags.length > 0 || !readOnly) && <span>•</span>}
-
-            <div className="flex flex-wrap items-center gap-1.5">
-              {task.tags.map(tag => (
-                <TagPill
-                  key={tag}
-                  tag={tag}
-                  onRemove={!readOnly ? () => handleRemoveTag(tag) : undefined}
-                />
-              ))}
-
-              {!readOnly && (
-                <div className="relative">
-                  <Input
-                    placeholder="+ tag"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddTag();
-                      }
-                    }}
-                    className="h-5 w-16 border-none bg-transparent px-1 py-0 text-[11px] shadow-none focus-visible:ring-0"
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                <PopoverTrigger
+                  disabled={readOnly}
+                  className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 hover:bg-muted/60 transition-colors disabled:opacity-60"
+                >
+                  <Calendar className="h-3 w-3" />
+                  <span>
+                    {task.scheduledDate
+                      ? format(parseDateString(task.scheduledDate), "EEE, MMM d")
+                      : "Add date"}
+                  </span>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={task.scheduledDate ? parseDateString(task.scheduledDate) : undefined}
+                    onSelect={handleSchedule}
                   />
-                  {filteredTags.length > 0 && newTag && (
-                    <div className="absolute top-full left-0 mt-1 w-40 max-h-32 overflow-auto rounded-md border bg-popover text-xs shadow-md z-10">
-                      {filteredTags.slice(0, 5).map(tag => (
-                        <button
-                          key={tag}
-                          onClick={() => {
-                            if (!task.tags.includes(tag)) {
-                              updateTask(task.id, { tags: [...task.tags, tag] });
-                            }
-                            setNewTag("");
-                          }}
-                          className="w-full px-2 py-1.5 text-left hover:bg-accent focus:bg-accent focus:outline-none"
-                        >
-                          {tag}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                </PopoverContent>
+              </Popover>
+
+              {(task.tags.length > 0 || !readOnly) && <span>•</span>}
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                {task.tags.map(tag => (
+                  <TagPill
+                    key={tag}
+                    tag={tag}
+                    onRemove={!readOnly ? () => handleRemoveTag(tag) : undefined}
+                  />
+                ))}
+
+                {!readOnly && (
+                  <div className="relative">
+                    <Input
+                      placeholder="+ tag"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      className="h-5 w-16 border-none bg-transparent px-1 py-0 text-[11px] shadow-none focus-visible:ring-0"
+                    />
+                    {filteredTags.length > 0 && newTag && (
+                      <div className="absolute top-full left-0 mt-1 w-40 max-h-32 overflow-auto rounded-md border bg-popover text-xs shadow-md z-10">
+                        {filteredTags.slice(0, 5).map(tag => (
+                          <button
+                            key={tag}
+                            onClick={() => {
+                              if (!task.tags.includes(tag)) {
+                                updateTask(task.id, { tags: [...task.tags, tag] });
+                              }
+                              setNewTag("");
+                            }}
+                            className="w-full px-2 py-1.5 text-left hover:bg-accent focus:bg-accent focus:outline-none"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
+
+            {!readOnly && (
+              <Tooltip>
+                <TooltipTrigger onClick={handleDelete} render={<Button variant="ghost" size="icon" className="h-6 w-6" />}>
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </TooltipTrigger>
+                <TooltipContent>Delete task</TooltipContent>
+              </Tooltip>
+            )}
           </div>
 
           <section className="pt-6">
